@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta name="description" content="Đăng nhập vào hệ thống quản trị Mộc Coffee." />
+
+  <title>Đăng nhập quản trị - Mộc Coffee</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <!-- CSS của dự án -->
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/admin.css" />
+  <link rel="stylesheet" href="../assets/css/responsive.css" />
+</head>
+
+<body class="admin-login-body">
+  <main class="admin-login-page">
+    <div class="container-fluid">
+      <div class="row min-vh-100">
+        <!-- ==================== PHẦN GIỚI THIỆU ==================== -->
+        <section class="col-12 col-lg-6 admin-login-cover d-none d-lg-flex">
+          <div class="admin-login-overlay"></div>
+
+          <div class="admin-login-introduction">
+            <!-- Logo -->
+            <a href="../index.html" class="admin-login-logo">
+              <i class="bi bi-cup-hot-fill"></i>
+              <span>Mộc Coffee</span>
+            </a>
+
+            <div class="mt-auto mb-auto">
+              <p class="text-uppercase fw-semibold mb-2">
+                Hệ thống quản lý quán cà phê
+              </p>
+
+              <h1 class="display-5 fw-bold">
+                Quản lý mọi hoạt động của quán tại một nơi
+              </h1>
+
+              <p class="lead mt-3 mb-4">
+                Theo dõi bàn, đặt bàn, món ăn, đơn hàng, hóa đơn và
+                doanh thu nhanh chóng.
+              </p>
+
+              <!-- Danh sách tính năng -->
+              <div class="login-feature-list">
+                <div class="login-feature-item">
+                  <div class="login-feature-icon">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                  </div>
+
+                  <div>
+                    <strong>Quản lý bàn</strong>
+
+                    <small>
+                      Theo dõi trạng thái bàn theo thời gian thực
+                    </small>
+                  </div>
+                </div>
+
+                <div class="login-feature-item">
+                  <div class="login-feature-icon">
+                    <i class="bi bi-receipt"></i>
+                  </div>
+
+                  <div>
+                    <strong>Quản lý đơn hàng</strong>
+
+                    <small>
+                      Tiếp nhận và cập nhật trạng thái đơn
+                    </small>
+                  </div>
+                </div>
+
+                <div class="login-feature-item">
+                  <div class="login-feature-icon">
+                    <i class="bi bi-bar-chart-line"></i>
+                  </div>
+
+                  <div>
+                    <strong>Thống kê doanh thu</strong>
+
+                    <small>
+                      Theo dõi kết quả kinh doanh của quán
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <p class="mb-0 text-white-50">
+              &copy; <span id="cover-current-year">2026</span>
+              Mộc Coffee.
+            </p>
+          </div>
+        </section>
+
+        <!-- ==================== FORM ĐĂNG NHẬP ==================== -->
+        <section class="col-12 col-lg-6 d-flex align-items-center justify-content-center admin-login-form-section">
+          <div class="admin-login-form-wrapper">
+            <!-- Logo trên điện thoại -->
+            <div class="text-center d-lg-none mb-4">
+              <a href="../index.html" class="navbar-brand fs-3 fw-bold">
+                <i class="bi bi-cup-hot-fill me-2"></i>
+                Mộc Coffee
+              </a>
+            </div>
+
+            <!-- Quay về website -->
+            <div class="mb-4">
+              <a href="../index.html" class="text-secondary text-decoration-none">
+                <i class="bi bi-arrow-left me-1"></i>
+                Quay về trang khách hàng
+              </a>
+            </div>
+
+            <!-- Tiêu đề -->
+            <div class="mb-4">
+              <p class="text-uppercase text-secondary fw-semibold mb-2">
+                Khu vực quản trị
+              </p>
+
+              <h2 class="display-6 fw-bold mb-2">
+                Đăng nhập
+              </h2>
+
+              <p class="text-secondary mb-0">
+                Nhập thông tin tài khoản để truy cập hệ thống.
+              </p>
+            </div>
+
+            <!-- Thông báo lỗi -->
+            <div id="login-error-alert" class="alert alert-danger d-none" role="alert">
+              <i class="bi bi-exclamation-circle-fill me-2"></i>
+
+              <span id="login-error-message">
+                Tên đăng nhập hoặc mật khẩu không chính xác.
+              </span>
+            </div>
+
+            <!-- Thông báo thành công -->
+            <div id="login-success-alert" class="alert alert-success d-none" role="alert">
+              <i class="bi bi-check-circle-fill me-2"></i>
+              Đăng nhập thành công. Đang chuyển hướng...
+            </div>
+
+            <!-- Form -->
+            <form id="admin-login-form" novalidate>
+              <!-- Tên đăng nhập -->
+              <div class="mb-3">
+                <label for="login-username" class="form-label fw-semibold">
+                  Tên đăng nhập
+                  <span class="text-danger">*</span>
+                </label>
+
+                <div class="input-group login-input-group">
+                  <span class="input-group-text bg-white">
+                    <i class="bi bi-person"></i>
+                  </span>
+
+                  <input type="text" id="login-username" name="username" class="form-control"
+                    placeholder="Nhập tên đăng nhập" minlength="3" maxlength="50" autocomplete="username" autofocus
+                    required />
+
+                  <div class="invalid-feedback">
+                    Vui lòng nhập tên đăng nhập từ 3 ký tự.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mật khẩu -->
+              <div class="mb-3">
+                <label for="login-password" class="form-label fw-semibold">
+                  Mật khẩu
+                  <span class="text-danger">*</span>
+                </label>
+
+                <div class="input-group login-input-group">
+                  <span class="input-group-text bg-white">
+                    <i class="bi bi-lock"></i>
+                  </span>
+
+                  <input type="password" id="login-password" name="password" class="form-control"
+                    placeholder="Nhập mật khẩu" minlength="6" maxlength="100" autocomplete="current-password"
+                    required />
+
+                  <button type="button" id="toggle-password-button" class="btn btn-outline-secondary"
+                    aria-label="Hiện mật khẩu" title="Hiện hoặc ẩn mật khẩu">
+                    <i id="password-toggle-icon" class="bi bi-eye"></i>
+                  </button>
+
+                  <div class="invalid-feedback">
+                    Mật khẩu phải có ít nhất 6 ký tự.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ghi nhớ và quên mật khẩu -->
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="form-check">
+                  <input type="checkbox" id="remember-login" name="rememberLogin" class="form-check-input" />
+
+                  <label for="remember-login" class="form-check-label">
+                    Ghi nhớ đăng nhập
+                  </label>
+                </div>
+
+                <button type="button" class="btn btn-link p-0 text-decoration-none" data-bs-toggle="modal"
+                  data-bs-target="#forgot-password-modal">
+                  Quên mật khẩu?
+                </button>
+              </div>
+
+              <!-- Nút đăng nhập -->
+              <button type="submit" id="login-submit-button" class="btn btn-coffee btn-lg w-100">
+                <span id="login-button-content">
+                  <i class="bi bi-box-arrow-in-right me-1"></i>
+                  Đăng nhập
+                </span>
+
+                <span id="login-loading-content" class="d-none">
+                  <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+                  Đang đăng nhập...
+                </span>
+              </button>
+            </form>
+
+            <!-- Tài khoản demo -->
+            <div class="demo-account-box mt-4">
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="h6 fw-bold mb-0">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Tài khoản thử nghiệm
+                </h3>
+
+                <button type="button" id="fill-demo-account-button" class="btn btn-sm btn-outline-coffee">
+                  Điền tự động
+                </button>
+              </div>
+
+              <div class="row g-2">
+                <div class="col-12 col-sm-6">
+                  <small class="text-secondary">
+                    Tên đăng nhập
+                  </small>
+
+                  <div class="d-flex align-items-center gap-2">
+                    <code id="demo-username">admin</code>
+
+                    <button type="button" id="copy-demo-username" class="btn btn-sm btn-link p-0"
+                      title="Sao chép tên đăng nhập">
+                      <i class="bi bi-copy"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="col-12 col-sm-6">
+                  <small class="text-secondary">
+                    Mật khẩu
+                  </small>
+
+                  <div class="d-flex align-items-center gap-2">
+                    <code id="demo-password">123456</code>
+
+                    <button type="button" id="copy-demo-password" class="btn btn-sm btn-link p-0"
+                      title="Sao chép mật khẩu">
+                      <i class="bi bi-copy"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Chú thích -->
+            <div class="text-center mt-4">
+              <small class="text-secondary">
+                <i class="bi bi-shield-lock me-1"></i>
+                Khu vực này chỉ dành cho nhân viên được cấp quyền.
+              </small>
+            </div>
+
+            <!-- Footer mobile -->
+            <p class="text-center text-secondary small mt-4 d-lg-none">
+              &copy; <span id="current-year">2026</span>
+              Mộc Coffee.
+            </p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- ==================== MODAL QUÊN MẬT KHẨU ==================== -->
+  <div class="modal fade" id="forgot-password-modal" tabindex="-1" aria-labelledby="forgot-password-title"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0">
+        <form id="forgot-password-form" novalidate>
+          <div class="modal-header">
+            <h2 class="modal-title h5" id="forgot-password-title">
+              Khôi phục mật khẩu
+            </h2>
+
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+
+          <div class="modal-body">
+            <p class="text-secondary">
+              Nhập địa chỉ email của tài khoản. Hệ thống sẽ gửi
+              hướng dẫn đặt lại mật khẩu.
+            </p>
+
+            <label for="forgot-password-email" class="form-label fw-semibold">
+              Địa chỉ email
+              <span class="text-danger">*</span>
+            </label>
+
+            <input type="email" id="forgot-password-email" class="form-control" placeholder="Ví dụ: admin@moccoffee.vn"
+              autocomplete="email" required />
+
+            <div class="invalid-feedback">
+              Vui lòng nhập địa chỉ email hợp lệ.
+            </div>
+
+            <div id="forgot-password-message" class="alert alert-success mt-3 mb-0 d-none">
+              <i class="bi bi-check-circle-fill me-1"></i>
+              Yêu cầu khôi phục mật khẩu đã được gửi.
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              Hủy
+            </button>
+
+            <button type="submit" id="forgot-password-submit" class="btn btn-coffee">
+              <i class="bi bi-send me-1"></i>
+              Gửi yêu cầu
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast thông báo sao chép -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="login-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <i class="bi bi-check-circle-fill text-success me-2"></i>
+
+        <strong class="me-auto">Mộc Coffee</strong>
+
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Đóng"></button>
+      </div>
+
+      <div id="login-toast-message" class="toast-body">
+        Đã sao chép thông tin.
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JavaScript của dự án -->
+  <script src="../assets/js/admin.js"></script>
+</body>
+
+</html>

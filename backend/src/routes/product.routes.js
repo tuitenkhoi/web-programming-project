@@ -1,42 +1,64 @@
 const express = require("express");
-const { pool } = require("../config/db");
+
+const {
+    getProducts,
+    getAllProducts,
+    getProductById,
+    createProduct,
+    updateProduct,
+    deleteProduct,
+} = require("../controllers/product.controller");
+
+const {
+    authenticateToken,
+    authorizeAdmin,
+} = require("../middleware/auth.middleware");
+
+const {
+    upload,
+} = require("../middleware/upload.middleware");
 
 const router = express.Router();
 
-// GET /api/products
-router.get("/", async (req, res) => {
-    try {
-        const [products] = await pool.execute(`
-            SELECT
-                p.id,
-                p.category_id,
-                c.name AS category_name,
-                p.name,
-                p.slug,
-                p.description,
-                p.price,
-                p.image
-            FROM products AS p
-            INNER JOIN categories AS c
-                ON p.category_id = c.id
-            WHERE p.status = 1
-                AND c.status = 1
-            ORDER BY p.id ASC
-        `);
+// Người dùng xem và tìm kiếm sản phẩm hoạt động
+router.get("/", getProducts);
 
-        res.status(200).json({
-            success: true,
-            count: products.length,
-            data: products
-        });
-    } catch (error) {
-        console.error("Lỗi lấy sản phẩm:", error.code);
+// Admin xem tất cả sản phẩm
+// Phải đặt trước /:id
+router.get(
+    "/admin",
+    authenticateToken,
+    authorizeAdmin,
+    getAllProducts
+);
 
-        res.status(500).json({
-            success: false,
-            message: "Không thể lấy danh sách sản phẩm"
-        });
-    }
-});
+// Xem chi tiết sản phẩm
+router.get("/:id", getProductById);
+
+// Admin thêm sản phẩm
+router.post(
+    "/",
+    authenticateToken,
+    authorizeAdmin,
+    upload.single("image"),
+    createProduct
+);
+
+// Admin cập nhật sản phẩm
+router.put(
+    "/:id",
+    authenticateToken,
+    authorizeAdmin,
+    upload.single("image"),
+    updateProduct
+);
+
+// Admin xóa sản phẩm
+router.delete(
+    "/:id",
+    authenticateToken,
+    authorizeAdmin,
+    deleteProduct
+);
 
 module.exports = router;

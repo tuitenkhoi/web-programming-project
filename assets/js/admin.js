@@ -303,7 +303,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-  initializeLoginPage();
+  // Trang đăng nhập thật được xử lý trong admin-api.js.
 
   /* =========================================================
      4. DASHBOARD
@@ -1650,7 +1650,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-  initializeProductsPage();
+  // Trang sản phẩm thật được xử lý trong admin-api.js.
 
   /* =========================================================
      8. QUẢN LÝ BÀN

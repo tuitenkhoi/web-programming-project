@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta name="description" content="Quản lý đặt bàn tại Mộc Coffee." />
+
+  <title>Quản lý đặt bàn - Mộc Coffee</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/admin.css" />
+  <link rel="stylesheet" href="../assets/css/responsive.css" />
+</head>
+
+<body class="admin-body">
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <aside id="admin-sidebar" class="admin-sidebar">
+    <div class="admin-sidebar-header">
+      <a href="dashboard.html" class="admin-logo">
+        <i class="bi bi-cup-hot-fill"></i>
+        <span>Mộc Coffee</span>
+      </a>
+
+      <button type="button" id="close-sidebar-button" class="btn d-lg-none text-white" aria-label="Đóng menu">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="admin-user-box">
+      <div class="admin-avatar">QL</div>
+
+      <div>
+        <strong>Quản lý</strong>
+        <small>admin@moccoffee.vn</small>
+      </div>
+    </div>
+
+    <nav class="admin-navigation">
+      <p class="admin-menu-title">Tổng quan</p>
+
+      <ul class="admin-menu">
+        <li>
+          <a href="dashboard.html">
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+      </ul>
+
+      <p class="admin-menu-title">Quản lý hệ thống</p>
+
+      <ul class="admin-menu">
+        <li>
+          <a href="tables.html">
+            <i class="bi bi-grid-3x3-gap"></i>
+            <span>Quản lý bàn</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="products.html">
+            <i class="bi bi-cup-straw"></i>
+            <span>Quản lý món</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="bookings.html" class="active">
+            <i class="bi bi-calendar2-check"></i>
+            <span>Quản lý đặt bàn</span>
+
+            <span class="badge rounded-pill bg-danger ms-auto">
+              5
+            </span>
+          </a>
+        </li>
+
+        <li>
+          <a href="orders.html">
+            <i class="bi bi-receipt"></i>
+            <span>Quản lý đơn hàng</span>
+
+            <span class="badge rounded-pill bg-warning text-dark ms-auto">
+              8
+            </span>
+          </a>
+        </li>
+
+        <li>
+          <a href="invoices.html">
+            <i class="bi bi-file-earmark-text"></i>
+            <span>Quản lý hóa đơn</span>
+          </a>
+        </li>
+      </ul>
+
+      <p class="admin-menu-title">Khác</p>
+
+      <ul class="admin-menu">
+        <li>
+          <a href="../index.html">
+            <i class="bi bi-globe"></i>
+            <span>Xem trang khách hàng</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="login.html">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Đăng xuất</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <div class="admin-main">
+    <header class="admin-topbar">
+      <div class="d-flex align-items-center">
+        <button type="button" id="open-sidebar-button" class="btn btn-light d-lg-none me-2" aria-label="Mở menu">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+
+        <div>
+          <h1 class="h5 mb-0">Quản lý đặt bàn</h1>
+
+          <small class="text-secondary">
+            Theo dõi và xử lý các yêu cầu đặt bàn
+          </small>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <div class="dropdown">
+          <button class="btn btn-light position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+            aria-label="Thông báo">
+            <i class="bi bi-bell"></i>
+
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              3
+            </span>
+          </button>
+
+          <ul class="dropdown-menu dropdown-menu-end admin-notifications">
+            <li>
+              <h6 class="dropdown-header">Thông báo mới</h6>
+            </li>
+
+            <li>
+              <a class="dropdown-item" href="#">
+                <strong>Có yêu cầu đặt bàn mới</strong>
+                <small class="d-block text-secondary">
+                  Khách hàng Nguyễn Minh Anh
+                </small>
+              </a>
+            </li>
+
+            <li>
+              <a class="dropdown-item" href="#">
+                <strong>Đơn hàng mới tại bàn T03</strong>
+                <small class="d-block text-secondary">
+                  5 phút trước
+                </small>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="dropdown">
+          <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle me-1"></i>
+            <span class="d-none d-md-inline">Quản lý</span>
+          </button>
+
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+              <a class="dropdown-item" href="#">
+                <i class="bi bi-person me-2"></i>
+                Hồ sơ cá nhân
+              </a>
+            </li>
+
+            <li>
+              <a class="dropdown-item" href="#">
+                <i class="bi bi-gear me-2"></i>
+                Cài đặt
+              </a>
+            </li>
+
+            <li>
+              <hr class="dropdown-divider" />
+            </li>
+
+            <li>
+              <a class="dropdown-item text-danger" href="login.html">
+                <i class="bi bi-box-arrow-right me-2"></i>
+                Đăng xuất
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="admin-content">
+      <!-- Tiêu đề -->
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+              <li class="breadcrumb-item">
+                <a href="dashboard.html">Dashboard</a>
+              </li>
+
+              <li class="breadcrumb-item active" aria-current="page">
+                Đặt bàn
+              </li>
+            </ol>
+          </nav>
+
+          <h2 class="h3 fw-bold mb-0">
+            Danh sách đặt bàn
+          </h2>
+        </div>
+
+        <button type="button" class="btn btn-coffee" data-bs-toggle="modal" data-bs-target="#booking-form-modal"
+          id="open-add-booking-button">
+          <i class="bi bi-plus-lg me-1"></i>
+          Thêm đặt bàn
+        </button>
+      </div>
+
+      <!-- Thẻ thống kê -->
+      <section class="row g-4 mb-4">
+        <!-- Tổng đặt bàn -->
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card admin-stat-card border-0 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <p class="text-secondary mb-2">
+                    Đặt bàn hôm nay
+                  </p>
+
+                  <h3 id="today-booking-count" class="fw-bold mb-0">
+                    18
+                  </h3>
+                </div>
+
+                <div class="admin-stat-icon bg-primary-subtle text-primary">
+                  <i class="bi bi-calendar2-check"></i>
+                </div>
+              </div>
+
+              <small class="text-success">
+                <i class="bi bi-arrow-up"></i>
+                Tăng 12% so với hôm qua
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chờ xác nhận -->
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card admin-stat-card border-0 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <p class="text-secondary mb-2">
+                    Chờ xác nhận
+                  </p>
+
+                  <h3 id="pending-booking-count" class="fw-bold mb-0">
+                    5
+                  </h3>
+                </div>
+
+                <div class="admin-stat-icon bg-warning-subtle text-warning">
+                  <i class="bi bi-hourglass-split"></i>
+                </div>
+              </div>
+
+              <small class="text-secondary">
+                Cần xử lý sớm
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Đã xác nhận -->
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card admin-stat-card border-0 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <p class="text-secondary mb-2">
+                    Đã xác nhận
+                  </p>
+
+                  <h3 id="confirmed-booking-count" class="fw-bold mb-0">
+                    10
+                  </h3>
+                </div>
+
+                <div class="admin-stat-icon bg-success-subtle text-success">
+                  <i class="bi bi-check-circle"></i>
+                </div>
+              </div>
+
+              <small class="text-secondary">
+                Sẵn sàng đón khách
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Đã hủy -->
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card admin-stat-card border-0 shadow-sm">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <p class="text-secondary mb-2">
+                    Đã hủy
+                  </p>
+
+                  <h3 id="cancelled-booking-count" class="fw-bold mb-0">
+                    3
+                  </h3>
+                </div>
+
+                <div class="admin-stat-icon bg-danger-subtle text-danger">
+                  <i class="bi bi-x-circle"></i>
+                </div>
+              </div>
+
+              <small class="text-secondary">
+                Trong hôm nay
+              </small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bộ lọc -->
+      <section class="card border-0 shadow-sm mb-4">
+        <div class="card-body p-4">
+          <div class="row g-3 align-items-end">
+            <!-- Tìm kiếm -->
+            <div class="col-12 col-lg-4">
+              <label for="booking-search-input" class="form-label fw-semibold">
+                Tìm kiếm
+              </label>
+
+              <div class="input-group">
+                <span class="input-group-text bg-white">
+                  <i class="bi bi-search"></i>
+                </span>
+
+                <input type="search" id="booking-search-input" class="form-control"
+                  placeholder="Mã đặt bàn, tên hoặc số điện thoại..." />
+              </div>
+            </div>
+
+            <!-- Ngày đặt -->
+            <div class="col-12 col-sm-6 col-lg-2">
+              <label for="booking-date-filter" class="form-label fw-semibold">
+                Ngày đến
+              </label>
+
+              <input type="date" id="booking-date-filter" class="form-control" />
+            </div>
+
+            <!-- Khu vực -->
+            <div class="col-12 col-sm-6 col-lg-2">
+              <label for="booking-area-filter" class="form-label fw-semibold">
+                Khu vực
+              </label>
+
+              <select id="booking-area-filter" class="form-select">
+                <option value="all">Tất cả khu vực</option>
+                <option value="indoor">Trong nhà</option>
+                <option value="outdoor">Ngoài trời</option>
+                <option value="balcony">Ban công</option>
+              </select>
+            </div>
+
+            <!-- Trạng thái -->
+            <div class="col-12 col-sm-6 col-lg-2">
+              <label for="booking-status-filter" class="form-label fw-semibold">
+                Trạng thái
+              </label>
+
+              <select id="booking-status-filter" class="form-select">
+                <option value="all">Tất cả</option>
+                <option value="pending">Chờ xác nhận</option>
+                <option value="confirmed">Đã xác nhận</option>
+                <option value="arrived">Đã đến</option>
+                <option value="completed">Hoàn thành</option>
+                <option value="cancelled">Đã hủy</option>
+              </select>
+            </div>
+
+            <!-- Đặt lại -->
+            <div class="col-12 col-sm-6 col-lg-2">
+              <button type="button" id="reset-booking-filter" class="btn btn-outline-secondary w-100">
+                <i class="bi bi-arrow-counterclockwise me-1"></i>
+                Đặt lại
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Bảng đặt bàn -->
+      <section class="card border-0 shadow-sm">
+        <div
+          class="card-header bg-white d-flex flex-column flex-md-row justify-content-between align-items-md-center p-4">
+          <div>
+            <h2 class="h5 mb-1">Các yêu cầu đặt bàn</h2>
+
+            <p class="text-secondary mb-0">
+              Hiển thị
+              <strong id="visible-booking-count">8</strong>
+              yêu cầu đặt bàn.
+            </p>
+          </div>
+
+          <div class="dropdown mt-3 mt-md-0">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              <i class="bi bi-download me-1"></i>
+              Xuất dữ liệu
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <button type="button" class="dropdown-item" id="export-excel-button">
+                  <i class="bi bi-file-earmark-excel me-2"></i>
+                  Xuất Excel
+                </button>
+              </li>
+
+              <li>
+                <button type="button" class="dropdown-item" id="print-booking-button">
+                  <i class="bi bi-printer me-2"></i>
+                  In danh sách
+                </button>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table admin-table align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th scope="col" class="ps-4">Mã đặt</th>
+                  <th scope="col">Khách hàng</th>
+                  <th scope="col">Ngày và giờ</th>
+                  <th scope="col">Bàn</th>
+                  <th scope="col">Số khách</th>
+                  <th scope="col">Trạng thái</th>
+                  <th scope="col" class="text-center pe-4">
+                    Thao tác
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody id="booking-table-body">
+                <!-- Dòng 1 -->
+                <tr class="booking-row" data-id="BK001" data-name="Nguyễn Minh Anh" data-phone="0912345678"
+                  data-date="2026-09-22" data-area="indoor" data-status="pending">
+                  <td class="ps-4">
+                    <strong>#BK001</strong>
+                    <small class="d-block text-secondary">
+                      22/09/2026
+                    </small>
+                  </td>
+
+                  <td>
+                    <strong>Nguyễn Minh Anh</strong>
+                    <small class="d-block text-secondary">
+                      0912 345 678
+                    </small>
+                  </td>
+
+                  <td>
+                    <strong>22/09/2026</strong>
+                    <small class="d-block text-secondary">
+                      18:30
+                    </small>
+                  </td>
+
+                  <td>
+                    <strong>T04</strong>
+                    <small class="d-block text-secondary">
+                      Trong nhà
+                    </small>
+                  </td>
+
+                  <td>4 khách</td>
+
+                  <td>
+                    <span class="badge text-bg-warning">
+                      Chờ xác nhận
+                    </span>
+                  </td>
+
+                  <td class="text-center pe-4">
+                    <div class="dropdown">
+                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                        aria-label="Thao tác">
+                        <i class="bi bi-three-dots-vertical"></i>
+                      </button>
+
+                      <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                          <button type="button" class="dropdown-item view-booking-button" data-id="BK001"
+                            data-bs-toggle="modal" data-bs-target="#booking-detail-modal">
+                            <i class="bi bi-eye me-2"></i>
+                            Xem chi tiết
+                          </button>
+                        </li>
+
+                        <li>
+                          <button type="button" class="dropdown-item edit-booking-button" data-id="BK001"
+                            data-bs-toggle="modal" data-bs-target="#booking-form-modal">
+                            <i class="bi bi-pencil-square me-2"></i>
+                            Chỉnh sửa
+                          </button>
+                        </li>
+
+                        <li>
+                          <button type="button" class="dropdown-item text-success confirm-booking-button"
+                            data-id="BK001">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Xác nhận
+                          </button>
+                        </li>
+
+                        <li>
+                          <hr class="dropdown-divider" />
+                        </li>
+
+                        <li>
+                          <button type="button" class="dropdown-item text-danger cancel-booking-button" data-id="BK001"
+                            data-bs-toggle="modal" data-bs-target="#cancel-booking-modal">
+                            <i class="bi bi-x-circle me-2"></i>
+                            Hủy đặt bàn
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Dòng 2 -->
+                <tr class="booking-row" data-id="BK002" data-name="Trần Hoàng Nam" data-phone="0987654321"
+                  data-date="2026-09-22" data-area="outdoor" data-status="confirmed">
+                  <td class="ps-4">
+                    <strong>#BK002</strong>
+                    <small class="d-block text-secondary">
+                      22/09/2026
+                    </small>
+                  </td>
+
+                  <td>
+                    <strong>Trần Hoàng Nam</strong>
+                    <small class="d-block text-secondary">
+                      0987 654 321
+                    </small>
+                  </td>
+
+                  <td>
+                    <strong>22/09/2026</strong>
+                    <small class="d-block text-secondary">
+                      19:00
+                    </small>
+                  </td>
+
+                  <td>
+                    <strong>T07</strong>
+                    <small class="d-block text-secondary">
+                      Ngoài trời
+                    </small>
+                  </td>
+
+                  <td>6 khách</td>
+
+                  <td>
+                    <span class="badge text-bg-success">
+                      Đã xác nhận
+                    </span>
+                  </td>
+
+                  <td class="text-center pe-4">
+                    <div class="dropdown">
+                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                      </button>
+
+                      <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                          <button type="button" class="dropdown-item view-booking-button" data-id="BK002"
+                            data-bs-toggle="modal" data-bs-target="#booking-detail-modal">
+                            <i class="bi bi-eye me-2"></i>
+                            Xem chi tiết
+                          </button>
+                        </li>
+
+                        <li>
+                          <button type="button" class="dropdown-item edit-booking-button" data-id="BK002"
+                            data-bs-toggle="modal" data-bs-target="#booking-form-modal">
+                            <i class="bi bi-pencil-square me-2"></i>
+                            Chỉnh sửa
+                          </button>
+                        </li>
+
+                        <li>
+                          <button type="button" class="dropdown-item text-primary arrived-booking-button"
+                            data-id="BK002">
+                            <i class="bi bi-person-check me-2"></i>
+                            Xác nhận khách đã đến
+                          </button>
+                        </li>
+
+                        <li>
+                          <hr class="dropdown-divider" />
+                        </li>
+
+                        <li>
+                          <button type="button" class="dropdown-item text-danger cancel-booking-button" data-id="BK002"
+                            data-bs-toggle="modal" data-bs-target="#cancel-booking-modal">
+                            <i class="bi bi-x-circle me-2"></i>
+                            Hủy đặt bàn
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Dòng 3 -->
+                <tr class="booking-row" data-id="BK003" data-name="Lê Thu Hương" data-phone="0903123456"
+                  data-date="2026-09-22" data-area="balcony" data-status="arrived">
+                  <td class="ps-4">
+                    <strong>#BK003</strong>
+                    <small class="d-block text-secondary">
+                      22/09/2026
+                    </small>
+                  </td>
+
+                  <td>
+                    <strong>Lê Thu Hương</strong>
+                    <small class="d-block text-secondary">
+                      0903 123 456
+                    </small>
+                  </td>
+
+                  <td>
+                    <strong>22/09/2026</strong>
+                    <small class="d-block text-secondary">
+                      17:30
+                    </small>
+                  </td>
+
+                  <td>
+                    <strong>T02</strong>
+                    <small class="d-block text-secondary">
+                      Ban công
+                    </small>
+                  </td>
+
+                  <td>2 khách</td>
+
+                  <td>
+                    <span class="badge text-bg-primary">
+                      Đã đến
+                    </span>
+                  </td>
+
+                  <td class="text-center pe-4">
+                    <div class="dropdown">
+                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                      </button>
+
+                      <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                          <button type="button" class="dropdown-item view-booking-button" data-id="BK003"
+                            data-bs-toggle="modal" data-bs-target="#booking-detail-modal">
+                            <i class="bi bi-eye me-2"></i>
+                            Xem chi tiết
+                          </button>
+                        </li>
+
+                        <li>
+                          <button type="button" class="dropdown-item text-success complete-booking-button"
+                            data-id="BK003">
+                            <i class="bi bi-check2-all me-2"></i>
+                            Hoàn thành
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Dòng 4 -->
+                <tr class="booking-row" data-id="BK004" data-name="Phạm Quốc Bảo" data-phone="0938123456"
+                  data-date="2026-09-23" data-area="indoor" data-status="pending">
+                  <td class="ps-4">
+                    <strong>#BK004</strong>
+                    <small class="d-block text-secondary">
+                      22/09/2026
+                    </small>
+                  </td>
+
+                  <td>
+                    <strong>Phạm Quốc Bảo</strong>
+                    <small class="d-block text-secondary">
+                      0938 123 456
+                    </small>
+                  </td>
+
+                  <td>
+                    <strong>23/09/2026</strong>
+                    <small class="d-block text-secondary">
+                      08:30
+                    </small>
+                  </td>
+
+                  <td>
+                    <strong>T01</strong>
+                    <small class="d-block text-secondary">
+                      Trong nhà
+                    </small>
+                  </td>
+
+                  <td>2 khách</td>
+
+                  <td>
+                    <span class="badge text-bg-warning">
+                      Chờ xác nhận
+                    </span>
+                  </td>
+
+                  <td class="text-center pe-4">
+                    <div class="dropdown">
+                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="bi bi-three-dots-vertical"></i>
+                      </button>
+
+                      <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                          <button type="button" class="dropdown-item view-booking-button" data-id="BK004"
+                            data-bs-toggle="modal" data-bs-target="#booking-detail-modal">
+                            <i class="bi bi-eye me-2"></i>
+                            Xem chi tiết
+                          </button>
+                        </li>
+
+                        <li>
+                          <button type="button" class="dropdown-item text-success confirm-booking-button"
+                            data-id="BK004">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Xác nhận
+                          </button>
+                        </li>
+
+                        <li>
+                          <button type="button" class="dropdown-item text-danger cancel-booking-button" data-id="BK004"
+                            data-bs-toggle="modal" data-bs-target="#cancel-booking-modal">
+                            <i class="bi bi-x-circle me-2"></i>
+                            Hủy đặt bàn
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Dòng 5 -->
+                <tr class="booking-row" data-id="BK005" data-name="Võ Ngọc Lan" data-phone="0977123456"
+                  data-date="2026-09-23" data-area="outdoor" data-status="cancelled">
+                  <td class="ps-4">
+                    <strong>#BK005</strong>
+                    <small class="d-block text-secondary">
+                      22/09/2026
+                    </small>
+                  </td>
+
+                  <td>
+                    <strong>Võ Ngọc Lan</strong>
+                    <small class="d-block text-secondary">
+                      0977 123 456
+                    </small>
+                  </td>
+
+                  <td>
+                    <strong>23/09/2026</strong>
+                    <small class="d-block text-secondary">
+                      20:00
+                    </small>
+                  </td>
+
+                  <td>
+                    <strong>T08</strong>
+                    <small class="d-block text-secondary">
+                      Ngoài trời
+                    </small>
+                  </td>
+
+                  <td>8 khách</td>
+
+                  <td>
+                    <span class="badge text-bg-danger">
+                      Đã hủy
+                    </span>
+                  </td>
+
+                  <td class="text-center pe-4">
+                    <button type="button" class="btn btn-sm btn-light view-booking-button" data-id="BK005"
+                      data-bs-toggle="modal" data-bs-target="#booking-detail-modal" title="Xem chi tiết">
+                      <i class="bi bi-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Không tìm thấy -->
+          <div id="empty-booking-result" class="text-center py-5 d-none">
+            <i class="bi bi-search display-4 text-secondary"></i>
+
+            <h3 class="h5 mt-3">
+              Không tìm thấy yêu cầu đặt bàn
+            </h3>
+
+            <p class="text-secondary">
+              Hãy thử thay đổi từ khóa hoặc bộ lọc.
+            </p>
+          </div>
+        </div>
+
+        <!-- Phân trang -->
+        <div
+          class="card-footer bg-white d-flex flex-column flex-md-row justify-content-between align-items-md-center p-4">
+          <p class="text-secondary mb-3 mb-md-0">
+            Hiển thị 1–5 trong tổng số 18 yêu cầu
+          </p>
+
+          <nav aria-label="Phân trang đặt bàn">
+            <ul class="pagination mb-0">
+              <li class="page-item disabled">
+                <button class="page-link" type="button">
+                  Trước
+                </button>
+              </li>
+
+              <li class="page-item active">
+                <button class="page-link" type="button">1</button>
+              </li>
+
+              <li class="page-item">
+                <button class="page-link" type="button">2</button>
+              </li>
+
+              <li class="page-item">
+                <button class="page-link" type="button">3</button>
+              </li>
+
+              <li class="page-item">
+                <button class="page-link" type="button">
+                  Sau
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ==================== MODAL THÊM/SỬA ==================== -->
+  <div class="modal fade" id="booking-form-modal" tabindex="-1" aria-labelledby="booking-form-title" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content border-0">
+        <form id="admin-booking-form" novalidate>
+          <div class="modal-header">
+            <h2 class="modal-title h5" id="booking-form-title">
+              Thêm yêu cầu đặt bàn
+            </h2>
+
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+          </div>
+
+          <div class="modal-body">
+            <input type="hidden" id="admin-booking-id" name="bookingId" />
+
+            <div class="row g-3">
+              <!-- Tên khách -->
+              <div class="col-12 col-md-6">
+                <label for="admin-customer-name" class="form-label fw-semibold">
+                  Tên khách hàng
+                  <span class="text-danger">*</span>
+                </label>
+
+                <input type="text" id="admin-customer-name" class="form-control" minlength="2" maxlength="100"
+                  required />
+
+                <div class="invalid-feedback">
+                  Vui lòng nhập tên khách hàng.
+                </div>
+              </div>
+
+              <!-- Số điện thoại -->
+              <div class="col-12 col-md-6">
+                <label for="admin-customer-phone" class="form-label fw-semibold">
+                  Số điện thoại
+                  <span class="text-danger">*</span>
+                </label>
+
+                <input type="tel" id="admin-customer-phone" class="form-control" pattern="0[0-9]{9}" maxlength="10"
+                  required />
+
+                <div class="invalid-feedback">
+                  Số điện thoại phải gồm 10 chữ số.
+                </div>
+              </div>
+
+              <!-- Email -->
+              <div class="col-12">
+                <label for="admin-customer-email" class="form-label fw-semibold">
+                  Email
+                </label>
+
+                <input type="email" id="admin-customer-email" class="form-control" />
+              </div>
+
+              <!-- Ngày đến -->
+              <div class="col-12 col-md-4">
+                <label for="admin-booking-date" class="form-label fw-semibold">
+                  Ngày đến
+                  <span class="text-danger">*</span>
+                </label>
+
+                <input type="date" id="admin-booking-date" class="form-control" required />
+
+                <div class="invalid-feedback">
+                  Vui lòng chọn ngày đến.
+                </div>
+              </div>
+
+              <!-- Giờ đến -->
+              <div class="col-12 col-md-4">
+                <label for="admin-booking-time" class="form-label fw-semibold">
+                  Giờ đến
+                  <span class="text-danger">*</span>
+                </label>
+
+                <input type="time" id="admin-booking-time" class="form-control" min="07:00" max="22:00" required />
+
+                <div class="invalid-feedback">
+                  Vui lòng chọn giờ đến.
+                </div>
+              </div>
+
+              <!-- Số khách -->
+              <div class="col-12 col-md-4">
+                <label for="admin-guest-count" class="form-label fw-semibold">
+                  Số khách
+                  <span class="text-danger">*</span>
+                </label>
+
+                <input type="number" id="admin-guest-count" class="form-control" min="1" max="20" required />
+
+                <div class="invalid-feedback">
+                  Số khách phải từ 1 đến 20.
+                </div>
+              </div>
+
+              <!-- Khu vực -->
+              <div class="col-12 col-md-6">
+                <label for="admin-booking-area" class="form-label fw-semibold">
+                  Khu vực
+                  <span class="text-danger">*</span>
+                </label>
+
+                <select id="admin-booking-area" class="form-select" required>
+                  <option value="" selected disabled>
+                    Chọn khu vực
+                  </option>
+                  <option value="indoor">Trong nhà</option>
+                  <option value="outdoor">Ngoài trời</option>
+                  <option value="balcony">Ban công</option>
+                </select>
+
+                <div class="invalid-feedback">
+                  Vui lòng chọn khu vực.
+                </div>
+              </div>
+
+              <!-- Bàn -->
+              <div class="col-12 col-md-6">
+                <label for="admin-table-id" class="form-label fw-semibold">
+                  Bàn
+                  <span class="text-danger">*</span>
+                </label>
+
+                <select id="admin-table-id" class="form-select" required>
+                  <option value="" selected disabled>
+                    Chọn bàn
+                  </option>
+                  <option value="T01">Bàn T01 – 2 người</option>
+                  <option value="T02">Bàn T02 – 2 người</option>
+                  <option value="T03">Bàn T03 – 4 người</option>
+                  <option value="T04">Bàn T04 – 4 người</option>
+                  <option value="T05">Bàn T05 – 4 người</option>
+                  <option value="T06">Bàn T06 – 6 người</option>
+                  <option value="T07">Bàn T07 – 6 người</option>
+                  <option value="T08">Bàn T08 – 8 người</option>
+                </select>
+
+                <div class="invalid-feedback">
+                  Vui lòng chọn bàn.
+                </div>
+              </div>
+
+              <!-- Trạng thái -->
+              <div class="col-12">
+                <label for="admin-booking-status" class="form-label fw-semibold">
+                  Trạng thái
+                </label>
+
+                <select id="admin-booking-status" class="form-select">
+                  <option value="pending">
+                    Chờ xác nhận
+                  </option>
+                  <option value="confirmed">
+                    Đã xác nhận
+                  </option>
+                  <option value="arrived">
+                    Khách đã đến
+                  </option>
+                  <option value="completed">
+                    Hoàn thành
+                  </option>
+                  <option value="cancelled">
+                    Đã hủy
+                  </option>
+                </select>
+              </div>
+
+              <!-- Ghi chú -->
+              <div class="col-12">
+                <label for="admin-booking-note" class="form-label fw-semibold">
+                  Ghi chú
+                </label>
+
+                <textarea id="admin-booking-note" class="form-control" rows="3" maxlength="300"
+                  placeholder="Thông tin bổ sung của khách..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+              Hủy
+            </button>
+
+            <button type="submit" class="btn btn-coffee">
+              <i class="bi bi-floppy me-1"></i>
+              Lưu thông tin
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL CHI TIẾT ==================== -->
+  <div class="modal fade" id="booking-detail-modal" tabindex="-1" aria-labelledby="booking-detail-title"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content border-0">
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="booking-detail-title">
+            Chi tiết đặt bàn
+          </h2>
+
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+
+        <div class="modal-body p-4">
+          <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4">
+            <div>
+              <small class="text-secondary">
+                Mã đặt bàn
+              </small>
+
+              <h3 id="detail-booking-id" class="h4 mb-0">
+                #BK001
+              </h3>
+            </div>
+
+            <span id="detail-booking-status" class="badge text-bg-warning mt-2 mt-sm-0">
+              Chờ xác nhận
+            </span>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-12 col-md-6">
+              <div class="admin-detail-item">
+                <span>Khách hàng</span>
+                <strong id="detail-customer-name">
+                  Nguyễn Minh Anh
+                </strong>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <div class="admin-detail-item">
+                <span>Số điện thoại</span>
+                <strong id="detail-customer-phone">
+                  0912 345 678
+                </strong>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <div class="admin-detail-item">
+                <span>Email</span>
+                <strong id="detail-customer-email">
+                  minhanh@gmail.com
+                </strong>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <div class="admin-detail-item">
+                <span>Ngày tạo</span>
+                <strong id="detail-created-at">
+                  22/09/2026 08:15
+                </strong>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <div class="admin-detail-item">
+                <span>Ngày và giờ đến</span>
+                <strong id="detail-booking-datetime">
+                  22/09/2026 – 18:30
+                </strong>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <div class="admin-detail-item">
+                <span>Số lượng khách</span>
+                <strong id="detail-guest-count">
+                  4 khách
+                </strong>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <div class="admin-detail-item">
+                <span>Bàn</span>
+                <strong id="detail-table-name">
+                  Bàn T04
+                </strong>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-6">
+              <div class="admin-detail-item">
+                <span>Khu vực</span>
+                <strong id="detail-area">
+                  Trong nhà
+                </strong>
+              </div>
+            </div>
+
+            <div class="col-12">
+              <div class="admin-detail-item">
+                <span>Ghi chú</span>
+                <strong id="detail-note">
+                  Cần một ghế trẻ em.
+                </strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Đóng
+          </button>
+
+          <button type="button" id="detail-edit-button" class="btn btn-coffee" data-bs-dismiss="modal">
+            <i class="bi bi-pencil-square me-1"></i>
+            Chỉnh sửa
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL HỦY ĐẶT BÀN ==================== -->
+  <div class="modal fade" id="cancel-booking-modal" tabindex="-1" aria-labelledby="cancel-booking-title"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0">
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="cancel-booking-title">
+            Xác nhận hủy đặt bàn
+          </h2>
+
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+
+        <div class="modal-body">
+          <input type="hidden" id="cancel-booking-id" />
+
+          <p>
+            Bạn có chắc chắn muốn hủy yêu cầu
+            <strong id="cancel-booking-code">#BK001</strong>
+            không?
+          </p>
+
+          <label for="cancel-booking-reason" class="form-label fw-semibold">
+            Lý do hủy
+          </label>
+
+          <textarea id="cancel-booking-reason" class="form-control" rows="3" maxlength="200"
+            placeholder="Nhập lý do hủy đặt bàn..."></textarea>
+
+          <div id="cancel-reason-error" class="text-danger small mt-1 d-none">
+            Vui lòng nhập lý do hủy.
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Quay lại
+          </button>
+
+          <button type="button" id="confirm-cancel-booking" class="btn btn-danger">
+            <i class="bi bi-x-circle me-1"></i>
+            Xác nhận hủy
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast thông báo -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="admin-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <i id="admin-toast-icon" class="bi bi-check-circle-fill text-success me-2"></i>
+
+        <strong class="me-auto">Mộc Coffee</strong>
+
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Đóng"></button>
+      </div>
+
+      <div id="admin-toast-message" class="toast-body">
+        Thao tác thành công.
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JavaScript -->
+  <script src="../assets/js/admin.js"></script>
+</body>
+
+</html>

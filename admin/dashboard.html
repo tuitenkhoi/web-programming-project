@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta name="description" content="Trang quản trị hệ thống Mộc Coffee." />
+
+  <title>Dashboard - Mộc Coffee</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <!-- CSS của dự án -->
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/admin.css" />
+  <link rel="stylesheet" href="../assets/css/responsive.css" />
+</head>
+
+<body class="admin-body">
+  <!-- Lớp phủ sidebar trên điện thoại -->
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside id="admin-sidebar" class="admin-sidebar">
+    <!-- Logo -->
+    <div class="admin-sidebar-header">
+      <a href="dashboard.html" class="admin-logo">
+        <i class="bi bi-cup-hot-fill"></i>
+        <span>Mộc Coffee</span>
+      </a>
+
+      <button type="button" id="close-sidebar-button" class="btn d-lg-none text-white" aria-label="Đóng menu">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <!-- Tài khoản -->
+    <div class="admin-user-box">
+      <div class="admin-avatar">QL</div>
+
+      <div>
+        <strong>Quản lý</strong>
+        <small>admin@moccoffee.vn</small>
+      </div>
+    </div>
+
+    <!-- Menu quản trị -->
+    <nav class="admin-navigation">
+      <p class="admin-menu-title">Tổng quan</p>
+
+      <ul class="admin-menu">
+        <li>
+          <a href="dashboard.html" class="active">
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+      </ul>
+
+      <p class="admin-menu-title">Quản lý hệ thống</p>
+
+      <ul class="admin-menu">
+        <li>
+          <a href="tables.html">
+            <i class="bi bi-grid-3x3-gap"></i>
+            <span>Quản lý bàn</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="products.html">
+            <i class="bi bi-cup-straw"></i>
+            <span>Quản lý món</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="bookings.html">
+            <i class="bi bi-calendar2-check"></i>
+            <span>Quản lý đặt bàn</span>
+
+            <span class="badge rounded-pill bg-danger ms-auto">
+              5
+            </span>
+          </a>
+        </li>
+
+        <li>
+          <a href="orders.html">
+            <i class="bi bi-receipt"></i>
+            <span>Quản lý đơn hàng</span>
+
+            <span class="badge rounded-pill bg-warning text-dark ms-auto">
+              8
+            </span>
+          </a>
+        </li>
+
+        <li>
+          <a href="invoices.html">
+            <i class="bi bi-file-earmark-text"></i>
+            <span>Quản lý hóa đơn</span>
+          </a>
+        </li>
+      </ul>
+
+      <p class="admin-menu-title">Khác</p>
+
+      <ul class="admin-menu">
+        <li>
+          <a href="../index.html">
+            <i class="bi bi-globe"></i>
+            <span>Xem trang khách hàng</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="login.html">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Đăng xuất</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- ==================== NỘI DUNG CHÍNH ==================== -->
+  <div class="admin-main">
+    <!-- Topbar -->
+    <header class="admin-topbar">
+      <div class="d-flex align-items-center">
+        <button type="button" id="open-sidebar-button" class="btn btn-light d-lg-none me-2" aria-label="Mở menu">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+
+        <div>
+          <h1 class="h5 mb-0">Dashboard</h1>
+
+          <small id="current-date" class="text-secondary">
+            Tổng quan hoạt động của Mộc Coffee
+          </small>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <!-- Làm mới -->
+        <button type="button" id="refresh-dashboard-button" class="btn btn-light" title="Làm mới dữ liệu">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+
+        <!-- Thông báo -->
+        <div class="dropdown">
+          <button class="btn btn-light position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+            aria-label="Thông báo">
+            <i class="bi bi-bell"></i>
+
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              3
+            </span>
+          </button>
+
+          <ul class="dropdown-menu dropdown-menu-end admin-notifications">
+            <li>
+              <h6 class="dropdown-header">Thông báo mới</h6>
+            </li>
+
+            <li>
+              <a class="dropdown-item" href="bookings.html">
+                <strong>Có yêu cầu đặt bàn mới</strong>
+
+                <small class="d-block text-secondary">
+                  Nguyễn Minh Anh đặt bàn lúc 18:30
+                </small>
+              </a>
+            </li>
+
+            <li>
+              <a class="dropdown-item" href="orders.html">
+                <strong>Đơn hàng mới tại bàn T03</strong>
+
+                <small class="d-block text-secondary">
+                  5 phút trước
+                </small>
+              </a>
+            </li>
+
+            <li>
+              <a class="dropdown-item" href="orders.html">
+                <strong>Bàn T05 yêu cầu thanh toán</strong>
+
+                <small class="d-block text-secondary">
+                  10 phút trước
+                </small>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Tài khoản -->
+        <div class="dropdown">
+          <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle me-1"></i>
+            <span class="d-none d-md-inline">Quản lý</span>
+          </button>
+
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+              <a class="dropdown-item" href="#">
+                <i class="bi bi-person me-2"></i>
+                Hồ sơ cá nhân
+              </a>
+            </li>
+
+            <li>
+              <a class="dropdown-item" href="#">
+                <i class="bi bi-gear me-2"></i>
+                Cài đặt
+              </a>
+            </li>
+
+            <li>
+              <hr class="dropdown-divider" />
+            </li>
+
+            <li>
+              <a class="dropdown-item text-danger" href="login.html">
+                <i class="bi bi-box-arrow-right me-2"></i>
+                Đăng xuất
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <!-- Nội dung Dashboard -->
+    <main class="admin-content">
+      <!-- Lời chào -->
+      <section class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+          <h2 id="dashboard-greeting" class="h3 fw-bold mb-1">
+            Xin chào, Quản lý!
+          </h2>
+
+          <p class="text-secondary mb-0">
+            Đây là tình hình hoạt động của quán hôm nay.
+          </p>
+        </div>
+
+        <div class="d-flex gap-2">
+          <a href="bookings.html" class="btn btn-outline-coffee">
+            <i class="bi bi-calendar-plus me-1"></i>
+            Thêm đặt bàn
+          </a>
+
+          <a href="orders.html" class="btn btn-coffee">
+            <i class="bi bi-plus-lg me-1"></i>
+            Tạo đơn hàng
+          </a>
+        </div>
+      </section>
+
+      <!-- ==================== THẺ THỐNG KÊ ==================== -->
+      <section class="row g-4 mb-4">
+        <!-- Doanh thu -->
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card admin-stat-card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <p class="text-secondary mb-2">
+                    Doanh thu hôm nay
+                  </p>
+
+                  <h3 id="dashboard-revenue" class="fw-bold mb-1">
+                    8.750.000đ
+                  </h3>
+                </div>
+
+                <div class="admin-stat-icon bg-success-subtle text-success">
+                  <i class="bi bi-currency-dollar"></i>
+                </div>
+              </div>
+
+              <small class="text-success">
+                <i class="bi bi-arrow-up-right"></i>
+                12,5% so với hôm qua
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Đơn hàng -->
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card admin-stat-card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <p class="text-secondary mb-2">
+                    Tổng đơn hàng
+                  </p>
+
+                  <h3 id="dashboard-order-count" class="fw-bold mb-1">
+                    86
+                  </h3>
+                </div>
+
+                <div class="admin-stat-icon bg-primary-subtle text-primary">
+                  <i class="bi bi-receipt"></i>
+                </div>
+              </div>
+
+              <small class="text-success">
+                <i class="bi bi-arrow-up-right"></i>
+                8,2% so với hôm qua
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Đặt bàn -->
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card admin-stat-card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <p class="text-secondary mb-2">
+                    Đặt bàn hôm nay
+                  </p>
+
+                  <h3 id="dashboard-booking-count" class="fw-bold mb-1">
+                    18
+                  </h3>
+                </div>
+
+                <div class="admin-stat-icon bg-warning-subtle text-warning">
+                  <i class="bi bi-calendar2-check"></i>
+                </div>
+              </div>
+
+              <small class="text-danger">
+                <i class="bi bi-exclamation-circle"></i>
+                5 yêu cầu chờ xác nhận
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bàn đang sử dụng -->
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card admin-stat-card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between">
+                <div>
+                  <p class="text-secondary mb-2">
+                    Bàn đang sử dụng
+                  </p>
+
+                  <h3 id="dashboard-table-count" class="fw-bold mb-1">
+                    12/20
+                  </h3>
+                </div>
+
+                <div class="admin-stat-icon bg-danger-subtle text-danger">
+                  <i class="bi bi-grid-3x3-gap"></i>
+                </div>
+              </div>
+
+              <small class="text-secondary">
+                Công suất hiện tại: 60%
+              </small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== DOANH THU VÀ TRẠNG THÁI BÀN ==================== -->
+      <section class="row g-4 mb-4">
+        <!-- Biểu đồ doanh thu -->
+        <div class="col-12 col-xl-8">
+          <div class="card border-0 shadow-sm h-100">
+            <div
+              class="card-header bg-white d-flex flex-column flex-sm-row justify-content-between align-items-sm-center p-4">
+              <div>
+                <h2 class="h5 mb-1">Doanh thu 7 ngày gần nhất</h2>
+
+                <p class="text-secondary mb-0">
+                  Tổng doanh thu:
+                  <strong class="text-dark">48.900.000đ</strong>
+                </p>
+              </div>
+
+              <select id="revenue-period-filter" class="form-select w-auto mt-3 mt-sm-0"
+                aria-label="Chọn thời gian thống kê">
+                <option value="7-days" selected>
+                  7 ngày
+                </option>
+                <option value="30-days">30 ngày</option>
+                <option value="12-months">12 tháng</option>
+              </select>
+            </div>
+
+            <div class="card-body p-4">
+              <div class="revenue-chart">
+                <!-- Cột thứ hai -->
+                <div class="revenue-column">
+                  <div class="revenue-value">5,2tr</div>
+
+                  <div class="revenue-bar-wrapper">
+                    <div class="revenue-bar" style="height: 52%"></div>
+                  </div>
+
+                  <span>Thứ 2</span>
+                </div>
+
+                <!-- Cột thứ ba -->
+                <div class="revenue-column">
+                  <div class="revenue-value">6,8tr</div>
+
+                  <div class="revenue-bar-wrapper">
+                    <div class="revenue-bar" style="height: 68%"></div>
+                  </div>
+
+                  <span>Thứ 3</span>
+                </div>
+
+                <!-- Cột thứ tư -->
+                <div class="revenue-column">
+                  <div class="revenue-value">5,9tr</div>
+
+                  <div class="revenue-bar-wrapper">
+                    <div class="revenue-bar" style="height: 59%"></div>
+                  </div>
+
+                  <span>Thứ 4</span>
+                </div>
+
+                <!-- Cột thứ năm -->
+                <div class="revenue-column">
+                  <div class="revenue-value">7,3tr</div>
+
+                  <div class="revenue-bar-wrapper">
+                    <div class="revenue-bar" style="height: 73%"></div>
+                  </div>
+
+                  <span>Thứ 5</span>
+                </div>
+
+                <!-- Cột thứ sáu -->
+                <div class="revenue-column">
+                  <div class="revenue-value">6,5tr</div>
+
+                  <div class="revenue-bar-wrapper">
+                    <div class="revenue-bar" style="height: 65%"></div>
+                  </div>
+
+                  <span>Thứ 6</span>
+                </div>
+
+                <!-- Cột thứ bảy -->
+                <div class="revenue-column">
+                  <div class="revenue-value">9,4tr</div>
+
+                  <div class="revenue-bar-wrapper">
+                    <div class="revenue-bar" style="height: 94%"></div>
+                  </div>
+
+                  <span>Thứ 7</span>
+                </div>
+
+                <!-- Cột chủ nhật -->
+                <div class="revenue-column">
+                  <div class="revenue-value">7,8tr</div>
+
+                  <div class="revenue-bar-wrapper">
+                    <div class="revenue-bar" style="height: 78%"></div>
+                  </div>
+
+                  <span>CN</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Trạng thái bàn -->
+        <div class="col-12 col-xl-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center p-4">
+              <div>
+                <h2 class="h5 mb-1">Trạng thái bàn</h2>
+
+                <p class="text-secondary mb-0">
+                  Tổng cộng 20 bàn
+                </p>
+              </div>
+
+              <a href="tables.html" class="btn btn-sm btn-outline-coffee">
+                Xem tất cả
+              </a>
+            </div>
+
+            <div class="card-body p-4">
+              <!-- Biểu đồ tròn -->
+              <div class="table-status-chart mb-4">
+                <div class="table-status-circle">
+                  <div>
+                    <strong>60%</strong>
+                    <small>Đang dùng</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Chú thích -->
+              <div class="table-status-list">
+                <div class="table-status-row">
+                  <div>
+                    <span class="status-dot available"></span>
+                    Bàn trống
+                  </div>
+
+                  <strong>5</strong>
+                </div>
+
+                <div class="table-status-row">
+                  <div>
+                    <span class="status-dot occupied"></span>
+                    Đang sử dụng
+                  </div>
+
+                  <strong>12</strong>
+                </div>
+
+                <div class="table-status-row">
+                  <div>
+                    <span class="status-dot reserved"></span>
+                    Đã đặt trước
+                  </div>
+
+                  <strong>2</strong>
+                </div>
+
+                <div class="table-status-row">
+                  <div>
+                    <span class="status-dot cleaning"></span>
+                    Đang dọn dẹp
+                  </div>
+
+                  <strong>1</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== ĐƠN HÀNG VÀ ĐẶT BÀN ==================== -->
+      <section class="row g-4 mb-4">
+        <!-- Đơn hàng gần đây -->
+        <div class="col-12 col-xl-7">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center p-4">
+              <div>
+                <h2 class="h5 mb-1">Đơn hàng gần đây</h2>
+
+                <p class="text-secondary mb-0">
+                  Các đơn hàng mới nhất trong ngày
+                </p>
+              </div>
+
+              <a href="orders.html" class="btn btn-sm btn-outline-coffee">
+                Xem tất cả
+              </a>
+            </div>
+
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table admin-table align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th scope="col" class="ps-4">Mã đơn</th>
+                      <th scope="col">Bàn</th>
+                      <th scope="col">Thời gian</th>
+                      <th scope="col">Tổng tiền</th>
+                      <th scope="col" class="pe-4">
+                        Trạng thái
+                      </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    <tr>
+                      <td class="ps-4">
+                        <a href="orders.html" class="fw-semibold">
+                          #OD086
+                        </a>
+                      </td>
+
+                      <td>Bàn T03</td>
+                      <td>10:25</td>
+                      <td class="fw-semibold">185.000đ</td>
+
+                      <td class="pe-4">
+                        <span class="badge text-bg-warning">
+                          Đang chế biến
+                        </span>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td class="ps-4">
+                        <a href="orders.html" class="fw-semibold">
+                          #OD085
+                        </a>
+                      </td>
+
+                      <td>Bàn T07</td>
+                      <td>10:18</td>
+                      <td class="fw-semibold">268.000đ</td>
+
+                      <td class="pe-4">
+                        <span class="badge text-bg-primary">
+                          Đang phục vụ
+                        </span>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td class="ps-4">
+                        <a href="orders.html" class="fw-semibold">
+                          #OD084
+                        </a>
+                      </td>
+
+                      <td>Bàn T05</td>
+                      <td>10:05</td>
+                      <td class="fw-semibold">139.000đ</td>
+
+                      <td class="pe-4">
+                        <span class="badge text-bg-info">
+                          Chờ thanh toán
+                        </span>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td class="ps-4">
+                        <a href="orders.html" class="fw-semibold">
+                          #OD083
+                        </a>
+                      </td>
+
+                      <td>Mang đi</td>
+                      <td>09:55</td>
+                      <td class="fw-semibold">98.000đ</td>
+
+                      <td class="pe-4">
+                        <span class="badge text-bg-success">
+                          Hoàn thành
+                        </span>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td class="ps-4">
+                        <a href="orders.html" class="fw-semibold">
+                          #OD082
+                        </a>
+                      </td>
+
+                      <td>Bàn T02</td>
+                      <td>09:40</td>
+                      <td class="fw-semibold">175.000đ</td>
+
+                      <td class="pe-4">
+                        <span class="badge text-bg-success">
+                          Hoàn thành
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Đặt bàn sắp tới -->
+        <div class="col-12 col-xl-5">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center p-4">
+              <div>
+                <h2 class="h5 mb-1">Đặt bàn sắp tới</h2>
+
+                <p class="text-secondary mb-0">
+                  Các bàn cần chuẩn bị
+                </p>
+              </div>
+
+              <a href="bookings.html" class="btn btn-sm btn-outline-coffee">
+                Xem tất cả
+              </a>
+            </div>
+
+            <div class="card-body p-4">
+              <!-- Đặt bàn 1 -->
+              <div class="dashboard-booking-item">
+                <div class="booking-time-box">
+                  <strong>18:30</strong>
+                  <small>Hôm nay</small>
+                </div>
+
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between gap-2">
+                    <strong>Nguyễn Minh Anh</strong>
+
+                    <span class="badge text-bg-warning">
+                      Chờ xác nhận
+                    </span>
+                  </div>
+
+                  <small class="text-secondary">
+                    Bàn T04 · 4 khách · Trong nhà
+                  </small>
+                </div>
+              </div>
+
+              <!-- Đặt bàn 2 -->
+              <div class="dashboard-booking-item">
+                <div class="booking-time-box">
+                  <strong>19:00</strong>
+                  <small>Hôm nay</small>
+                </div>
+
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between gap-2">
+                    <strong>Trần Hoàng Nam</strong>
+
+                    <span class="badge text-bg-success">
+                      Đã xác nhận
+                    </span>
+                  </div>
+
+                  <small class="text-secondary">
+                    Bàn T07 · 6 khách · Ngoài trời
+                  </small>
+                </div>
+              </div>
+
+              <!-- Đặt bàn 3 -->
+              <div class="dashboard-booking-item">
+                <div class="booking-time-box">
+                  <strong>20:00</strong>
+                  <small>Hôm nay</small>
+                </div>
+
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between gap-2">
+                    <strong>Lê Ngọc Hân</strong>
+
+                    <span class="badge text-bg-success">
+                      Đã xác nhận
+                    </span>
+                  </div>
+
+                  <small class="text-secondary">
+                    Bàn T08 · 8 khách · Ban công
+                  </small>
+                </div>
+              </div>
+
+              <!-- Đặt bàn 4 -->
+              <div class="dashboard-booking-item mb-0">
+                <div class="booking-time-box">
+                  <strong>08:30</strong>
+                  <small>Ngày mai</small>
+                </div>
+
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between gap-2">
+                    <strong>Phạm Quốc Bảo</strong>
+
+                    <span class="badge text-bg-warning">
+                      Chờ xác nhận
+                    </span>
+                  </div>
+
+                  <small class="text-secondary">
+                    Bàn T01 · 2 khách · Trong nhà
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== MÓN BÁN CHẠY VÀ TRUY CẬP NHANH ==================== -->
+      <section class="row g-4">
+        <!-- Món bán chạy -->
+        <div class="col-12 col-xl-7">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center p-4">
+              <div>
+                <h2 class="h5 mb-1">Món bán chạy</h2>
+
+                <p class="text-secondary mb-0">
+                  Thống kê trong hôm nay
+                </p>
+              </div>
+
+              <a href="products.html" class="btn btn-sm btn-outline-coffee">
+                Quản lý món
+              </a>
+            </div>
+
+            <div class="card-body p-4">
+              <!-- Món 1 -->
+              <div class="best-selling-item">
+                <div class="best-selling-rank">1</div>
+
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between mb-2">
+                    <strong>Cà phê sữa đá</strong>
+                    <span>42 ly</span>
+                  </div>
+
+                  <div class="progress" role="progressbar" aria-label="Cà phê sữa đá" aria-valuenow="90"
+                    aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar bg-success" style="width: 90%"></div>
+                  </div>
+                </div>
+
+                <strong class="text-success">1.470.000đ</strong>
+              </div>
+
+              <!-- Món 2 -->
+              <div class="best-selling-item">
+                <div class="best-selling-rank">2</div>
+
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between mb-2">
+                    <strong>Trà đào cam sả</strong>
+                    <span>35 ly</span>
+                  </div>
+
+                  <div class="progress" role="progressbar" aria-label="Trà đào cam sả" aria-valuenow="75"
+                    aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar bg-primary" style="width: 75%"></div>
+                  </div>
+                </div>
+
+                <strong class="text-success">1.715.000đ</strong>
+              </div>
+
+              <!-- Món 3 -->
+              <div class="best-selling-item">
+                <div class="best-selling-rank">3</div>
+
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between mb-2">
+                    <strong>Bạc xỉu</strong>
+                    <span>28 ly</span>
+                  </div>
+
+                  <div class="progress" role="progressbar" aria-label="Bạc xỉu" aria-valuenow="60" aria-valuemin="0"
+                    aria-valuemax="100">
+                    <div class="progress-bar bg-warning" style="width: 60%"></div>
+                  </div>
+                </div>
+
+                <strong class="text-success">1.092.000đ</strong>
+              </div>
+
+              <!-- Món 4 -->
+              <div class="best-selling-item mb-0">
+                <div class="best-selling-rank">4</div>
+
+                <div class="flex-grow-1">
+                  <div class="d-flex justify-content-between mb-2">
+                    <strong>Matcha đá xay</strong>
+                    <span>21 ly</span>
+                  </div>
+
+                  <div class="progress" role="progressbar" aria-label="Matcha đá xay" aria-valuenow="45"
+                    aria-valuemin="0" aria-valuemax="100">
+                    <div class="progress-bar bg-danger" style="width: 45%"></div>
+                  </div>
+                </div>
+
+                <strong class="text-success">1.155.000đ</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Truy cập nhanh -->
+        <div class="col-12 col-xl-5">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white p-4">
+              <h2 class="h5 mb-1">Truy cập nhanh</h2>
+
+              <p class="text-secondary mb-0">
+                Các chức năng thường xuyên sử dụng
+              </p>
+            </div>
+
+            <div class="card-body p-4">
+              <div class="row g-3">
+                <div class="col-6">
+                  <a href="orders.html" class="dashboard-quick-action">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>Tạo đơn hàng</span>
+                  </a>
+                </div>
+
+                <div class="col-6">
+                  <a href="bookings.html" class="dashboard-quick-action">
+                    <i class="bi bi-calendar-plus"></i>
+                    <span>Thêm đặt bàn</span>
+                  </a>
+                </div>
+
+                <div class="col-6">
+                  <a href="tables.html" class="dashboard-quick-action">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    <span>Sơ đồ bàn</span>
+                  </a>
+                </div>
+
+                <div class="col-6">
+                  <a href="products.html" class="dashboard-quick-action">
+                    <i class="bi bi-cup-straw"></i>
+                    <span>Thêm món mới</span>
+                  </a>
+                </div>
+
+                <div class="col-6">
+                  <a href="invoices.html" class="dashboard-quick-action">
+                    <i class="bi bi-receipt-cutoff"></i>
+                    <span>Xem hóa đơn</span>
+                  </a>
+                </div>
+
+                <div class="col-6">
+                  <a href="../index.html" class="dashboard-quick-action">
+                    <i class="bi bi-globe"></i>
+                    <span>Xem website</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer trang quản trị -->
+      <footer class="d-flex flex-column flex-md-row justify-content-between align-items-center py-4 mt-4 border-top">
+        <p class="text-secondary mb-2 mb-md-0">
+          &copy; <span id="current-year">2026</span> Mộc Coffee.
+        </p>
+
+        <p class="text-secondary mb-0">
+          Phiên bản 1.0.0
+        </p>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Toast thông báo -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="admin-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <i id="admin-toast-icon" class="bi bi-check-circle-fill text-success me-2"></i>
+
+        <strong class="me-auto">Mộc Coffee</strong>
+
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Đóng"></button>
+      </div>
+
+      <div id="admin-toast-message" class="toast-body">
+        Dữ liệu đã được cập nhật.
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JavaScript của dự án -->
+  <script src="../assets/js/admin.js"></script>
+</body>
+
+</html>

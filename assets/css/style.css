@@ -1,0 +1,1475 @@
+/* =========================================================
+   1. BIẾN MÀU VÀ THIẾT LẬP CHUNG
+========================================================= */
+
+:root {
+  --coffee-primary: #6f4e37;
+  --coffee-primary-dark: #3e2723;
+  --coffee-primary-light: #c68b59;
+
+  --coffee-green: #557153;
+  --coffee-green-dark: #385238;
+
+  --coffee-cream: #f5eee6;
+  --coffee-background: #faf8f5;
+
+  --white: #ffffff;
+  --black: #000000;
+
+  --text-color: #2d2d2d;
+  --text-muted: #6c757d;
+
+  --border-color: #e5e5e5;
+
+  --success: #198754;
+  --danger: #dc3545;
+  --warning: #ffc107;
+  --info: #0dcaf0;
+
+  --border-radius: 12px;
+  --border-radius-large: 18px;
+
+  --box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  --box-shadow-hover: 0 12px 28px rgba(0, 0, 0, 0.14);
+
+  --transition: all 0.25s ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  color: var(--text-color);
+  background-color: var(--white);
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+  line-height: 1.6;
+}
+
+body.modal-open {
+  padding-right: 0 !important;
+}
+
+img {
+  max-width: 100%;
+}
+
+a {
+  color: var(--coffee-primary);
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+a:hover {
+  color: var(--coffee-primary-dark);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+section {
+  scroll-margin-top: 80px;
+}
+
+.section-title {
+  color: var(--coffee-primary-dark);
+  font-weight: 700;
+}
+
+/* =========================================================
+   2. BUTTON
+========================================================= */
+
+.btn {
+  border-radius: 8px;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.btn-coffee {
+  color: var(--white);
+  background-color: var(--coffee-primary);
+  border-color: var(--coffee-primary);
+}
+
+.btn-coffee:hover,
+.btn-coffee:focus {
+  color: var(--white);
+  background-color: var(--coffee-primary-dark);
+  border-color: var(--coffee-primary-dark);
+  transform: translateY(-1px);
+}
+
+.btn-coffee:disabled {
+  color: var(--white);
+  background-color: #a89080;
+  border-color: #a89080;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-outline-coffee {
+  color: var(--coffee-primary);
+  background-color: transparent;
+  border-color: var(--coffee-primary);
+}
+
+.btn-outline-coffee:hover,
+.btn-outline-coffee:focus,
+.btn-outline-coffee.active {
+  color: var(--white);
+  background-color: var(--coffee-primary);
+  border-color: var(--coffee-primary);
+}
+
+.btn-link {
+  color: var(--coffee-primary);
+}
+
+.btn-link:hover {
+  color: var(--coffee-primary-dark);
+}
+
+/* =========================================================
+   3. FORM
+========================================================= */
+
+.form-label {
+  color: #333333;
+}
+
+.form-control,
+.form-select {
+  min-height: 46px;
+  color: var(--text-color);
+  border-color: #d9d9d9;
+  border-radius: 8px;
+}
+
+textarea.form-control {
+  min-height: auto;
+  resize: vertical;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--coffee-primary-light);
+  box-shadow: 0 0 0 0.2rem rgba(111, 78, 55, 0.13);
+}
+
+.input-group-text {
+  border-color: #d9d9d9;
+}
+
+.form-check-input:checked {
+  background-color: var(--coffee-primary);
+  border-color: var(--coffee-primary);
+}
+
+.form-check-input:focus {
+  border-color: var(--coffee-primary-light);
+  box-shadow: 0 0 0 0.2rem rgba(111, 78, 55, 0.13);
+}
+
+/* =========================================================
+   4. NAVBAR
+========================================================= */
+
+.navbar {
+  min-height: 72px;
+  transition:
+    background-color 0.25s ease,
+    box-shadow 0.25s ease,
+    padding 0.25s ease;
+}
+
+.navbar.navbar-scrolled {
+  min-height: 64px;
+  background-color: rgba(25, 25, 25, 0.97) !important;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+}
+
+.navbar-brand {
+  color: var(--coffee-primary-light) !important;
+  font-size: 22px;
+}
+
+.navbar-brand:hover {
+  color: #dfb489 !important;
+}
+
+.navbar-brand i {
+  font-size: 25px;
+}
+
+.navbar-nav .nav-link {
+  position: relative;
+  margin: 0 3px;
+  color: rgba(255, 255, 255, 0.78);
+  font-weight: 500;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+  color: var(--white);
+}
+
+.navbar-nav .nav-link:not(.active)::after {
+  position: absolute;
+  right: 50%;
+  bottom: 4px;
+  left: 50%;
+  height: 2px;
+  background-color: var(--coffee-primary-light);
+  content: "";
+  transition: var(--transition);
+}
+
+.navbar-nav .nav-link:hover::after {
+  right: 10px;
+  left: 10px;
+}
+
+.navbar-toggler {
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.navbar-toggler:focus {
+  box-shadow: 0 0 0 0.15rem rgba(198, 139, 89, 0.35);
+}
+
+/* =========================================================
+   5. CAROUSEL TRANG CHỦ
+========================================================= */
+
+#mainCarousel {
+  background-color: #1d1714;
+}
+
+.carousel-item {
+  position: relative;
+}
+
+.carousel-item>img {
+  width: 100%;
+  height: 680px;
+  object-fit: cover;
+}
+
+.carousel-item::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg,
+      rgba(0, 0, 0, 0.72) 0%,
+      rgba(0, 0, 0, 0.42) 48%,
+      rgba(0, 0, 0, 0.2) 100%);
+  content: "";
+}
+
+.carousel-caption {
+  z-index: 2;
+  right: 10%;
+  bottom: 110px;
+  left: 10%;
+  text-align: left;
+}
+
+.banner-content {
+  max-width: 700px;
+  padding: 28px;
+  background-color: rgba(0, 0, 0, 0.23);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: var(--border-radius-large);
+  backdrop-filter: blur(3px);
+}
+
+.banner-content h1,
+.banner-content h2 {
+  color: var(--white);
+  font-size: 52px;
+  line-height: 1.15;
+  text-shadow: 0 3px 10px rgba(0, 0, 0, 0.45);
+}
+
+.carousel-indicators [data-bs-target] {
+  width: 34px;
+  height: 4px;
+  border: none;
+  border-radius: 10px;
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  width: 42px;
+  height: 42px;
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.45);
+  background-size: 55%;
+  border-radius: 50%;
+}
+
+/* =========================================================
+   6. TIỆN ÍCH NỔI BẬT
+========================================================= */
+
+.feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 74px;
+  height: 74px;
+  color: var(--coffee-primary);
+  background-color: var(--coffee-cream);
+  border-radius: 50%;
+  font-size: 32px;
+}
+
+.feature-icon+h3 {
+  color: var(--coffee-primary-dark);
+}
+
+/* =========================================================
+   7. DANH MỤC
+========================================================= */
+
+.category-card {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  transition: var(--transition);
+}
+
+.category-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--box-shadow-hover);
+}
+
+.category-card img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.category-card:hover img {
+  transform: scale(1.06);
+}
+
+.category-content {
+  padding: 17px;
+  color: var(--white);
+  background:
+    linear-gradient(135deg,
+      var(--coffee-primary-dark),
+      var(--coffee-primary));
+}
+
+.category-content h3 {
+  color: var(--white);
+  font-weight: 700;
+}
+
+/* =========================================================
+   8. CARD SẢN PHẨM
+========================================================= */
+
+.product-card {
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--white);
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  transition: var(--transition);
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--box-shadow-hover);
+}
+
+.product-card .position-relative {
+  overflow: hidden;
+}
+
+.product-card img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.product-card:hover img {
+  transform: scale(1.04);
+}
+
+.product-card .card-body {
+  padding: 20px;
+}
+
+.product-card .card-title,
+.product-card h3 {
+  color: var(--coffee-primary-dark);
+  font-weight: 700;
+}
+
+.product-card .badge {
+  z-index: 2;
+  padding: 7px 10px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   9. PHẦN GIỚI THIỆU
+========================================================= */
+
+#about img {
+  width: 100%;
+  min-height: 420px;
+  object-fit: cover;
+}
+
+#about .bi-check-circle-fill {
+  color: var(--coffee-green) !important;
+}
+
+/* =========================================================
+   10. QUY TRÌNH SỬ DỤNG
+========================================================= */
+
+.process-card {
+  position: relative;
+  padding: 32px 25px;
+  background-color: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  transition: var(--transition);
+}
+
+.process-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--box-shadow-hover);
+}
+
+.process-number {
+  position: absolute;
+  top: 16px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  color: var(--white);
+  background-color: var(--coffee-primary);
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.process-icon {
+  color: var(--coffee-primary);
+  font-size: 48px;
+}
+
+/* =========================================================
+   11. KHỐI KÊU GỌI ĐẶT BÀN
+========================================================= */
+
+.booking-callout {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg,
+      rgba(62, 39, 35, 0.96),
+      rgba(111, 78, 55, 0.92));
+}
+
+.booking-callout::before,
+.booking-callout::after {
+  position: absolute;
+  border-radius: 50%;
+  content: "";
+}
+
+.booking-callout::before {
+  top: -100px;
+  left: -70px;
+  width: 250px;
+  height: 250px;
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.booking-callout::after {
+  right: -80px;
+  bottom: -120px;
+  width: 300px;
+  height: 300px;
+  border: 50px solid rgba(255, 255, 255, 0.04);
+}
+
+.booking-callout .container {
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================================================
+   12. BANNER TRANG CON
+========================================================= */
+
+.page-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 370px;
+  margin-top: 72px;
+  padding: 80px 20px;
+  background-position: center;
+  background-size: cover;
+}
+
+.page-banner::before {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(135deg,
+      rgba(20, 15, 12, 0.78),
+      rgba(62, 39, 35, 0.62));
+  content: "";
+}
+
+.page-banner .container {
+  position: relative;
+  z-index: 1;
+}
+
+.menu-banner {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.2),
+      rgba(0, 0, 0, 0.2)),
+    url("../images/banner/banner-2.jpg");
+}
+
+.booking-banner {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.2),
+      rgba(0, 0, 0, 0.2)),
+    url("../images/banner/banner-3.jpg");
+}
+
+.cart-banner {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.25),
+      rgba(0, 0, 0, 0.25)),
+    url("../images/banner/banner-1.jpg");
+}
+
+.payment-banner {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.25),
+      rgba(0, 0, 0, 0.25)),
+    url("../images/banner/banner-2.jpg");
+}
+
+/* =========================================================
+   13. BREADCRUMB VÀ BỘ LỌC
+========================================================= */
+
+.breadcrumb-item a {
+  color: var(--coffee-primary);
+}
+
+.breadcrumb-item.active {
+  color: var(--text-muted);
+}
+
+.sticky-filter {
+  position: sticky;
+  top: 64px;
+  z-index: 100;
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.04);
+}
+
+/* =========================================================
+   14. CÁC BƯỚC ĐẶT BÀN/THANH TOÁN
+========================================================= */
+
+.booking-steps {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.booking-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 100px;
+  color: #a0a0a0;
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  color: #777777;
+  background-color: #eeeeee;
+  border: 2px solid #dddddd;
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.step-label {
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.booking-step.active {
+  color: var(--coffee-primary);
+}
+
+.booking-step.active .step-number {
+  color: var(--white);
+  background-color: var(--coffee-primary);
+  border-color: var(--coffee-primary);
+}
+
+.step-line {
+  flex: 1;
+  height: 3px;
+  margin-top: 20px;
+  background-color: #dddddd;
+}
+
+.step-line.active {
+  background-color: var(--coffee-primary);
+}
+
+/* =========================================================
+   15. TRANG ĐẶT BÀN
+========================================================= */
+
+.booking-section-icon {
+  display: flex;
+  flex: 0 0 52px;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  color: var(--coffee-primary);
+  background-color: var(--coffee-cream);
+  border-radius: 12px;
+  font-size: 23px;
+}
+
+.area-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  padding: 18px;
+  color: var(--text-color);
+  background-color: #fafafa;
+  border: 2px solid var(--border-color);
+  border-radius: 11px;
+  cursor: pointer;
+  text-align: center;
+  transition: var(--transition);
+}
+
+.area-option small,
+.table-option small {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-muted);
+}
+
+.area-option:hover {
+  border-color: var(--coffee-primary-light);
+}
+
+.area-radio:checked+.area-option {
+  color: var(--coffee-primary);
+  background-color: var(--coffee-cream);
+  border-color: var(--coffee-primary);
+  box-shadow: 0 0 0 3px rgba(111, 78, 55, 0.08);
+}
+
+.table-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 130px;
+  padding: 15px;
+  border: 2px solid #dddddd;
+  border-radius: 11px;
+  cursor: pointer;
+  text-align: center;
+  transition: var(--transition);
+}
+
+.table-option.available {
+  color: var(--success);
+  background-color: rgba(25, 135, 84, 0.06);
+  border-color: rgba(25, 135, 84, 0.45);
+}
+
+.table-option.available:hover {
+  background-color: rgba(25, 135, 84, 0.12);
+  transform: translateY(-2px);
+}
+
+.table-option.unavailable {
+  color: #999999;
+  background-color: #eeeeee;
+  border-color: #dddddd;
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.table-radio:checked+.table-option {
+  color: var(--white);
+  background-color: var(--success);
+  border-color: var(--success);
+  box-shadow: 0 5px 15px rgba(25, 135, 84, 0.25);
+}
+
+.table-radio:checked+.table-option small {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.booking-summary,
+.cart-summary,
+.payment-summary {
+  top: 95px;
+}
+
+.summary-row {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 13px;
+}
+
+.summary-row>span {
+  color: var(--text-muted);
+}
+
+.summary-row>strong {
+  text-align: right;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  border-radius: 50%;
+}
+
+.status-dot.available {
+  background-color: var(--success);
+}
+
+.status-dot.unavailable {
+  background-color: var(--danger);
+}
+
+/* =========================================================
+   16. TRANG GIỎ HÀNG
+========================================================= */
+
+.cart-table {
+  min-width: 800px;
+}
+
+.cart-table thead th {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  color: #555555;
+  border-bottom-width: 1px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.cart-table tbody td {
+  padding-top: 17px;
+  padding-bottom: 17px;
+  vertical-align: middle;
+}
+
+.cart-product-image {
+  flex: 0 0 72px;
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  background-color: #eeeeee;
+}
+
+.cart-product-name {
+  color: var(--coffee-primary-dark);
+}
+
+.quantity-control {
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid #d5d5d5;
+  border-radius: 8px;
+}
+
+.quantity-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 36px;
+  padding: 0;
+  color: var(--coffee-primary);
+  background-color: #f5f5f5;
+  border: none;
+}
+
+.quantity-button:hover {
+  color: var(--white);
+  background-color: var(--coffee-primary);
+}
+
+.quantity-input {
+  width: 42px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  outline: none;
+  text-align: center;
+  appearance: textfield;
+}
+
+.quantity-input::-webkit-inner-spin-button,
+.quantity-input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.product-quantity-control .quantity-input {
+  width: 55px;
+}
+
+.service-option {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  min-height: 105px;
+  padding: 18px;
+  color: var(--text-color);
+  background-color: #fafafa;
+  border: 2px solid var(--border-color);
+  border-radius: 11px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.service-option strong,
+.service-option small {
+  display: block;
+}
+
+.service-option small {
+  color: var(--text-muted);
+}
+
+.btn-check:checked+.service-option {
+  color: var(--coffee-primary);
+  background-color: var(--coffee-cream);
+  border-color: var(--coffee-primary);
+}
+
+.payment-method-badge {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 11px;
+  color: var(--coffee-primary);
+  background-color: var(--coffee-cream);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.empty-cart-icon {
+  color: #bbbbbb;
+  font-size: 85px;
+}
+
+/* =========================================================
+   17. TRANG THANH TOÁN
+========================================================= */
+
+.payment-option {
+  position: relative;
+  display: flex;
+  gap: 13px;
+  align-items: center;
+  min-height: 120px;
+  padding: 18px;
+  color: var(--text-color);
+  background-color: #fafafa;
+  border: 2px solid var(--border-color);
+  border-radius: 11px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.payment-option:hover {
+  border-color: var(--coffee-primary-light);
+}
+
+.payment-option-icon {
+  display: flex;
+  flex: 0 0 52px;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  color: var(--coffee-primary);
+  background-color: var(--coffee-cream);
+  border-radius: 11px;
+  font-size: 24px;
+}
+
+.payment-option strong,
+.payment-option small {
+  display: block;
+}
+
+.payment-option small {
+  color: var(--text-muted);
+}
+
+.payment-check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: none;
+  color: var(--success);
+  font-size: 20px;
+}
+
+.payment-method-radio:checked+.payment-option {
+  background-color: rgba(111, 78, 55, 0.06);
+  border-color: var(--coffee-primary);
+}
+
+.payment-method-radio:checked+.payment-option .payment-check {
+  display: block;
+}
+
+.payment-detail-box {
+  padding: 23px;
+  background-color: #f8f9fa;
+  border: 1px solid var(--border-color);
+  border-radius: 11px;
+}
+
+.qr-code-wrapper {
+  max-width: 230px;
+  margin: 0 auto 10px;
+  padding: 12px;
+  background-color: var(--white);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+}
+
+.qr-code-wrapper img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+
+.bank-info-row {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed #dddddd;
+}
+
+.bank-info-row:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.bank-info-row>span {
+  color: var(--text-muted);
+}
+
+.payment-order-items {
+  max-height: 355px;
+  overflow-y: auto;
+}
+
+.payment-order-item {
+  display: flex;
+  gap: 13px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.payment-order-item:last-child {
+  margin-bottom: 0;
+}
+
+.payment-item-image {
+  flex: 0 0 65px;
+  width: 65px;
+  height: 65px;
+  object-fit: cover;
+  background-color: #eeeeee;
+}
+
+.payment-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.payment-item-name {
+  overflow: hidden;
+  color: var(--coffee-primary-dark);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =========================================================
+   18. TRANG CHI TIẾT SẢN PHẨM
+========================================================= */
+
+.product-detail-page {
+  background-color: var(--white);
+}
+
+.product-breadcrumb {
+  margin-top: 72px;
+}
+
+.product-detail-image-wrapper {
+  position: relative;
+  overflow: hidden;
+  background-color: #f5f5f5;
+  border-radius: var(--border-radius-large);
+  box-shadow: var(--box-shadow);
+}
+
+.product-detail-image {
+  width: 100%;
+  height: 570px;
+  object-fit: cover;
+}
+
+.product-detail-badge {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  padding: 9px 13px;
+  font-size: 13px;
+}
+
+.product-thumbnails {
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+
+.product-thumbnail {
+  width: 85px;
+  height: 85px;
+  padding: 3px;
+  overflow: hidden;
+  background-color: var(--white);
+  border: 2px solid transparent;
+  border-radius: 9px;
+  cursor: pointer;
+}
+
+.product-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.product-thumbnail:hover,
+.product-thumbnail.active {
+  border-color: var(--coffee-primary);
+}
+
+.product-option-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 90px;
+  padding: 12px;
+  color: var(--text-color);
+  background-color: #fafafa;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.product-option-box strong {
+  font-size: 21px;
+}
+
+.product-option-box small {
+  color: var(--text-muted);
+}
+
+.size-option:checked+.product-option-box {
+  color: var(--white);
+  background-color: var(--coffee-primary);
+  border-color: var(--coffee-primary);
+}
+
+.size-option:checked+.product-option-box small {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.topping-option {
+  min-height: 52px;
+  padding: 14px 14px 14px 40px;
+  background-color: #fafafa;
+  border: 1px solid var(--border-color);
+  border-radius: 9px;
+}
+
+.topping-option:has(.form-check-input:checked) {
+  background-color: var(--coffee-cream);
+  border-color: var(--coffee-primary-light);
+}
+
+.product-action-box {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: var(--coffee-background);
+  border: 1px solid #eadfd6;
+  border-radius: 12px;
+}
+
+.product-action-box .btn {
+  min-width: 210px;
+}
+
+.product-service-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-height: 90px;
+  padding: 15px;
+  background-color: #fafafa;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+}
+
+.product-service-item i {
+  color: var(--coffee-primary);
+  font-size: 28px;
+}
+
+.product-service-item strong,
+.product-service-item small {
+  display: block;
+}
+
+.product-service-item small {
+  color: var(--text-muted);
+}
+
+.review-item {
+  padding: 5px 0;
+}
+
+/* =========================================================
+   19. TRANG KẾT QUẢ THÀNH CÔNG
+========================================================= */
+
+.success-page {
+  min-height: calc(100vh - 250px);
+  padding-top: 95px;
+}
+
+.success-card {
+  overflow: hidden;
+}
+
+.success-card::before {
+  display: block;
+  height: 7px;
+  background:
+    linear-gradient(90deg,
+      var(--success),
+      var(--coffee-green));
+  content: "";
+}
+
+.success-icon,
+.success-icon-large {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: auto;
+  margin-left: auto;
+  color: var(--white);
+  background-color: var(--success);
+  border-radius: 50%;
+  box-shadow: 0 8px 25px rgba(25, 135, 84, 0.25);
+}
+
+.success-icon {
+  width: 75px;
+  height: 75px;
+  font-size: 38px;
+}
+
+.success-icon-large {
+  width: 100px;
+  height: 100px;
+  font-size: 52px;
+}
+
+.success-code-box {
+  padding: 15px 22px;
+  background-color: #f3f7f4;
+  border: 1px dashed var(--success);
+  border-radius: 10px;
+}
+
+.result-information {
+  height: 100%;
+  padding: 17px;
+  background-color: #fafafa;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+}
+
+.result-information .result-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.result-information>strong {
+  display: block;
+}
+
+.result-product-image {
+  width: 58px;
+  height: 58px;
+  object-fit: cover;
+  background-color: #eeeeee;
+}
+
+.support-icon {
+  display: flex;
+  flex: 0 0 52px;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  color: var(--coffee-primary);
+  background-color: var(--coffee-cream);
+  border-radius: 50%;
+  font-size: 24px;
+}
+
+/* =========================================================
+   20. TAB
+========================================================= */
+
+.nav-tabs .nav-link {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--coffee-primary);
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--coffee-primary);
+  border-top-color: var(--coffee-primary);
+  border-right-color: #dee2e6;
+  border-bottom-color: var(--white);
+  border-left-color: #dee2e6;
+}
+
+/* =========================================================
+   21. FOOTER
+========================================================= */
+
+footer {
+  background-color: #1e1b19 !important;
+}
+
+footer h2,
+footer h3 {
+  color: var(--white);
+}
+
+.footer-links li {
+  margin-bottom: 9px;
+}
+
+.footer-links a {
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.footer-links a:hover {
+  color: var(--coffee-primary-light);
+  padding-left: 4px;
+}
+
+footer .text-white-50 {
+  color: rgba(255, 255, 255, 0.58) !important;
+}
+
+/* =========================================================
+   22. NÚT QUAY LẠI ĐẦU TRANG
+========================================================= */
+
+#back-to-top {
+  position: fixed;
+  right: 25px;
+  bottom: 25px;
+  z-index: 1025;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 47px;
+  height: 47px;
+  padding: 0;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateY(15px);
+  transition: var(--transition);
+}
+
+#back-to-top.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =========================================================
+   23. TOAST, MODAL VÀ ALERT
+========================================================= */
+
+.toast {
+  overflow: hidden;
+  border: none;
+  border-radius: 10px;
+  box-shadow: var(--box-shadow-hover);
+}
+
+.modal-content {
+  border-radius: 14px;
+}
+
+.modal-header,
+.modal-footer {
+  padding: 17px 22px;
+}
+
+.modal-body {
+  padding: 22px;
+}
+
+.connection-alert {
+  z-index: 2000;
+  min-width: 320px;
+  max-width: calc(100vw - 30px);
+}
+
+/* =========================================================
+   24. HIỆU ỨNG
+========================================================= */
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.product-card,
+.category-card,
+.process-card {
+  animation: fade-in-up 0.45s ease both;
+}
+
+/* =========================================================
+   25. TIỆN ÍCH
+========================================================= */
+
+.object-fit-cover {
+  object-fit: cover;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.min-width-0 {
+  min-width: 0;
+}
+
+.text-coffee {
+  color: var(--coffee-primary) !important;
+}
+
+.bg-coffee {
+  background-color: var(--coffee-primary) !important;
+}
+
+.bg-coffee-light {
+  background-color: var(--coffee-cream) !important;
+}
+
+.border-coffee {
+  border-color: var(--coffee-primary) !important;
+}

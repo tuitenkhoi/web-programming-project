@@ -3,3 +3,7 @@ backend/.env
 frontend/node_modules/
 dist/
 .env
+
+# Ảnh sản phẩm được upload khi chạy ứng dụng
+backend/uploads/products/*
+!backend/uploads/products/.gitkeep

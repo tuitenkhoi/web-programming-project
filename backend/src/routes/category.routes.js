@@ -1,31 +1,51 @@
 const express = require("express");
-const { pool } = require("../config/db");
+
+const {
+    getCategories,
+    getAllCategories,
+    getCategoryById,
+    createCategory,
+    updateCategory,
+    deleteCategory,
+} = require("../controllers/category.controller");
+
+const {
+    authenticateToken,
+    authorizeAdmin,
+} = require("../middleware/auth.middleware");
 
 const router = express.Router();
 
-// GET /api/categories
-router.get("/", async (req, res) => {
-    try {
-        const [categories] = await pool.execute(`
-            SELECT id, name, slug, description
-            FROM categories
-            WHERE status = 1
-            ORDER BY id ASC
-        `);
+router.get("/", getCategories);
 
-        res.status(200).json({
-            success: true,
-            count: categories.length,
-            data: categories
-        });
-    } catch (error) {
-        console.error("Lỗi lấy danh mục:", error.code);
+router.get(
+    "/admin",
+    authenticateToken,
+    authorizeAdmin,
+    getAllCategories
+);
 
-        res.status(500).json({
-            success: false,
-            message: "Không thể lấy danh sách danh mục"
-        });
-    }
-});
+router.get("/:id", getCategoryById);
+
+router.post(
+    "/",
+    authenticateToken,
+    authorizeAdmin,
+    createCategory
+);
+
+router.put(
+    "/:id",
+    authenticateToken,
+    authorizeAdmin,
+    updateCategory
+);
+
+router.delete(
+    "/:id",
+    authenticateToken,
+    authorizeAdmin,
+    deleteCategory
+);
 
 module.exports = router;

@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta name="description" content="Thực đơn đồ uống và bánh ngọt tại Mộc Coffee." />
+
+  <title>Thực đơn - Mộc Coffee</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <!-- CSS của dự án -->
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/responsive.css" />
+</head>
+
+<body>
+  <!-- ==================== HEADER ==================== -->
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow">
+      <div class="container">
+        <!-- Logo -->
+        <a class="navbar-brand d-flex align-items-center fw-bold" href="../index.html">
+          <i class="bi bi-cup-hot-fill me-2"></i>
+          Mộc Coffee
+        </a>
+
+        <!-- Nút mở menu trên điện thoại -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+          aria-controls="mainNavbar" aria-expanded="false" aria-label="Mở menu điều hướng">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Menu điều hướng -->
+        <div class="collapse navbar-collapse" id="mainNavbar">
+          <ul class="navbar-nav ms-auto align-items-lg-center">
+            <li class="nav-item">
+              <a class="nav-link" href="../index.html">
+                Trang chủ
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="menu.html">
+                Thực đơn
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="../index.html#about">
+                Giới thiệu
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="../index.html#contact">
+                Liên hệ
+              </a>
+            </li>
+
+            <li class="nav-item ms-lg-2">
+              <a class="btn btn-outline-light" href="booking.html">
+                <i class="bi bi-calendar-check me-1"></i>
+                Đặt bàn
+              </a>
+            </li>
+
+            <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+              <a class="btn btn-coffee position-relative" href="cart.html">
+                <i class="bi bi-cart3 me-1"></i>
+                Giỏ hàng
+
+                <span id="cart-count"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  0
+                </span>
+              </a>
+            </li>
+
+            <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+              <a class="nav-link" href="../admin/login.html" title="Đăng nhập quản trị">
+                <i class="bi bi-person-circle fs-5"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ==================== MAIN ==================== -->
+  <main>
+    <!-- Banner trang thực đơn -->
+    <section class="page-banner menu-banner">
+      <div class="container text-center text-white">
+        <h1 class="display-5 fw-bold">Thực đơn Mộc Coffee</h1>
+
+        <p class="lead mb-0">
+          Khám phá những thức uống và món bánh được chuẩn bị mỗi
+          ngày.
+        </p>
+      </div>
+    </section>
+
+    <!-- Breadcrumb -->
+    <section class="bg-light border-bottom">
+      <div class="container py-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item">
+              <a href="../index.html">Trang chủ</a>
+            </li>
+
+            <li class="breadcrumb-item active" aria-current="page">
+              Thực đơn
+            </li>
+          </ol>
+        </nav>
+      </div>
+    </section>
+
+    <!-- Tìm kiếm và bộ lọc -->
+    <section class="py-4 bg-white sticky-filter">
+      <div class="container">
+        <div class="row g-3 align-items-end">
+          <!-- Tìm kiếm -->
+          <div class="col-12 col-lg-5">
+            <label for="search-input" class="form-label fw-semibold">
+              Tìm kiếm món
+            </label>
+
+            <div class="input-group">
+              <span class="input-group-text bg-white">
+                <i class="bi bi-search"></i>
+              </span>
+
+              <input type="search" id="search-input" class="form-control" placeholder="Nhập tên món cần tìm..."
+                autocomplete="off" />
+
+              <button type="button" id="clear-search" class="btn btn-outline-secondary" title="Xóa nội dung tìm kiếm">
+                <i class="bi bi-x-lg"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Lọc danh mục -->
+          <div class="col-12 col-md-6 col-lg-3">
+            <label for="category-filter" class="form-label fw-semibold">
+              Danh mục
+            </label>
+
+            <select id="category-filter" class="form-select">
+              <option value="all">Tất cả danh mục</option>
+              <option value="coffee">Cà phê</option>
+              <option value="tea">Trà trái cây</option>
+              <option value="ice-blended">Đá xay</option>
+              <option value="cake">Bánh ngọt</option>
+            </select>
+          </div>
+
+          <!-- Sắp xếp -->
+          <div class="col-12 col-md-6 col-lg-3">
+            <label for="sort-filter" class="form-label fw-semibold">
+              Sắp xếp
+            </label>
+
+            <select id="sort-filter" class="form-select">
+              <option value="default">Mặc định</option>
+              <option value="name-asc">Tên A–Z</option>
+              <option value="name-desc">Tên Z–A</option>
+              <option value="price-asc">Giá thấp đến cao</option>
+              <option value="price-desc">Giá cao đến thấp</option>
+            </select>
+          </div>
+
+          <!-- Xóa bộ lọc -->
+          <div class="col-12 col-lg-1">
+            <button type="button" id="reset-filter" class="btn btn-outline-secondary w-100" title="Xóa bộ lọc">
+              <i class="bi bi-arrow-counterclockwise"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Các nút lọc nhanh -->
+        <div class="d-flex flex-wrap gap-2 justify-content-center mt-4" id="category-buttons">
+          <button type="button" class="btn btn-coffee category-btn active" data-category="all">
+            Tất cả
+          </button>
+
+          <button type="button" class="btn btn-outline-coffee category-btn" data-category="coffee">
+            <i class="bi bi-cup-hot me-1"></i>
+            Cà phê
+          </button>
+
+          <button type="button" class="btn btn-outline-coffee category-btn" data-category="tea">
+            <i class="bi bi-cup-straw me-1"></i>
+            Trà trái cây
+          </button>
+
+          <button type="button" class="btn btn-outline-coffee category-btn" data-category="ice-blended">
+            <i class="bi bi-snow me-1"></i>
+            Đá xay
+          </button>
+
+          <button type="button" class="btn btn-outline-coffee category-btn" data-category="cake">
+            <i class="bi bi-cake2 me-1"></i>
+            Bánh ngọt
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Danh sách món -->
+    <section class="py-5 bg-light">
+      <div class="container">
+        <!-- Tiêu đề và số lượng kết quả -->
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+          <div>
+            <p class="text-uppercase text-secondary fw-semibold mb-2">
+              Khám phá hương vị
+            </p>
+
+            <h2 class="section-title mb-0">Danh sách món</h2>
+          </div>
+
+          <p class="text-secondary mt-2 mb-0">
+            Hiển thị
+            <strong id="product-count">12</strong>
+            món
+          </p>
+        </div>
+
+        <!-- Khu vực sản phẩm -->
+        <div class="row g-4" id="product-list">
+          <!-- ==================== CÀ PHÊ ==================== -->
+
+          <!-- Sản phẩm 1 -->
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3 product-item" data-id="1" data-name="Cà phê sữa đá"
+            data-category="coffee" data-price="35000">
+            <article class="card product-card">
+              <div class="position-relative">
+                <img src="../assets/images/products/ca-phe-sua-da.jpg" class="card-img-top" alt="Cà phê sữa đá" />
+
+                <span class="badge bg-danger position-absolute top-0 start-0 m-3">
+                  Bán chạy
+                </span>
+              </div>
+
+              <div class="card-body d-flex flex-column">
+                <p class="small text-secondary mb-1">
+                  Cà phê
+                </p>
+
+                <h3 class="card-title h5">Cà phê sữa đá</h3>
+
+                <p class="card-text text-secondary">
+                  Cà phê đậm vị kết hợp cùng sữa đặc truyền thống.
+                </p>
+
+                <div class="mt-auto">
+                  <p class="fw-bold text-danger fs-5 mb-3">
+                    35.000đ
+                  </p>
+
+                  <div class="d-flex gap-2">
+                    <a href="product-detail.html?id=1" class="btn btn-outline-coffee flex-grow-1">
+                      Chi tiết
+                    </a>
+
+                    <button type="button" class="btn btn-coffee add-to-cart" data-id="1" data-name="Cà phê sữa đá"
+                      data-price="35000" data-image="../assets/images/products/ca-phe-sua-da.jpg"
+                      title="Thêm vào giỏ hàng">
+                      <i class="bi bi-cart-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- Sản phẩm 2 -->
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3 product-item" data-id="2" data-name="Bạc xỉu"
+            data-category="coffee" data-price="39000">
+            <article class="card product-card">
+              <div class="position-relative">
+                <img src="../assets/images/products/bac-xiu.jpg" class="card-img-top" alt="Bạc xỉu" />
+
+                <span class="badge bg-success position-absolute top-0 start-0 m-3">
+                  Mới
+                </span>
+              </div>
+
+              <div class="card-body d-flex flex-column">
+                <p class="small text-secondary mb-1">
+                  Cà phê
+                </p>
+
+                <h3 class="card-title h5">Bạc xỉu</h3>
+
+                <p class="card-text text-secondary">
+                  Vị sữa ngọt dịu kết hợp cùng một chút cà phê thơm.
+                </p>
+
+                <div class="mt-auto">
+                  <p class="fw-bold text-danger fs-5 mb-3">
+                    39.000đ
+                  </p>
+
+                  <div class="d-flex gap-2">
+                    <a href="product-detail.html?id=2" class="btn btn-outline-coffee flex-grow-1">
+                      Chi tiết
+                    </a>
+
+                    <button type="button" class="btn btn-coffee add-to-cart" data-id="2" data-name="Bạc xỉu"
+                      data-price="39000" data-image="../assets/images/products/bac-xiu.jpg" title="Thêm vào giỏ hàng">
+                      <i class="bi bi-cart-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- Sản phẩm 3 -->
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3 product-item" data-id="3" data-name="Cà phê đen đá"
+            data-category="coffee" data-price="30000">
+            <article class="card product-card">
+              <div class="position-relative">
+                <img src="../assets/images/products/ca-phe-den-da.jpg" class="card-img-top" alt="Cà phê đen đá" />
+              </div>
+
+              <div class="card-body d-flex flex-column">
+                <p class="small text-secondary mb-1">
+                  Cà phê
+                </p>
+
+                <h3 class="card-title h5">Cà phê đen đá</h3>
+
+                <p class="card-text text-secondary">
+                  Cà phê nguyên chất có hương thơm mạnh và vị đậm.
+                </p>
+
+                <div class="mt-auto">
+                  <p class="fw-bold text-danger fs-5 mb-3">
+                    30.000đ
+                  </p>
+
+                  <div class="d-flex gap-2">
+                    <a href="product-detail.html?id=3" class="btn btn-outline-coffee flex-grow-1">
+                      Chi tiết
+                    </a>
+
+                    <button type="button" class="btn btn-coffee add-to-cart" data-id="3" data-name="Cà phê đen đá"
+                      data-price="30000" data-image="../assets/images/products/ca-phe-den-da.jpg"
+                      title="Thêm vào giỏ hàng">
+                      <i class="bi bi-cart-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- ==================== TRÀ TRÁI CÂY ==================== -->
+
+          <!-- Sản phẩm 4 -->
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3 product-item" data-id="4" data-name="Trà đào cam sả"
+            data-category="tea" data-price="49000">
+            <article class="card product-card">
+              <div class="position-relative">
+                <img src="../assets/images/products/tra-dao-cam-sa.jpg" class="card-img-top" alt="Trà đào cam sả" />
+
+                <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3">
+                  Yêu thích
+                </span>
+              </div>
+
+              <div class="card-body d-flex flex-column">
+                <p class="small text-secondary mb-1">
+                  Trà trái cây
+                </p>
+
+                <h3 class="card-title h5">Trà đào cam sả</h3>
+
+                <p class="card-text text-secondary">
+                  Trà đào thanh mát kết hợp cùng cam tươi và sả.
+                </p>
+
+                <div class="mt-auto">
+                  <p class="fw-bold text-danger fs-5 mb-3">
+                    49.000đ
+                  </p>
+
+                  <div class="d-flex gap-2">
+                    <a href="product-detail.html?id=4" class="btn btn-outline-coffee flex-grow-1">
+                      Chi tiết
+                    </a>
+
+                    <button type="button" class="btn btn-coffee add-to-cart" data-id="4" data-name="Trà đào cam sả"
+                      data-price="49000" data-image="../assets/images/products/tra-dao-cam-sa.jpg"
+                      title="Thêm vào giỏ hàng">
+                      <i class="bi bi-cart-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- Sản phẩm 5 -->
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3 product-item" data-id="5" data-name="Trà vải"
+            data-category="tea" data-price="45000">
+            <article class="card product-card">
+              <div class="position-relative">
+                <img src="../assets/images/products/tra-vai.jpg" class="card-img-top" alt="Trà vải" />
+              </div>
+
+              <div class="card-body d-flex flex-column">
+                <p class="small text-secondary mb-1">
+                  Trà trái cây
+                </p>
+
+                <h3 class="card-title h5">Trà vải</h3>
+
+                <p class="card-text text-secondary">
+                  Trà thơm nhẹ kết hợp với quả vải ngọt thanh.
+                </p>
+
+                <div class="mt-auto">
+                  <p class="fw-bold text-danger fs-5 mb-3">
+                    45.000đ
+                  </p>
+
+                  <div class="d-flex gap-2">
+                    <a href="product-detail.html?id=5" class="btn btn-outline-coffee flex-grow-1">
+                      Chi tiết
+                    </a>
+
+                    <button type="button" class="btn btn-coffee add-to-cart" data-id="5" data-name="Trà vải"
+                      data-price="45000" data-image="../assets/images/products/tra-vai.jpg" title="Thêm vào giỏ hàng">
+                      <i class="bi bi-cart-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- Sản phẩm 6 -->
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3 product-item" data-id="6" data-name="Trà dâu"
+            data-category="tea" data-price="47000">
+            <article class="card product-card">
+              <div class="position-relative">
+                <img src="../assets/images/products/tra-dau.jpg" class="card-img-top" alt="Trà dâu" />
+              </div>
+
+              <div class="card-body d-flex flex-column">
+                <p class="small text-secondary mb-1">
+                  Trà trái cây
+                </p>
+
+                <h3 class="card-title h5">Trà dâu</h3>
+
+                <p class="card-text text-secondary">
+                  Trà trái cây kết hợp dâu tươi có vị chua ngọt.
+                </p>
+
+                <div class="mt-auto">
+                  <p class="fw-bold text-danger fs-5 mb-3">
+                    47.000đ
+                  </p>
+
+                  <div class="d-flex gap-2">
+                    <a href="product-detail.html?id=6" class="btn btn-outline-coffee flex-grow-1">
+                      Chi tiết
+                    </a>
+
+                    <button type="button" class="btn btn-coffee add-to-cart" data-id="6" data-name="Trà dâu"
+                      data-price="47000" data-image="../assets/images/products/tra-dau.jpg" title="Thêm vào giỏ hàng">
+                      <i class="bi bi-cart-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- ==================== ĐÁ XAY ==================== -->
+
+          <!-- Sản phẩm 7 -->
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3 product-item" data-id="7" data-name="Matcha đá xay"
+            data-category="ice-blended" data-price="55000">
+            <article class="card product-card">
+              <div class="position-relative">
+                <img src="../assets/images/products/matcha-da-xay.jpg" class="card-img-top" alt="Matcha đá xay" />
+
+                <span class="badge bg-success position-absolute top-0 start-0 m-3">
+                  Mới
+                </span>
+              </div>
+
+              <div class="card-body d-flex flex-column">
+                <p class="small text-secondary mb-1">
+                  Đá xay
+                </p>
+
+                <h3 class="card-title h5">Matcha đá xay</h3>
+
+                <p class="card-text text-secondary">
+                  Matcha thơm nhẹ kết hợp với sữa và kem tươi.
+                </p>
+
+                <div class="mt-auto">
+                  <p class="fw-bold text-danger fs-5 mb-3">
+                    55.000đ
+                  </p>
+
+                  <div class="d-flex gap-2">
+                    <a href="product-detail.html?id=7" class="btn btn-outline-coffee flex-grow-1">
+                      Chi tiết
+                    </a>
+
+                    <button type="button" class="btn btn-coffee add-to-cart" data-id="7" data-name="Matcha đá xay"
+                      data-price="55000" data-image="../assets/images/products/matcha-da-xay.jpg"
+                      title="Thêm vào giỏ hàng">
+                      <i class="bi bi-cart-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- Sản phẩm 8 -->
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3 product-item" data-id="8" data-name="Chocolate đá xay"
+            data-category="ice-blended" data-price="59000">
+            <article class="card product-card">
+              <div class="position-relative">
+                <img src="../assets/images/products/chocolate-da-xay.jpg" class="card-img-top" alt="Chocolate đá xay" />
+              </div>
+
+              <div class="card-body d-flex flex-column">
+                <p class="small text-secondary mb-1">
+                  Đá xay
+                </p>
+
+                <h3 class="card-title h5">Chocolate đá xay</h3>
+
+                <p class="card-text text-secondary">
+                  Chocolate đậm vị hòa quyện cùng sữa và kem tươi.
+                </p>
+
+                <div class="mt-auto">
+                  <p class="fw-bold text-danger fs-5 mb-3">
+                    59.000đ
+                  </p>
+
+                  <div class="d-flex gap-2">
+                    <a href="product-detail.html?id=8" class="btn btn-outline-coffee flex-grow-1">
+                      Chi tiết
+                    </a>
+
+                    <button type="button" class="btn btn-coffee add-to-cart" data-id="8" data-name="Chocolate đá xay"
+                      data-price="59000" data-image="../assets/images/products/chocolate-da-xay.jpg"
+                      title="Thêm vào giỏ hàng">
+                      <i class="bi bi-cart-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- Sản phẩm 9 -->
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3 product-item" data-id="9" data-name="Cookies đá xay"
+            data-category="ice-blended" data-price="59000">
+            <article class="card product-card">
+              <div class="position-relative">
+                <img src="../assets/images/products/cookies-da-xay.jpg" class="card-img-top" alt="Cookies đá xay" />
+              </div>
+
+              <div class="card-body d-flex flex-column">
+                <p class="small text-secondary mb-1">
+                  Đá xay
+                </p>
+
+                <h3 class="card-title h5">Cookies đá xay</h3>
+
+                <p class="card-text text-secondary">
+                  Bánh cookies xay cùng sữa, đá và lớp kem mềm.
+                </p>
+
+                <div class="mt-auto">
+                  <p class="fw-bold text-danger fs-5 mb-3">
+                    59.000đ
+                  </p>
+
+                  <div class="d-flex gap-2">
+                    <a href="product-detail.html?id=9" class="btn btn-outline-coffee flex-grow-1">
+                      Chi tiết
+                    </a>
+
+                    <button type="button" class="btn btn-coffee add-to-cart" data-id="9" data-name="Cookies đá xay"
+                      data-price="59000" data-image="../assets/images/products/cookies-da-xay.jpg"
+                      title="Thêm vào giỏ hàng">
+                      <i class="bi bi-cart-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- ==================== BÁNH NGỌT ==================== -->
+
+          <!-- Sản phẩm 10 -->
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3 product-item" data-id="10" data-name="Bánh tiramisu"
+            data-category="cake" data-price="45000">
+            <article class="card product-card">
+              <div class="position-relative">
+                <img src="../assets/images/products/banh-tiramisu.jpg" class="card-img-top" alt="Bánh tiramisu" />
+
+                <span class="badge bg-warning text-dark position-absolute top-0 start-0 m-3">
+                  Yêu thích
+                </span>
+              </div>
+
+              <div class="card-body d-flex flex-column">
+                <p class="small text-secondary mb-1">
+                  Bánh ngọt
+                </p>
+
+                <h3 class="card-title h5">Bánh tiramisu</h3>
+
+                <p class="card-text text-secondary">
+                  Bánh mềm mịn với hương cà phê và lớp kem béo nhẹ.
+                </p>
+
+                <div class="mt-auto">
+                  <p class="fw-bold text-danger fs-5 mb-3">
+                    45.000đ
+                  </p>
+
+                  <div class="d-flex gap-2">
+                    <a href="product-detail.html?id=10" class="btn btn-outline-coffee flex-grow-1">
+                      Chi tiết
+                    </a>
+
+                    <button type="button" class="btn btn-coffee add-to-cart" data-id="10" data-name="Bánh tiramisu"
+                      data-price="45000" data-image="../assets/images/products/banh-tiramisu.jpg"
+                      title="Thêm vào giỏ hàng">
+                      <i class="bi bi-cart-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- Sản phẩm 11 -->
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3 product-item" data-id="11" data-name="Bánh croissant"
+            data-category="cake" data-price="35000">
+            <article class="card product-card">
+              <div class="position-relative">
+                <img src="../assets/images/products/banh-croissant.jpg" class="card-img-top" alt="Bánh croissant" />
+              </div>
+
+              <div class="card-body d-flex flex-column">
+                <p class="small text-secondary mb-1">
+                  Bánh ngọt
+                </p>
+
+                <h3 class="card-title h5">Bánh croissant</h3>
+
+                <p class="card-text text-secondary">
+                  Bánh sừng bò có lớp vỏ giòn và hương bơ thơm.
+                </p>
+
+                <div class="mt-auto">
+                  <p class="fw-bold text-danger fs-5 mb-3">
+                    35.000đ
+                  </p>
+
+                  <div class="d-flex gap-2">
+                    <a href="product-detail.html?id=11" class="btn btn-outline-coffee flex-grow-1">
+                      Chi tiết
+                    </a>
+
+                    <button type="button" class="btn btn-coffee add-to-cart" data-id="11" data-name="Bánh croissant"
+                      data-price="35000" data-image="../assets/images/products/banh-croissant.jpg"
+                      title="Thêm vào giỏ hàng">
+                      <i class="bi bi-cart-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- Sản phẩm 12 -->
+          <div class="col-12 col-sm-6 col-lg-4 col-xl-3 product-item" data-id="12" data-name="Bánh mousse chocolate"
+            data-category="cake" data-price="49000">
+            <article class="card product-card">
+              <div class="position-relative">
+                <img src="../assets/images/products/banh-mousse-chocolate.jpg" class="card-img-top"
+                  alt="Bánh mousse chocolate" />
+              </div>
+
+              <div class="card-body d-flex flex-column">
+                <p class="small text-secondary mb-1">
+                  Bánh ngọt
+                </p>
+
+                <h3 class="card-title h5">
+                  Bánh mousse chocolate
+                </h3>
+
+                <p class="card-text text-secondary">
+                  Bánh mousse mềm mịn với chocolate đậm đà.
+                </p>
+
+                <div class="mt-auto">
+                  <p class="fw-bold text-danger fs-5 mb-3">
+                    49.000đ
+                  </p>
+
+                  <div class="d-flex gap-2">
+                    <a href="product-detail.html?id=12" class="btn btn-outline-coffee flex-grow-1">
+                      Chi tiết
+                    </a>
+
+                    <button type="button" class="btn btn-coffee add-to-cart" data-id="12"
+                      data-name="Bánh mousse chocolate" data-price="49000"
+                      data-image="../assets/images/products/banh-mousse-chocolate.jpg" title="Thêm vào giỏ hàng">
+                      <i class="bi bi-cart-plus"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+
+        <!-- Thông báo không tìm thấy -->
+        <div id="empty-result" class="text-center py-5 d-none">
+          <i class="bi bi-search display-3 text-secondary"></i>
+
+          <h3 class="h4 mt-3">Không tìm thấy món phù hợp</h3>
+
+          <p class="text-secondary">
+            Hãy thử thay đổi từ khóa hoặc chọn danh mục khác.
+          </p>
+
+          <button type="button" id="empty-reset-filter" class="btn btn-coffee">
+            Xem tất cả món
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Phần đặt bàn -->
+    <section class="booking-callout py-5">
+      <div class="container text-center text-white">
+        <h2 class="fw-bold">Bạn muốn dùng món tại quán?</h2>
+
+        <p class="lead mb-4">
+          Đặt bàn trước để lựa chọn vị trí phù hợp và được phục vụ
+          nhanh chóng.
+        </p>
+
+        <a href="booking.html" class="btn btn-light btn-lg">
+          <i class="bi bi-calendar2-check me-1"></i>
+          Đặt bàn ngay
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="bg-dark text-white pt-5">
+    <div class="container">
+      <div class="row g-4">
+        <!-- Giới thiệu -->
+        <div class="col-12 col-md-6 col-lg-4">
+          <h2 class="h4 fw-bold">
+            <i class="bi bi-cup-hot-fill me-2"></i>
+            Mộc Coffee
+          </h2>
+
+          <p class="text-white-50">
+            Không gian cà phê gần gũi với dịch vụ đặt bàn, gọi món
+            và thanh toán thuận tiện.
+          </p>
+
+          <div class="d-flex gap-3">
+            <a href="#" class="text-white fs-5" aria-label="Facebook">
+              <i class="bi bi-facebook"></i>
+            </a>
+
+            <a href="#" class="text-white fs-5" aria-label="Instagram">
+              <i class="bi bi-instagram"></i>
+            </a>
+
+            <a href="#" class="text-white fs-5" aria-label="TikTok">
+              <i class="bi bi-tiktok"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Liên kết -->
+        <div class="col-6 col-md-3 col-lg-2">
+          <h3 class="h5">Liên kết</h3>
+
+          <ul class="list-unstyled footer-links">
+            <li>
+              <a href="../index.html">Trang chủ</a>
+            </li>
+
+            <li>
+              <a href="menu.html">Thực đơn</a>
+            </li>
+
+            <li>
+              <a href="booking.html">Đặt bàn</a>
+            </li>
+
+            <li>
+              <a href="cart.html">Giỏ hàng</a>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Giờ mở cửa -->
+        <div class="col-6 col-md-3 col-lg-3">
+          <h3 class="h5">Giờ mở cửa</h3>
+
+          <ul class="list-unstyled text-white-50">
+            <li class="mb-2">
+              Thứ 2 – Thứ 6: 07:00 – 22:00
+            </li>
+
+            <li class="mb-2">
+              Thứ 7 – Chủ nhật: 07:00 – 23:00
+            </li>
+          </ul>
+        </div>
+
+        <!-- Liên hệ -->
+        <div class="col-12 col-lg-3">
+          <h3 class="h5">Liên hệ</h3>
+
+          <ul class="list-unstyled text-white-50">
+            <li class="mb-2">
+              <i class="bi bi-geo-alt-fill me-2"></i>
+              19 Nguyễn Hữu Thọ, Quận 7, TP.HCM
+            </li>
+
+            <li class="mb-2">
+              <i class="bi bi-telephone-fill me-2"></i>
+              0123 456 789
+            </li>
+
+            <li class="mb-2">
+              <i class="bi bi-envelope-fill me-2"></i>
+              moccoffee@example.com
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <hr class="border-secondary mt-4" />
+
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center py-3">
+        <p class="text-white-50 mb-2 mb-md-0">
+          &copy; <span id="current-year">2026</span> Mộc Coffee.
+          All rights reserved.
+        </p>
+
+        <a href="#" class="text-white-50">
+          Điều khoản và chính sách
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Thông báo thêm vào giỏ -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="cart-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <i class="bi bi-check-circle-fill text-success me-2"></i>
+
+        <strong class="me-auto">Mộc Coffee</strong>
+
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Đóng"></button>
+      </div>
+
+      <div class="toast-body">
+        Đã thêm món vào giỏ hàng.
+      </div>
+    </div>
+  </div>
+
+  <!-- Nút trở về đầu trang -->
+  <button type="button" id="back-to-top" class="btn btn-coffee rounded-circle" title="Quay lại đầu trang"
+    aria-label="Quay lại đầu trang">
+    <i class="bi bi-arrow-up"></i>
+  </button>
+
+  <!-- Bootstrap JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JavaScript của dự án -->
+  <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/menu.js"></script>
+</body>
+
+</html>

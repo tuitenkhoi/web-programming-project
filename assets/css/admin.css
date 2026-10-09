@@ -1,0 +1,1403 @@
+/* =========================================================
+   1. BIẾN MÀU VÀ THIẾT LẬP CHUNG
+========================================================= */
+
+:root {
+  --admin-sidebar-width: 270px;
+  --admin-topbar-height: 72px;
+
+  --admin-primary: #6f4e37;
+  --admin-primary-dark: #3e2723;
+  --admin-primary-light: #c68b59;
+
+  --admin-background: #f5f6f8;
+  --admin-sidebar-background: #25201d;
+  --admin-sidebar-hover: #3a312c;
+
+  --admin-text: #2d2d2d;
+  --admin-text-muted: #6c757d;
+  --admin-border: #e8e8e8;
+
+  --admin-success: #198754;
+  --admin-danger: #dc3545;
+  --admin-warning: #ffc107;
+  --admin-info: #0dcaf0;
+  --admin-blue: #0d6efd;
+
+  --admin-radius: 12px;
+  --admin-shadow: 0 4px 18px rgba(0, 0, 0, 0.07);
+  --admin-transition: all 0.25s ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body.admin-body {
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+  color: var(--admin-text);
+  background-color: var(--admin-background);
+}
+
+.admin-body a {
+  text-decoration: none;
+}
+
+/* =========================================================
+   2. SIDEBAR
+========================================================= */
+
+.admin-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  width: var(--admin-sidebar-width);
+  height: 100vh;
+  overflow-y: auto;
+  color: #ffffff;
+  background-color: var(--admin-sidebar-background);
+  transition: transform 0.3s ease;
+}
+
+.admin-sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.admin-sidebar::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+
+.admin-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--admin-topbar-height);
+  padding: 15px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-logo {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: #ffffff;
+  font-size: 21px;
+  font-weight: 700;
+}
+
+.admin-logo:hover {
+  color: var(--admin-primary-light);
+}
+
+.admin-logo i {
+  color: var(--admin-primary-light);
+  font-size: 25px;
+}
+
+.admin-user-box {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin: 20px 16px;
+  padding: 14px;
+  background-color: rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+}
+
+.admin-avatar {
+  display: flex;
+  flex: 0 0 42px;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  color: #ffffff;
+  background-color: var(--admin-primary);
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.admin-user-box strong,
+.admin-user-box small {
+  display: block;
+}
+
+.admin-user-box small {
+  max-width: 155px;
+  overflow: hidden;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-navigation {
+  padding: 0 12px 30px;
+}
+
+.admin-menu-title {
+  margin: 24px 12px 8px;
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.admin-menu {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-menu li {
+  margin-bottom: 4px;
+}
+
+.admin-menu a {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 11px 13px;
+  color: rgba(255, 255, 255, 0.72);
+  border-radius: 9px;
+  transition: var(--admin-transition);
+}
+
+.admin-menu a i {
+  width: 20px;
+  font-size: 18px;
+  text-align: center;
+}
+
+.admin-menu a:hover {
+  color: #ffffff;
+  background-color: var(--admin-sidebar-hover);
+  transform: translateX(3px);
+}
+
+.admin-menu a.active {
+  color: #ffffff;
+  background-color: var(--admin-primary);
+  box-shadow: 0 4px 12px rgba(111, 78, 55, 0.35);
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1035;
+  display: none;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.sidebar-overlay.show {
+  display: block;
+}
+
+/* =========================================================
+   3. NỘI DUNG CHÍNH VÀ TOPBAR
+========================================================= */
+
+.admin-main {
+  min-height: 100vh;
+  margin-left: var(--admin-sidebar-width);
+}
+
+.admin-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--admin-topbar-height);
+  padding: 12px 28px;
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--admin-border);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+}
+
+.admin-notifications {
+  width: 320px;
+  max-width: calc(100vw - 30px);
+}
+
+.admin-notifications .dropdown-item {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  white-space: normal;
+}
+
+.admin-content {
+  padding: 28px;
+}
+
+/* =========================================================
+   4. CARD VÀ THỐNG KÊ
+========================================================= */
+
+.admin-content .card,
+.admin-login-page .card {
+  border-radius: var(--admin-radius);
+}
+
+.admin-stat-card {
+  overflow: hidden;
+  transition: var(--admin-transition);
+}
+
+.admin-stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.1) !important;
+}
+
+.admin-stat-card .card-body {
+  padding: 22px;
+}
+
+.admin-stat-card h3 {
+  font-size: 27px;
+}
+
+.admin-stat-icon {
+  display: flex;
+  flex: 0 0 52px;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 13px;
+  font-size: 24px;
+}
+
+/* =========================================================
+   5. BẢNG QUẢN TRỊ
+========================================================= */
+
+.admin-table {
+  min-width: 850px;
+}
+
+.admin-table thead th {
+  padding-top: 14px;
+  padding-bottom: 14px;
+  color: #555555;
+  border-bottom-width: 1px;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.admin-table tbody td {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  border-color: #eeeeee;
+  vertical-align: middle;
+}
+
+.admin-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.admin-table tbody tr:hover {
+  background-color: #faf8f6;
+}
+
+.admin-table .dropdown-menu {
+  min-width: 190px;
+}
+
+.admin-table .dropdown-item {
+  padding: 9px 15px;
+}
+
+.admin-table .badge {
+  padding: 7px 10px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   6. BIỂU ĐỒ DOANH THU DASHBOARD
+========================================================= */
+
+.revenue-chart {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  justify-content: space-around;
+  min-height: 300px;
+  padding-top: 30px;
+  border-bottom: 1px solid #dddddd;
+}
+
+.revenue-column {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  height: 260px;
+  min-width: 42px;
+}
+
+.revenue-value {
+  min-height: 24px;
+  margin-bottom: 6px;
+  color: var(--admin-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.revenue-bar-wrapper {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  width: 44px;
+  max-width: 100%;
+  overflow: hidden;
+  background-color: #f1ebe7;
+  border-radius: 8px 8px 0 0;
+}
+
+.revenue-bar {
+  width: 100%;
+  min-height: 5px;
+  background: linear-gradient(180deg,
+      var(--admin-primary-light),
+      var(--admin-primary));
+  border-radius: 8px 8px 0 0;
+  transition: height 0.4s ease;
+}
+
+.revenue-column:hover .revenue-bar {
+  background: linear-gradient(180deg,
+      #d9a06e,
+      var(--admin-primary-dark));
+}
+
+.revenue-column>span {
+  margin-top: 9px;
+  color: var(--admin-text-muted);
+  font-size: 12px;
+}
+
+/* =========================================================
+   7. BIỂU ĐỒ TRẠNG THÁI BÀN
+========================================================= */
+
+.table-status-chart {
+  display: flex;
+  justify-content: center;
+}
+
+.table-status-circle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 165px;
+  height: 165px;
+  padding: 20px;
+  background:
+    radial-gradient(circle at center,
+      #ffffff 55%,
+      transparent 56%),
+    conic-gradient(var(--admin-danger) 0 60%,
+      var(--admin-success) 60% 85%,
+      var(--admin-warning) 85% 95%,
+      var(--admin-info) 95% 100%);
+  border-radius: 50%;
+}
+
+.table-status-circle>div {
+  text-align: center;
+}
+
+.table-status-circle strong,
+.table-status-circle small {
+  display: block;
+}
+
+.table-status-circle strong {
+  font-size: 28px;
+}
+
+.table-status-circle small {
+  color: var(--admin-text-muted);
+}
+
+.table-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.table-status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed #dddddd;
+}
+
+.table-status-row:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  border-radius: 50%;
+}
+
+.status-dot.available {
+  background-color: var(--admin-success);
+}
+
+.status-dot.occupied {
+  background-color: var(--admin-danger);
+}
+
+.status-dot.reserved {
+  background-color: var(--admin-warning);
+}
+
+.status-dot.cleaning {
+  background-color: var(--admin-info);
+}
+
+.status-dot.maintenance {
+  background-color: #6c757d;
+}
+
+.status-dot.unavailable {
+  background-color: var(--admin-danger);
+}
+
+/* =========================================================
+   8. ĐẶT BÀN GẦN NHẤT TRÊN DASHBOARD
+========================================================= */
+
+.dashboard-booking-item {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 17px;
+  padding-bottom: 17px;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.dashboard-booking-item:last-child {
+  border-bottom: none;
+}
+
+.booking-time-box {
+  display: flex;
+  flex: 0 0 72px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 62px;
+  color: var(--admin-primary);
+  background-color: #f5eee8;
+  border-radius: 10px;
+}
+
+.booking-time-box strong,
+.booking-time-box small {
+  display: block;
+}
+
+.booking-time-box strong {
+  font-size: 17px;
+}
+
+.booking-time-box small {
+  font-size: 11px;
+}
+
+/* =========================================================
+   9. MÓN BÁN CHẠY
+========================================================= */
+
+.best-selling-item {
+  display: grid;
+  grid-template-columns: 40px minmax(150px, 1fr) auto;
+  gap: 15px;
+  align-items: center;
+  margin-bottom: 21px;
+}
+
+.best-selling-rank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  color: var(--admin-primary);
+  background-color: #f4ece7;
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.best-selling-item .progress {
+  height: 7px;
+}
+
+/* =========================================================
+   10. TRUY CẬP NHANH
+========================================================= */
+
+.dashboard-quick-action {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  align-items: center;
+  justify-content: center;
+  min-height: 105px;
+  padding: 15px;
+  color: var(--admin-text);
+  background-color: #faf9f8;
+  border: 1px solid #eeeeee;
+  border-radius: 11px;
+  text-align: center;
+  transition: var(--admin-transition);
+}
+
+.dashboard-quick-action i {
+  color: var(--admin-primary);
+  font-size: 27px;
+}
+
+.dashboard-quick-action span {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.dashboard-quick-action:hover {
+  color: #ffffff;
+  background-color: var(--admin-primary);
+  border-color: var(--admin-primary);
+  transform: translateY(-3px);
+}
+
+.dashboard-quick-action:hover i {
+  color: #ffffff;
+}
+
+/* =========================================================
+   11. HÌNH ẢNH SẢN PHẨM TRONG ADMIN
+========================================================= */
+
+.admin-product-image {
+  width: 58px;
+  height: 58px;
+  object-fit: cover;
+  background-color: #eeeeee;
+  border-radius: 9px;
+}
+
+.admin-grid-product-image {
+  width: 100%;
+  height: 190px;
+  object-fit: cover;
+}
+
+.product-image-upload {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 275px;
+  padding: 20px;
+  background-color: #fafafa;
+  border: 2px dashed #d5d5d5;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.product-image-upload img {
+  width: 100%;
+  max-width: 240px;
+  height: 180px;
+  object-fit: cover;
+  background-color: #eeeeee;
+  border-radius: 10px;
+}
+
+/* =========================================================
+   12. SƠ ĐỒ QUẢN LÝ BÀN
+========================================================= */
+
+.table-area-section {
+  padding-bottom: 5px;
+}
+
+.table-management-card {
+  height: 100%;
+  overflow: hidden;
+  background-color: #ffffff;
+  border: 2px solid #dddddd;
+  border-radius: 13px;
+  box-shadow: 0 3px 13px rgba(0, 0, 0, 0.05);
+  transition: var(--admin-transition);
+}
+
+.table-management-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--admin-shadow);
+}
+
+.table-management-card.available {
+  border-color: rgba(25, 135, 84, 0.55);
+}
+
+.table-management-card.occupied {
+  border-color: rgba(220, 53, 69, 0.55);
+}
+
+.table-management-card.reserved {
+  border-color: rgba(255, 193, 7, 0.75);
+}
+
+.table-management-card.cleaning {
+  border-color: rgba(13, 202, 240, 0.65);
+}
+
+.table-management-card.maintenance {
+  border-color: rgba(108, 117, 125, 0.65);
+}
+
+.table-card-header,
+.table-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-card-header {
+  padding: 11px 13px;
+}
+
+.table-card-footer {
+  min-height: 48px;
+  padding: 10px 14px;
+  background-color: #fafafa;
+  border-top: 1px solid #eeeeee;
+}
+
+.table-card-body {
+  padding: 16px 15px 25px;
+  text-align: center;
+}
+
+.table-card-body h4 {
+  margin: 8px 0 4px;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.table-card-body p {
+  margin-bottom: 0;
+  color: var(--admin-text-muted);
+}
+
+.table-card-icon {
+  font-size: 42px;
+}
+
+.table-management-card.available .table-card-icon,
+.table-management-card.available .table-status-label {
+  color: var(--admin-success);
+}
+
+.table-management-card.occupied .table-card-icon,
+.table-management-card.occupied .table-status-label {
+  color: var(--admin-danger);
+}
+
+.table-management-card.reserved .table-card-icon,
+.table-management-card.reserved .table-status-label {
+  color: #b78500;
+}
+
+.table-management-card.cleaning .table-card-icon,
+.table-management-card.cleaning .table-status-label {
+  color: #087990;
+}
+
+.table-management-card.maintenance .table-card-icon,
+.table-management-card.maintenance .table-status-label {
+  color: #6c757d;
+}
+
+.table-status-label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.detail-table-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 90px;
+  height: 90px;
+  margin: 0 auto;
+  background-color: #eeeeee;
+  border-radius: 50%;
+  font-size: 40px;
+}
+
+.detail-table-icon.available {
+  color: var(--admin-success);
+  background-color: rgba(25, 135, 84, 0.12);
+}
+
+.detail-table-icon.occupied {
+  color: var(--admin-danger);
+  background-color: rgba(220, 53, 69, 0.12);
+}
+
+.detail-table-icon.reserved {
+  color: #9a7300;
+  background-color: rgba(255, 193, 7, 0.18);
+}
+
+/* =========================================================
+   13. THÔNG TIN CHI TIẾT VÀ TỔNG TIỀN
+========================================================= */
+
+.admin-detail-item,
+.summary-row,
+.bank-info-row {
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 13px;
+}
+
+.admin-detail-item {
+  padding-bottom: 11px;
+  border-bottom: 1px dashed #dddddd;
+}
+
+.admin-detail-item:last-child {
+  margin-bottom: 0;
+  border-bottom: none;
+}
+
+.admin-detail-item>span {
+  flex: 0 0 42%;
+  color: var(--admin-text-muted);
+}
+
+.admin-detail-item>strong {
+  text-align: right;
+}
+
+.summary-row>span {
+  color: var(--admin-text-muted);
+}
+
+/* =========================================================
+   14. TIẾN TRÌNH ĐƠN HÀNG
+========================================================= */
+
+.order-timeline {
+  display: flex;
+  justify-content: space-between;
+  overflow-x: auto;
+  padding: 10px 0 5px;
+}
+
+.order-timeline-item {
+  position: relative;
+  display: flex;
+  flex: 1;
+  gap: 10px;
+  align-items: center;
+  min-width: 180px;
+  color: var(--admin-text-muted);
+}
+
+.order-timeline-item:not(:last-child)::after {
+  position: absolute;
+  top: 19px;
+  right: 10px;
+  left: 55px;
+  height: 2px;
+  background-color: #dddddd;
+  content: "";
+}
+
+.timeline-icon {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: 0 0 40px;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: #eeeeee;
+  border-radius: 50%;
+}
+
+.order-timeline-item strong,
+.order-timeline-item small {
+  display: block;
+}
+
+.order-timeline-item small {
+  margin-top: 2px;
+  font-size: 11px;
+}
+
+.order-timeline-item.completed {
+  color: var(--admin-success);
+}
+
+.order-timeline-item.completed .timeline-icon {
+  color: #ffffff;
+  background-color: var(--admin-success);
+}
+
+.order-timeline-item.completed::after {
+  background-color: var(--admin-success);
+}
+
+/* =========================================================
+   15. MODAL, FORM VÀ DROPDOWN
+========================================================= */
+
+.admin-body .modal-content {
+  border-radius: 14px;
+}
+
+.admin-body .modal-header,
+.admin-body .modal-footer {
+  padding: 17px 22px;
+}
+
+.admin-body .modal-body {
+  padding: 22px;
+}
+
+.admin-body .form-control,
+.admin-body .form-select,
+.admin-login-body .form-control {
+  min-height: 44px;
+  border-color: #dcdcdc;
+  border-radius: 8px;
+}
+
+.admin-body textarea.form-control {
+  min-height: unset;
+}
+
+.admin-body .form-control:focus,
+.admin-body .form-select:focus,
+.admin-login-body .form-control:focus {
+  border-color: var(--admin-primary-light);
+  box-shadow: 0 0 0 0.2rem rgba(111, 78, 55, 0.13);
+}
+
+.admin-body .pagination .page-link {
+  color: var(--admin-primary);
+}
+
+.admin-body .pagination .page-item.active .page-link {
+  color: #ffffff;
+  background-color: var(--admin-primary);
+  border-color: var(--admin-primary);
+}
+
+.admin-body .breadcrumb a {
+  color: var(--admin-primary);
+}
+
+/* =========================================================
+   16. NÚT CHUNG ADMIN
+========================================================= */
+
+.admin-body .btn-coffee,
+.admin-login-body .btn-coffee {
+  color: #ffffff;
+  background-color: var(--admin-primary);
+  border-color: var(--admin-primary);
+}
+
+.admin-body .btn-coffee:hover,
+.admin-login-body .btn-coffee:hover {
+  color: #ffffff;
+  background-color: var(--admin-primary-dark);
+  border-color: var(--admin-primary-dark);
+}
+
+.admin-body .btn-outline-coffee,
+.admin-login-body .btn-outline-coffee {
+  color: var(--admin-primary);
+  background-color: transparent;
+  border-color: var(--admin-primary);
+}
+
+.admin-body .btn-outline-coffee:hover,
+.admin-login-body .btn-outline-coffee:hover {
+  color: #ffffff;
+  background-color: var(--admin-primary);
+}
+
+/* =========================================================
+   17. TRANG ĐĂNG NHẬP
+========================================================= */
+
+.admin-login-body {
+  min-height: 100vh;
+  margin: 0;
+  color: var(--admin-text);
+  background-color: #ffffff;
+}
+
+.admin-login-page {
+  min-height: 100vh;
+}
+
+.admin-login-cover {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 15% 20%,
+      rgba(198, 139, 89, 0.45),
+      transparent 28%),
+    radial-gradient(circle at 85% 80%,
+      rgba(85, 113, 83, 0.3),
+      transparent 30%),
+    linear-gradient(135deg,
+      #251914 0%,
+      #4b3327 52%,
+      #6f4e37 100%);
+}
+
+.admin-login-cover::before {
+  position: absolute;
+  top: -130px;
+  right: -130px;
+  width: 350px;
+  height: 350px;
+  border: 60px solid rgba(255, 255, 255, 0.04);
+  border-radius: 50%;
+  content: "";
+}
+
+.admin-login-cover::after {
+  position: absolute;
+  bottom: -100px;
+  left: -100px;
+  width: 280px;
+  height: 280px;
+  background-color: rgba(255, 255, 255, 0.04);
+  border-radius: 50%;
+  content: "";
+}
+
+.admin-login-overlay {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px),
+    linear-gradient(90deg,
+      rgba(255, 255, 255, 0.025) 1px,
+      transparent 1px);
+  background-size: 35px 35px;
+}
+
+.admin-login-introduction {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100vh;
+  padding: 50px 8%;
+}
+
+.admin-login-logo {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  width: max-content;
+  color: #ffffff;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.admin-login-logo:hover {
+  color: var(--admin-primary-light);
+}
+
+.admin-login-logo i {
+  color: var(--admin-primary-light);
+}
+
+.login-feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 17px;
+  max-width: 540px;
+}
+
+.login-feature-item {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 15px;
+  background-color: rgba(255, 255, 255, 0.09);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 11px;
+  backdrop-filter: blur(8px);
+}
+
+.login-feature-icon {
+  display: flex;
+  flex: 0 0 45px;
+  align-items: center;
+  justify-content: center;
+  width: 45px;
+  height: 45px;
+  color: var(--admin-primary-dark);
+  background-color: var(--admin-primary-light);
+  border-radius: 10px;
+  font-size: 21px;
+}
+
+.login-feature-item strong,
+.login-feature-item small {
+  display: block;
+}
+
+.login-feature-item small {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.admin-login-form-section {
+  min-height: 100vh;
+  padding: 40px 25px;
+  background-color: #ffffff;
+}
+
+.admin-login-form-wrapper {
+  width: 100%;
+  max-width: 480px;
+}
+
+.login-input-group .input-group-text {
+  color: var(--admin-primary);
+  border-right: none;
+}
+
+.login-input-group .form-control {
+  border-right: none;
+  border-left: none;
+}
+
+.login-input-group .form-control:last-child {
+  border-right: 1px solid #dcdcdc;
+}
+
+.login-input-group .btn {
+  min-width: 48px;
+}
+
+.demo-account-box {
+  padding: 17px;
+  background-color: #f7f2ee;
+  border: 1px solid #e8d9cd;
+  border-radius: 11px;
+}
+
+.demo-account-box code {
+  color: var(--admin-primary-dark);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   18. HIỆU ỨNG QUAY
+========================================================= */
+
+.spin {
+  animation: admin-spin 0.65s linear infinite;
+}
+
+@keyframes admin-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================================
+   19. TOAST
+========================================================= */
+
+.admin-body .toast,
+.admin-login-body .toast {
+  overflow: hidden;
+  border: none;
+  border-radius: 10px;
+  box-shadow: var(--admin-shadow);
+}
+
+/* =========================================================
+   20. RESPONSIVE TABLET VÀ ĐIỆN THOẠI
+========================================================= */
+
+@media (max-width: 1199.98px) {
+  .revenue-chart {
+    min-height: 270px;
+  }
+
+  .revenue-column {
+    height: 230px;
+  }
+
+  .best-selling-item {
+    grid-template-columns: 38px minmax(130px, 1fr);
+  }
+
+  .best-selling-item>strong {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 991.98px) {
+  .admin-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .admin-sidebar.show {
+    transform: translateX(0);
+  }
+
+  .admin-main {
+    margin-left: 0;
+  }
+
+  .admin-topbar {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+
+  .admin-content {
+    padding: 22px 18px;
+  }
+
+  body.sidebar-open {
+    overflow: hidden;
+  }
+
+  .admin-login-form-section {
+    padding: 35px 20px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .admin-topbar {
+    min-height: 65px;
+  }
+
+  .admin-topbar h1 {
+    font-size: 17px;
+  }
+
+  .admin-topbar small {
+    display: none;
+  }
+
+  .admin-content {
+    padding: 18px 12px;
+  }
+
+  .admin-stat-card .card-body {
+    padding: 18px;
+  }
+
+  .admin-stat-card h3 {
+    font-size: 23px;
+  }
+
+  .admin-stat-icon {
+    flex-basis: 45px;
+    width: 45px;
+    height: 45px;
+    font-size: 21px;
+  }
+
+  .revenue-chart {
+    gap: 7px;
+    min-width: 560px;
+  }
+
+  .revenue-chart {
+    overflow-x: auto;
+  }
+
+  .revenue-bar-wrapper {
+    width: 35px;
+  }
+
+  .order-timeline {
+    gap: 15px;
+  }
+
+  .admin-detail-item {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .admin-detail-item>span {
+    flex-basis: auto;
+  }
+
+  .admin-detail-item>strong {
+    text-align: left;
+  }
+
+  .best-selling-item {
+    grid-template-columns: 35px 1fr;
+    gap: 10px;
+  }
+
+  .admin-notifications {
+    width: 290px;
+  }
+
+  .admin-login-form-wrapper {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .admin-topbar {
+    padding: 10px 12px;
+  }
+
+  .admin-content {
+    padding: 15px 10px;
+  }
+
+  .admin-content .card-header,
+  .admin-content .card-body,
+  .admin-content .card-footer {
+    padding: 16px;
+  }
+
+  .admin-stat-card .card-body {
+    padding: 17px;
+  }
+
+  .table-management-card {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .dashboard-quick-action {
+    min-height: 95px;
+    padding: 10px;
+  }
+
+  .dashboard-quick-action i {
+    font-size: 23px;
+  }
+
+  .dashboard-booking-item {
+    align-items: flex-start;
+  }
+
+  .booking-time-box {
+    flex-basis: 62px;
+    width: 62px;
+  }
+
+  .admin-login-form-section {
+    padding: 25px 16px;
+  }
+
+  .admin-login-form-wrapper h2 {
+    font-size: 32px;
+  }
+
+  .modal-footer {
+    flex-wrap: nowrap;
+  }
+
+  .modal-footer .btn {
+    flex: 1;
+  }
+}
+
+/* =========================================================
+   21. CHẾ ĐỘ IN
+========================================================= */
+
+@media print {
+
+  .admin-sidebar,
+  .admin-topbar,
+  .sidebar-overlay,
+  .btn,
+  .dropdown,
+  .pagination,
+  .toast-container,
+  form,
+  footer {
+    display: none !important;
+  }
+
+  .admin-main {
+    margin: 0;
+  }
+
+  .admin-content {
+    padding: 0;
+  }
+
+  .card {
+    border: 1px solid #dddddd !important;
+    box-shadow: none !important;
+  }
+
+  .table-responsive {
+    overflow: visible;
+  }
+
+  .admin-table {
+    min-width: 100%;
+    font-size: 11px;
+  }
+
+  body {
+    color: #000000;
+    background-color: #ffffff;
+  }
+}

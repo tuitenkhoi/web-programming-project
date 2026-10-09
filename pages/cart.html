@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta name="description" content="Giỏ hàng và đơn gọi món tại Mộc Coffee." />
+
+  <title>Giỏ hàng - Mộc Coffee</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <!-- CSS của dự án -->
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/responsive.css" />
+</head>
+
+<body>
+  <!-- ==================== HEADER ==================== -->
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center fw-bold" href="../index.html">
+          <i class="bi bi-cup-hot-fill me-2"></i>
+          Mộc Coffee
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+          aria-controls="mainNavbar" aria-expanded="false" aria-label="Mở menu điều hướng">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+          <ul class="navbar-nav ms-auto align-items-lg-center">
+            <li class="nav-item">
+              <a class="nav-link" href="../index.html">
+                Trang chủ
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="menu.html">
+                Thực đơn
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="../index.html#about">
+                Giới thiệu
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="../index.html#contact">
+                Liên hệ
+              </a>
+            </li>
+
+            <li class="nav-item ms-lg-2">
+              <a class="btn btn-outline-light" href="booking.html">
+                <i class="bi bi-calendar-check me-1"></i>
+                Đặt bàn
+              </a>
+            </li>
+
+            <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+              <a class="btn btn-coffee position-relative active" href="cart.html" aria-current="page">
+                <i class="bi bi-cart3 me-1"></i>
+                Giỏ hàng
+
+                <span id="cart-count"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  0
+                </span>
+              </a>
+            </li>
+
+            <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+              <a class="nav-link" href="../admin/login.html" title="Đăng nhập quản trị">
+                <i class="bi bi-person-circle fs-5"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ==================== MAIN ==================== -->
+  <main>
+    <!-- Banner -->
+    <section class="page-banner cart-banner">
+      <div class="container text-center text-white">
+        <h1 class="display-5 fw-bold">Giỏ hàng của bạn</h1>
+
+        <p class="lead mb-0">
+          Kiểm tra món, số lượng và tổng tiền trước khi gửi đơn.
+        </p>
+      </div>
+    </section>
+
+    <!-- Breadcrumb -->
+    <section class="bg-light border-bottom">
+      <div class="container py-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item">
+              <a href="../index.html">Trang chủ</a>
+            </li>
+
+            <li class="breadcrumb-item">
+              <a href="menu.html">Thực đơn</a>
+            </li>
+
+            <li class="breadcrumb-item active" aria-current="page">
+              Giỏ hàng
+            </li>
+          </ol>
+        </nav>
+      </div>
+    </section>
+
+    <!-- Các bước gọi món -->
+    <section class="py-4 bg-white border-bottom">
+      <div class="container">
+        <div class="booking-steps">
+          <div class="booking-step active">
+            <span class="step-number">
+              <i class="bi bi-check-lg"></i>
+            </span>
+            <span class="step-label">Chọn món</span>
+          </div>
+
+          <div class="step-line active"></div>
+
+          <div class="booking-step active">
+            <span class="step-number">2</span>
+            <span class="step-label">Giỏ hàng</span>
+          </div>
+
+          <div class="step-line"></div>
+
+          <div class="booking-step">
+            <span class="step-number">3</span>
+            <span class="step-label">Thanh toán</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Nội dung giỏ hàng -->
+    <section class="py-5 bg-light">
+      <div class="container">
+        <!-- Giỏ hàng có sản phẩm -->
+        <div id="cart-content" class="row g-4">
+          <!-- Danh sách sản phẩm -->
+          <div class="col-12 col-lg-8">
+            <div class="card border-0 shadow-sm">
+              <div
+                class="card-header bg-white d-flex flex-column flex-sm-row justify-content-between align-items-sm-center p-4">
+                <div>
+                  <h2 class="h4 mb-1">
+                    <i class="bi bi-bag-check me-2"></i>
+                    Món đã chọn
+                  </h2>
+
+                  <p class="text-secondary mb-0">
+                    Có
+                    <strong id="cart-item-count">0</strong>
+                    món trong giỏ hàng.
+                  </p>
+                </div>
+
+                <button type="button" id="open-clear-cart-modal" class="btn btn-outline-danger btn-sm mt-3 mt-sm-0"
+                  data-bs-toggle="modal" data-bs-target="#clear-cart-modal">
+                  <i class="bi bi-trash3 me-1"></i>
+                  Xóa toàn bộ
+                </button>
+              </div>
+
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table cart-table align-middle mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th scope="col" class="ps-4">
+                          Sản phẩm
+                        </th>
+                        <th scope="col">Đơn giá</th>
+                        <th scope="col">Số lượng</th>
+                        <th scope="col">Thành tiền</th>
+                        <th scope="col" class="text-center pe-4">
+                          Xóa
+                        </th>
+                      </tr>
+                    </thead>
+
+                    <tbody id="cart-table-body">
+                      <!-- cart.js sẽ hiển thị sản phẩm tại đây -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="card-footer bg-white p-4 d-flex flex-column flex-sm-row justify-content-between gap-2">
+                <a href="menu.html" class="btn btn-outline-coffee">
+                  <i class="bi bi-arrow-left me-1"></i>
+                  Tiếp tục chọn món
+                </a>
+
+                <button type="button" id="update-cart-button" class="btn btn-coffee">
+                  <i class="bi bi-arrow-clockwise me-1"></i>
+                  Cập nhật giỏ hàng
+                </button>
+              </div>
+            </div>
+
+            <!-- Thông tin dùng món -->
+            <div class="card border-0 shadow-sm mt-4">
+              <div class="card-body p-4">
+                <h2 class="h4 mb-4">
+                  <i class="bi bi-shop me-2"></i>
+                  Thông tin sử dụng dịch vụ
+                </h2>
+
+                <!-- Hình thức nhận món -->
+                <div class="mb-4">
+                  <label class="form-label fw-semibold">
+                    Hình thức nhận món
+                  </label>
+
+                  <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                      <input type="radio" class="btn-check" name="orderType" id="order-at-table" value="at-table"
+                        autocomplete="off" checked />
+
+                      <label class="service-option" for="order-at-table">
+                        <i class="bi bi-cup-hot fs-3"></i>
+
+                        <span>
+                          <strong>Dùng tại bàn</strong>
+                          <small>
+                            Nhân viên mang món đến bàn
+                          </small>
+                        </span>
+                      </label>
+                    </div>
+
+                    <div class="col-12 col-md-6">
+                      <input type="radio" class="btn-check" name="orderType" id="order-takeaway" value="takeaway"
+                        autocomplete="off" />
+
+                      <label class="service-option" for="order-takeaway">
+                        <i class="bi bi-bag fs-3"></i>
+
+                        <span>
+                          <strong>Mang đi</strong>
+                          <small>
+                            Nhận món tại quầy
+                          </small>
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row g-3">
+                  <!-- Mã bàn -->
+                  <div class="col-12 col-md-6" id="table-code-group">
+                    <label for="table-code" class="form-label fw-semibold">
+                      Mã bàn
+                      <span class="text-danger">*</span>
+                    </label>
+
+                    <select id="table-code" class="form-select">
+                      <option value="" selected>
+                        Chọn mã bàn
+                      </option>
+                      <option value="T01">Bàn T01</option>
+                      <option value="T02">Bàn T02</option>
+                      <option value="T03">Bàn T03</option>
+                      <option value="T04">Bàn T04</option>
+                      <option value="T05">Bàn T05</option>
+                      <option value="T06">Bàn T06</option>
+                      <option value="T07">Bàn T07</option>
+                      <option value="T08">Bàn T08</option>
+                    </select>
+
+                    <div id="table-code-error" class="text-danger small mt-1 d-none">
+                      Vui lòng chọn mã bàn.
+                    </div>
+                  </div>
+
+                  <!-- Tên khách -->
+                  <div class="col-12 col-md-6">
+                    <label for="order-customer-name" class="form-label fw-semibold">
+                      Tên khách hàng
+                    </label>
+
+                    <input type="text" id="order-customer-name" class="form-control" placeholder="Nhập tên của bạn"
+                      maxlength="100" />
+                  </div>
+
+                  <!-- Ghi chú -->
+                  <div class="col-12">
+                    <label for="order-note" class="form-label fw-semibold">
+                      Ghi chú chung
+                    </label>
+
+                    <textarea id="order-note" class="form-control" rows="3" maxlength="300"
+                      placeholder="Ví dụ: Mang món ra cùng lúc, cần thêm ly đá..."></textarea>
+
+                    <div class="text-end mt-1">
+                      <small class="text-secondary">
+                        <span id="order-note-count">0</span>/300
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ghi chú -->
+            <div class="alert alert-warning mt-4 mb-0">
+              <div class="d-flex">
+                <i class="bi bi-info-circle-fill fs-5 me-3"></i>
+
+                <div>
+                  <strong>Lưu ý:</strong>
+
+                  <p class="mb-0 mt-1">
+                    Giá trên chưa bao gồm các tùy chọn thêm. Vui
+                    lòng kiểm tra kỹ món và số lượng trước khi gửi
+                    đơn.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tổng kết đơn hàng -->
+          <div class="col-12 col-lg-4">
+            <div class="card border-0 shadow-sm cart-summary">
+              <div class="card-body p-4">
+                <h2 class="h4 mb-4">
+                  <i class="bi bi-receipt me-2"></i>
+                  Tóm tắt đơn hàng
+                </h2>
+
+                <!-- Mã giảm giá -->
+                <div class="mb-4">
+                  <label for="coupon-input" class="form-label fw-semibold">
+                    Mã giảm giá
+                  </label>
+
+                  <div class="input-group">
+                    <input type="text" id="coupon-input" class="form-control text-uppercase" placeholder="Nhập mã"
+                      maxlength="20" />
+
+                    <button type="button" id="apply-coupon-button" class="btn btn-outline-coffee">
+                      Áp dụng
+                    </button>
+                  </div>
+
+                  <div id="coupon-message" class="small mt-2"></div>
+
+                  <small class="text-secondary">
+                    Mã thử nghiệm:
+                    <strong>MOCCOFFEE10</strong>
+                  </small>
+                </div>
+
+                <hr />
+
+                <!-- Chi tiết giá -->
+                <div class="summary-row">
+                  <span class="text-secondary">Tạm tính</span>
+
+                  <strong id="cart-subtotal">0đ</strong>
+                </div>
+
+                <div class="summary-row">
+                  <span class="text-secondary">
+                    Giảm giá
+                  </span>
+
+                  <strong id="cart-discount" class="text-success">
+                    -0đ
+                  </strong>
+                </div>
+
+                <div class="summary-row">
+                  <span class="text-secondary">
+                    Phí phục vụ
+                  </span>
+
+                  <strong id="service-fee">0đ</strong>
+                </div>
+
+                <hr />
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                  <span class="fs-5 fw-semibold">
+                    Tổng thanh toán
+                  </span>
+
+                  <strong id="cart-total" class="fs-4 text-danger">
+                    0đ
+                  </strong>
+                </div>
+
+                <button type="button" id="checkout-button" class="btn btn-coffee btn-lg w-100">
+                  Tiến hành thanh toán
+                  <i class="bi bi-arrow-right ms-1"></i>
+                </button>
+
+                <div class="text-center mt-3">
+                  <small class="text-secondary">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Thông tin đơn hàng được bảo mật
+                  </small>
+                </div>
+              </div>
+            </div>
+
+            <!-- Phương thức thanh toán -->
+            <div class="card border-0 shadow-sm mt-4">
+              <div class="card-body p-4">
+                <h3 class="h5">Phương thức thanh toán</h3>
+
+                <p class="small text-secondary">
+                  Mộc Coffee hỗ trợ các phương thức:
+                </p>
+
+                <div class="d-flex flex-wrap gap-2">
+                  <span class="payment-method-badge">
+                    <i class="bi bi-cash-stack"></i>
+                    Tiền mặt
+                  </span>
+
+                  <span class="payment-method-badge">
+                    <i class="bi bi-qr-code"></i>
+                    Chuyển khoản
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hỗ trợ -->
+            <div class="card border-0 shadow-sm mt-4">
+              <div class="card-body p-4">
+                <h3 class="h5">
+                  <i class="bi bi-headset me-2"></i>
+                  Cần hỗ trợ?
+                </h3>
+
+                <p class="small text-secondary mb-2">
+                  Liên hệ với nhân viên nếu bạn gặp vấn đề khi gọi
+                  món.
+                </p>
+
+                <a href="tel:0123456789" class="fw-semibold text-decoration-none">
+                  <i class="bi bi-telephone-fill me-1"></i>
+                  0123 456 789
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Giỏ hàng trống -->
+        <div id="empty-cart" class="card border-0 shadow-sm d-none">
+          <div class="card-body text-center py-5">
+            <div class="empty-cart-icon mb-4">
+              <i class="bi bi-cart-x"></i>
+            </div>
+
+            <h2 class="h3 fw-bold">Giỏ hàng đang trống</h2>
+
+            <p class="text-secondary mb-4">
+              Bạn chưa thêm món nào vào giỏ hàng. Hãy xem thực đơn
+              và chọn món yêu thích.
+            </p>
+
+            <a href="menu.html" class="btn btn-coffee btn-lg">
+              <i class="bi bi-cup-straw me-1"></i>
+              Xem thực đơn
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="bg-dark text-white pt-5">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-12 col-md-6 col-lg-4">
+          <h2 class="h4 fw-bold">
+            <i class="bi bi-cup-hot-fill me-2"></i>
+            Mộc Coffee
+          </h2>
+
+          <p class="text-white-50">
+            Không gian cà phê gần gũi với dịch vụ đặt bàn, gọi món
+            và thanh toán thuận tiện.
+          </p>
+
+          <div class="d-flex gap-3">
+            <a href="#" class="text-white fs-5" aria-label="Facebook">
+              <i class="bi bi-facebook"></i>
+            </a>
+
+            <a href="#" class="text-white fs-5" aria-label="Instagram">
+              <i class="bi bi-instagram"></i>
+            </a>
+
+            <a href="#" class="text-white fs-5" aria-label="TikTok">
+              <i class="bi bi-tiktok"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-6 col-md-3 col-lg-2">
+          <h3 class="h5">Liên kết</h3>
+
+          <ul class="list-unstyled footer-links">
+            <li>
+              <a href="../index.html">Trang chủ</a>
+            </li>
+
+            <li>
+              <a href="menu.html">Thực đơn</a>
+            </li>
+
+            <li>
+              <a href="booking.html">Đặt bàn</a>
+            </li>
+
+            <li>
+              <a href="cart.html">Giỏ hàng</a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="col-6 col-md-3 col-lg-3">
+          <h3 class="h5">Giờ mở cửa</h3>
+
+          <ul class="list-unstyled text-white-50">
+            <li class="mb-2">
+              Thứ 2 – Thứ 6: 07:00 – 22:00
+            </li>
+
+            <li class="mb-2">
+              Thứ 7 – Chủ nhật: 07:00 – 23:00
+            </li>
+          </ul>
+        </div>
+
+        <div class="col-12 col-lg-3">
+          <h3 class="h5">Liên hệ</h3>
+
+          <ul class="list-unstyled text-white-50">
+            <li class="mb-2">
+              <i class="bi bi-geo-alt-fill me-2"></i>
+              19 Nguyễn Hữu Thọ, Quận 7, TP.HCM
+            </li>
+
+            <li class="mb-2">
+              <i class="bi bi-telephone-fill me-2"></i>
+              0123 456 789
+            </li>
+
+            <li class="mb-2">
+              <i class="bi bi-envelope-fill me-2"></i>
+              moccoffee@example.com
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <hr class="border-secondary mt-4" />
+
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center py-3">
+        <p class="text-white-50 mb-2 mb-md-0">
+          &copy; <span id="current-year">2026</span> Mộc Coffee.
+          All rights reserved.
+        </p>
+
+        <a href="#" class="text-white-50">
+          Điều khoản và chính sách
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== TEMPLATE SẢN PHẨM ==================== -->
+  <!-- cart.js sẽ sao chép template này cho từng món -->
+  <template id="cart-row-template">
+    <tr class="cart-row">
+      <!-- Thông tin sản phẩm -->
+      <td class="ps-4">
+        <div class="d-flex align-items-center">
+          <img src="" alt="" class="cart-product-image rounded" />
+
+          <div class="ms-3">
+            <h3 class="cart-product-name h6 mb-1"></h3>
+
+            <small class="cart-product-option text-secondary">
+              Kích thước: M
+            </small>
+
+            <div>
+              <button type="button" class="btn btn-link text-secondary p-0 small edit-note-button">
+                <i class="bi bi-pencil me-1"></i>
+                Ghi chú
+              </button>
+            </div>
+          </div>
+        </div>
+      </td>
+
+      <!-- Đơn giá -->
+      <td>
+        <span class="cart-product-price fw-semibold"></span>
+      </td>
+
+      <!-- Số lượng -->
+      <td>
+        <div class="quantity-control">
+          <button type="button" class="quantity-button decrease-quantity" aria-label="Giảm số lượng">
+            <i class="bi bi-dash"></i>
+          </button>
+
+          <input type="number" class="quantity-input" value="1" min="1" max="99" aria-label="Số lượng sản phẩm" />
+
+          <button type="button" class="quantity-button increase-quantity" aria-label="Tăng số lượng">
+            <i class="bi bi-plus"></i>
+          </button>
+        </div>
+      </td>
+
+      <!-- Thành tiền -->
+      <td>
+        <span class="cart-product-total fw-bold text-danger"></span>
+      </td>
+
+      <!-- Xóa -->
+      <td class="text-center pe-4">
+        <button type="button" class="btn btn-sm btn-outline-danger remove-item-button" title="Xóa món">
+          <i class="bi bi-trash3"></i>
+        </button>
+      </td>
+    </tr>
+  </template>
+
+  <!-- Modal xác nhận xóa toàn bộ -->
+  <div class="modal fade" id="clear-cart-modal" tabindex="-1" aria-labelledby="clear-cart-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0">
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="clear-cart-title">
+            Xác nhận xóa giỏ hàng
+          </h2>
+
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+
+        <div class="modal-body">
+          Bạn có chắc chắn muốn xóa toàn bộ món trong giỏ hàng
+          không?
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Hủy
+          </button>
+
+          <button type="button" id="confirm-clear-cart" class="btn btn-danger">
+            <i class="bi bi-trash3 me-1"></i>
+            Xóa toàn bộ
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast thông báo -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="cart-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <i id="toast-icon" class="bi bi-check-circle-fill text-success me-2"></i>
+
+        <strong class="me-auto">Mộc Coffee</strong>
+
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Đóng"></button>
+      </div>
+
+      <div id="toast-message" class="toast-body">
+        Giỏ hàng đã được cập nhật.
+      </div>
+    </div>
+  </div>
+
+  <!-- Nút quay lại đầu trang -->
+  <button type="button" id="back-to-top" class="btn btn-coffee rounded-circle" title="Quay lại đầu trang"
+    aria-label="Quay lại đầu trang">
+    <i class="bi bi-arrow-up"></i>
+  </button>
+
+  <!-- Bootstrap JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JavaScript của dự án -->
+  <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/cart.js"></script>
+</body>
+
+</html>

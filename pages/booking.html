@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta name="description" content="Đặt bàn trực tuyến tại Mộc Coffee." />
+
+  <title>Đặt bàn - Mộc Coffee</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <!-- CSS của dự án -->
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/responsive.css" />
+</head>
+
+<body>
+  <!-- ==================== HEADER ==================== -->
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top shadow">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center fw-bold" href="../index.html">
+          <i class="bi bi-cup-hot-fill me-2"></i>
+          Mộc Coffee
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+          aria-controls="mainNavbar" aria-expanded="false" aria-label="Mở menu điều hướng">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+          <ul class="navbar-nav ms-auto align-items-lg-center">
+            <li class="nav-item">
+              <a class="nav-link" href="../index.html">
+                Trang chủ
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="menu.html">
+                Thực đơn
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="../index.html#about">
+                Giới thiệu
+              </a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="../index.html#contact">
+                Liên hệ
+              </a>
+            </li>
+
+            <li class="nav-item ms-lg-2">
+              <a class="btn btn-outline-light active" href="booking.html" aria-current="page">
+                <i class="bi bi-calendar-check me-1"></i>
+                Đặt bàn
+              </a>
+            </li>
+
+            <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+              <a class="btn btn-coffee position-relative" href="cart.html">
+                <i class="bi bi-cart3 me-1"></i>
+                Giỏ hàng
+
+                <span id="cart-count"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  0
+                </span>
+              </a>
+            </li>
+
+            <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+              <a class="nav-link" href="../admin/login.html" title="Đăng nhập quản trị">
+                <i class="bi bi-person-circle fs-5"></i>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ==================== MAIN ==================== -->
+  <main>
+    <!-- Banner -->
+    <section class="page-banner booking-banner">
+      <div class="container text-center text-white">
+        <h1 class="display-5 fw-bold">Đặt bàn tại Mộc Coffee</h1>
+
+        <p class="lead mb-0">
+          Chọn thời gian và vị trí phù hợp trước khi đến quán.
+        </p>
+      </div>
+    </section>
+
+    <!-- Breadcrumb -->
+    <section class="bg-light border-bottom">
+      <div class="container py-3">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item">
+              <a href="../index.html">Trang chủ</a>
+            </li>
+
+            <li class="breadcrumb-item active" aria-current="page">
+              Đặt bàn
+            </li>
+          </ol>
+        </nav>
+      </div>
+    </section>
+
+    <!-- Các bước đặt bàn -->
+    <section class="py-4 bg-white border-bottom">
+      <div class="container">
+        <div class="booking-steps">
+          <div class="booking-step active">
+            <span class="step-number">1</span>
+            <span class="step-label">Thông tin</span>
+          </div>
+
+          <div class="step-line"></div>
+
+          <div class="booking-step">
+            <span class="step-number">2</span>
+            <span class="step-label">Chọn bàn</span>
+          </div>
+
+          <div class="step-line"></div>
+
+          <div class="booking-step">
+            <span class="step-number">3</span>
+            <span class="step-label">Xác nhận</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Form đặt bàn -->
+    <section class="py-5 bg-light">
+      <div class="container">
+        <form id="booking-form" novalidate>
+          <div class="row g-4">
+            <!-- Nội dung bên trái -->
+            <div class="col-12 col-lg-8">
+              <!-- Thông tin khách hàng -->
+              <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                  <div class="d-flex align-items-center mb-4">
+                    <div class="booking-section-icon">
+                      <i class="bi bi-person-fill"></i>
+                    </div>
+
+                    <div class="ms-3">
+                      <h2 class="h4 mb-1">
+                        Thông tin khách hàng
+                      </h2>
+
+                      <p class="text-secondary mb-0">
+                        Nhập thông tin để quán liên hệ xác nhận.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="row g-3">
+                    <!-- Họ tên -->
+                    <div class="col-12 col-md-6">
+                      <label for="customer-name" class="form-label fw-semibold">
+                        Họ và tên
+                        <span class="text-danger">*</span>
+                      </label>
+
+                      <input type="text" id="customer-name" name="customerName" class="form-control"
+                        placeholder="Ví dụ: Nguyễn Văn An" minlength="2" maxlength="100" required />
+
+                      <div class="invalid-feedback">
+                        Vui lòng nhập họ và tên.
+                      </div>
+                    </div>
+
+                    <!-- Số điện thoại -->
+                    <div class="col-12 col-md-6">
+                      <label for="customer-phone" class="form-label fw-semibold">
+                        Số điện thoại
+                        <span class="text-danger">*</span>
+                      </label>
+
+                      <input type="tel" id="customer-phone" name="customerPhone" class="form-control"
+                        placeholder="Ví dụ: 0912345678" pattern="0[0-9]{9}" maxlength="10" required />
+
+                      <div class="invalid-feedback">
+                        Số điện thoại phải gồm 10 chữ số và bắt đầu
+                        bằng số 0.
+                      </div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-12">
+                      <label for="customer-email" class="form-label fw-semibold">
+                        Email
+                      </label>
+
+                      <input type="email" id="customer-email" name="customerEmail" class="form-control"
+                        placeholder="Ví dụ: nguyenvanan@gmail.com" />
+
+                      <div class="invalid-feedback">
+                        Địa chỉ email không hợp lệ.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Thời gian và số lượng khách -->
+              <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                  <div class="d-flex align-items-center mb-4">
+                    <div class="booking-section-icon">
+                      <i class="bi bi-calendar-event-fill"></i>
+                    </div>
+
+                    <div class="ms-3">
+                      <h2 class="h4 mb-1">
+                        Thời gian đặt bàn
+                      </h2>
+
+                      <p class="text-secondary mb-0">
+                        Chọn ngày, giờ đến và số lượng khách.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="row g-3">
+                    <!-- Ngày đặt -->
+                    <div class="col-12 col-md-4">
+                      <label for="booking-date" class="form-label fw-semibold">
+                        Ngày đến
+                        <span class="text-danger">*</span>
+                      </label>
+
+                      <input type="date" id="booking-date" name="bookingDate" class="form-control" required />
+
+                      <div class="invalid-feedback">
+                        Vui lòng chọn ngày đến.
+                      </div>
+                    </div>
+
+                    <!-- Giờ đặt -->
+                    <div class="col-12 col-md-4">
+                      <label for="booking-time" class="form-label fw-semibold">
+                        Giờ đến
+                        <span class="text-danger">*</span>
+                      </label>
+
+                      <select id="booking-time" name="bookingTime" class="form-select" required>
+                        <option value="" selected disabled>
+                          Chọn giờ
+                        </option>
+                        <option value="07:00">07:00</option>
+                        <option value="07:30">07:30</option>
+                        <option value="08:00">08:00</option>
+                        <option value="08:30">08:30</option>
+                        <option value="09:00">09:00</option>
+                        <option value="09:30">09:30</option>
+                        <option value="10:00">10:00</option>
+                        <option value="10:30">10:30</option>
+                        <option value="11:00">11:00</option>
+                        <option value="11:30">11:30</option>
+                        <option value="12:00">12:00</option>
+                        <option value="12:30">12:30</option>
+                        <option value="13:00">13:00</option>
+                        <option value="13:30">13:30</option>
+                        <option value="14:00">14:00</option>
+                        <option value="14:30">14:30</option>
+                        <option value="15:00">15:00</option>
+                        <option value="15:30">15:30</option>
+                        <option value="16:00">16:00</option>
+                        <option value="16:30">16:30</option>
+                        <option value="17:00">17:00</option>
+                        <option value="17:30">17:30</option>
+                        <option value="18:00">18:00</option>
+                        <option value="18:30">18:30</option>
+                        <option value="19:00">19:00</option>
+                        <option value="19:30">19:30</option>
+                        <option value="20:00">20:00</option>
+                        <option value="20:30">20:30</option>
+                        <option value="21:00">21:00</option>
+                      </select>
+
+                      <div class="invalid-feedback">
+                        Vui lòng chọn giờ đến.
+                      </div>
+                    </div>
+
+                    <!-- Số lượng khách -->
+                    <div class="col-12 col-md-4">
+                      <label for="guest-count" class="form-label fw-semibold">
+                        Số lượng khách
+                        <span class="text-danger">*</span>
+                      </label>
+
+                      <select id="guest-count" name="guestCount" class="form-select" required>
+                        <option value="" selected disabled>
+                          Chọn số khách
+                        </option>
+                        <option value="1">1 khách</option>
+                        <option value="2">2 khách</option>
+                        <option value="3">3 khách</option>
+                        <option value="4">4 khách</option>
+                        <option value="5">5 khách</option>
+                        <option value="6">6 khách</option>
+                        <option value="7">7 khách</option>
+                        <option value="8">8 khách</option>
+                        <option value="9">9 khách</option>
+                        <option value="10">10 khách</option>
+                        <option value="11">11 khách</option>
+                        <option value="12">12 khách</option>
+                      </select>
+
+                      <div class="invalid-feedback">
+                        Vui lòng chọn số lượng khách.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Chọn khu vực -->
+              <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                  <div class="d-flex align-items-center mb-4">
+                    <div class="booking-section-icon">
+                      <i class="bi bi-geo-alt-fill"></i>
+                    </div>
+
+                    <div class="ms-3">
+                      <h2 class="h4 mb-1">Chọn khu vực</h2>
+
+                      <p class="text-secondary mb-0">
+                        Lựa chọn khu vực chỗ ngồi mong muốn.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="row g-3">
+                    <!-- Trong nhà -->
+                    <div class="col-12 col-md-4">
+                      <input type="radio" class="btn-check area-radio" name="bookingArea" id="area-indoor"
+                        value="Trong nhà" autocomplete="off" checked />
+
+                      <label class="area-option" for="area-indoor">
+                        <i class="bi bi-house-door fs-2"></i>
+                        <span class="fw-semibold mt-2">
+                          Trong nhà
+                        </span>
+                        <small>Máy lạnh, yên tĩnh</small>
+                      </label>
+                    </div>
+
+                    <!-- Ngoài trời -->
+                    <div class="col-12 col-md-4">
+                      <input type="radio" class="btn-check area-radio" name="bookingArea" id="area-outdoor"
+                        value="Ngoài trời" autocomplete="off" />
+
+                      <label class="area-option" for="area-outdoor">
+                        <i class="bi bi-tree fs-2"></i>
+                        <span class="fw-semibold mt-2">
+                          Ngoài trời
+                        </span>
+                        <small>Thoáng mát, nhiều cây xanh</small>
+                      </label>
+                    </div>
+
+                    <!-- Ban công -->
+                    <div class="col-12 col-md-4">
+                      <input type="radio" class="btn-check area-radio" name="bookingArea" id="area-balcony"
+                        value="Ban công" autocomplete="off" />
+
+                      <label class="area-option" for="area-balcony">
+                        <i class="bi bi-sunset fs-2"></i>
+                        <span class="fw-semibold mt-2">
+                          Ban công
+                        </span>
+                        <small>Không gian riêng và có view</small>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Chọn bàn -->
+              <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+                    <div class="d-flex align-items-center">
+                      <div class="booking-section-icon">
+                        <i class="bi bi-grid-3x3-gap-fill"></i>
+                      </div>
+
+                      <div class="ms-3">
+                        <h2 class="h4 mb-1">Chọn bàn</h2>
+
+                        <p class="text-secondary mb-0">
+                          Chọn một bàn còn trống phù hợp.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="table-legend mt-3 mt-md-0">
+                      <span class="me-3">
+                        <span class="status-dot available"></span>
+                        Còn trống
+                      </span>
+
+                      <span>
+                        <span class="status-dot unavailable"></span>
+                        Đã đặt
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="row g-3" id="table-list">
+                    <!-- Bàn T01 -->
+                    <div class="col-6 col-md-4 col-xl-3">
+                      <input type="radio" class="btn-check table-radio" name="tableId" id="table-01" value="T01"
+                        data-name="Bàn T01" data-capacity="2" autocomplete="off" required />
+
+                      <label class="table-option available" for="table-01">
+                        <i class="bi bi-table fs-3"></i>
+                        <strong>Bàn T01</strong>
+                        <small>2 người</small>
+                      </label>
+                    </div>
+
+                    <!-- Bàn T02 -->
+                    <div class="col-6 col-md-4 col-xl-3">
+                      <input type="radio" class="btn-check table-radio" name="tableId" id="table-02" value="T02"
+                        data-name="Bàn T02" data-capacity="2" autocomplete="off" />
+
+                      <label class="table-option available" for="table-02">
+                        <i class="bi bi-table fs-3"></i>
+                        <strong>Bàn T02</strong>
+                        <small>2 người</small>
+                      </label>
+                    </div>
+
+                    <!-- Bàn T03 đã đặt -->
+                    <div class="col-6 col-md-4 col-xl-3">
+                      <input type="radio" class="btn-check table-radio" name="tableId" id="table-03" value="T03"
+                        disabled />
+
+                      <label class="table-option unavailable" for="table-03">
+                        <i class="bi bi-table fs-3"></i>
+                        <strong>Bàn T03</strong>
+                        <small>Đã đặt</small>
+                      </label>
+                    </div>
+
+                    <!-- Bàn T04 -->
+                    <div class="col-6 col-md-4 col-xl-3">
+                      <input type="radio" class="btn-check table-radio" name="tableId" id="table-04" value="T04"
+                        data-name="Bàn T04" data-capacity="4" autocomplete="off" />
+
+                      <label class="table-option available" for="table-04">
+                        <i class="bi bi-table fs-3"></i>
+                        <strong>Bàn T04</strong>
+                        <small>4 người</small>
+                      </label>
+                    </div>
+
+                    <!-- Bàn T05 -->
+                    <div class="col-6 col-md-4 col-xl-3">
+                      <input type="radio" class="btn-check table-radio" name="tableId" id="table-05" value="T05"
+                        data-name="Bàn T05" data-capacity="4" autocomplete="off" />
+
+                      <label class="table-option available" for="table-05">
+                        <i class="bi bi-table fs-3"></i>
+                        <strong>Bàn T05</strong>
+                        <small>4 người</small>
+                      </label>
+                    </div>
+
+                    <!-- Bàn T06 đã đặt -->
+                    <div class="col-6 col-md-4 col-xl-3">
+                      <input type="radio" class="btn-check table-radio" name="tableId" id="table-06" value="T06"
+                        disabled />
+
+                      <label class="table-option unavailable" for="table-06">
+                        <i class="bi bi-table fs-3"></i>
+                        <strong>Bàn T06</strong>
+                        <small>Đã đặt</small>
+                      </label>
+                    </div>
+
+                    <!-- Bàn T07 -->
+                    <div class="col-6 col-md-4 col-xl-3">
+                      <input type="radio" class="btn-check table-radio" name="tableId" id="table-07" value="T07"
+                        data-name="Bàn T07" data-capacity="6" autocomplete="off" />
+
+                      <label class="table-option available" for="table-07">
+                        <i class="bi bi-table fs-3"></i>
+                        <strong>Bàn T07</strong>
+                        <small>6 người</small>
+                      </label>
+                    </div>
+
+                    <!-- Bàn T08 -->
+                    <div class="col-6 col-md-4 col-xl-3">
+                      <input type="radio" class="btn-check table-radio" name="tableId" id="table-08" value="T08"
+                        data-name="Bàn T08" data-capacity="8" autocomplete="off" />
+
+                      <label class="table-option available" for="table-08">
+                        <i class="bi bi-table fs-3"></i>
+                        <strong>Bàn T08</strong>
+                        <small>8 người</small>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div id="table-error" class="text-danger small mt-3 d-none">
+                    Vui lòng chọn một bàn còn trống.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Ghi chú -->
+              <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                  <label for="booking-note" class="form-label fw-semibold">
+                    <i class="bi bi-pencil-square me-1"></i>
+                    Ghi chú
+                  </label>
+
+                  <textarea id="booking-note" name="bookingNote" class="form-control" rows="4" maxlength="300"
+                    placeholder="Ví dụ: Cần ghế trẻ em, trang trí sinh nhật..."></textarea>
+
+                  <div class="d-flex justify-content-between mt-2">
+                    <small class="text-secondary">
+                      Ghi chú không bắt buộc.
+                    </small>
+
+                    <small class="text-secondary">
+                      <span id="note-count">0</span>/300
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Nội dung bên phải -->
+            <div class="col-12 col-lg-4">
+              <div class="card border-0 shadow-sm booking-summary">
+                <div class="card-body p-4">
+                  <h2 class="h4 mb-4">
+                    <i class="bi bi-clipboard-check me-2 text-success"></i>
+                    Thông tin đặt bàn
+                  </h2>
+
+                  <div class="summary-row">
+                    <span class="text-secondary">Khách hàng</span>
+                    <strong id="summary-name">
+                      Chưa nhập
+                    </strong>
+                  </div>
+
+                  <div class="summary-row">
+                    <span class="text-secondary">
+                      Số điện thoại
+                    </span>
+                    <strong id="summary-phone">
+                      Chưa nhập
+                    </strong>
+                  </div>
+
+                  <div class="summary-row">
+                    <span class="text-secondary">Ngày đến</span>
+                    <strong id="summary-date">
+                      Chưa chọn
+                    </strong>
+                  </div>
+
+                  <div class="summary-row">
+                    <span class="text-secondary">Giờ đến</span>
+                    <strong id="summary-time">
+                      Chưa chọn
+                    </strong>
+                  </div>
+
+                  <div class="summary-row">
+                    <span class="text-secondary">Số khách</span>
+                    <strong id="summary-guests">
+                      Chưa chọn
+                    </strong>
+                  </div>
+
+                  <div class="summary-row">
+                    <span class="text-secondary">Khu vực</span>
+                    <strong id="summary-area">
+                      Trong nhà
+                    </strong>
+                  </div>
+
+                  <div class="summary-row">
+                    <span class="text-secondary">Bàn</span>
+                    <strong id="summary-table">
+                      Chưa chọn
+                    </strong>
+                  </div>
+
+                  <hr />
+
+                  <div class="alert alert-warning small">
+                    <i class="bi bi-info-circle-fill me-1"></i>
+                    Quán sẽ giữ bàn trong vòng 15 phút kể từ giờ
+                    khách đã đăng ký.
+                  </div>
+
+                  <div class="form-check mb-4">
+                    <input type="checkbox" id="booking-policy" class="form-check-input" required />
+
+                    <label class="form-check-label small" for="booking-policy">
+                      Tôi xác nhận thông tin trên là chính xác và
+                      đồng ý với quy định đặt bàn.
+                    </label>
+
+                    <div class="invalid-feedback">
+                      Bạn cần đồng ý với quy định đặt bàn.
+                    </div>
+                  </div>
+
+                  <button type="submit" class="btn btn-coffee btn-lg w-100">
+                    <i class="bi bi-check-circle me-1"></i>
+                    Xác nhận đặt bàn
+                  </button>
+
+                  <a href="../index.html" class="btn btn-outline-secondary w-100 mt-2">
+                    Quay lại trang chủ
+                  </a>
+                </div>
+              </div>
+
+              <!-- Thông tin hỗ trợ -->
+              <div class="card border-0 shadow-sm mt-4">
+                <div class="card-body p-4">
+                  <h3 class="h5">
+                    <i class="bi bi-headset me-2"></i>
+                    Cần hỗ trợ?
+                  </h3>
+
+                  <p class="text-secondary small">
+                    Liên hệ với Mộc Coffee nếu bạn cần đặt bàn cho
+                    nhóm đông người.
+                  </p>
+
+                  <a href="tel:0123456789" class="fw-semibold text-decoration-none">
+                    <i class="bi bi-telephone-fill me-1"></i>
+                    0123 456 789
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="bg-dark text-white pt-5">
+    <div class="container">
+      <div class="row g-4">
+        <div class="col-12 col-md-6 col-lg-4">
+          <h2 class="h4 fw-bold">
+            <i class="bi bi-cup-hot-fill me-2"></i>
+            Mộc Coffee
+          </h2>
+
+          <p class="text-white-50">
+            Không gian cà phê gần gũi với dịch vụ đặt bàn, gọi món
+            và thanh toán thuận tiện.
+          </p>
+
+          <div class="d-flex gap-3">
+            <a href="#" class="text-white fs-5" aria-label="Facebook">
+              <i class="bi bi-facebook"></i>
+            </a>
+
+            <a href="#" class="text-white fs-5" aria-label="Instagram">
+              <i class="bi bi-instagram"></i>
+            </a>
+
+            <a href="#" class="text-white fs-5" aria-label="TikTok">
+              <i class="bi bi-tiktok"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-6 col-md-3 col-lg-2">
+          <h3 class="h5">Liên kết</h3>
+
+          <ul class="list-unstyled footer-links">
+            <li>
+              <a href="../index.html">Trang chủ</a>
+            </li>
+
+            <li>
+              <a href="menu.html">Thực đơn</a>
+            </li>
+
+            <li>
+              <a href="booking.html">Đặt bàn</a>
+            </li>
+
+            <li>
+              <a href="cart.html">Giỏ hàng</a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="col-6 col-md-3 col-lg-3">
+          <h3 class="h5">Giờ mở cửa</h3>
+
+          <ul class="list-unstyled text-white-50">
+            <li class="mb-2">
+              Thứ 2 – Thứ 6: 07:00 – 22:00
+            </li>
+
+            <li class="mb-2">
+              Thứ 7 – Chủ nhật: 07:00 – 23:00
+            </li>
+          </ul>
+        </div>
+
+        <div class="col-12 col-lg-3">
+          <h3 class="h5">Liên hệ</h3>
+
+          <ul class="list-unstyled text-white-50">
+            <li class="mb-2">
+              <i class="bi bi-geo-alt-fill me-2"></i>
+              19 Nguyễn Hữu Thọ, Quận 7, TP.HCM
+            </li>
+
+            <li class="mb-2">
+              <i class="bi bi-telephone-fill me-2"></i>
+              0123 456 789
+            </li>
+
+            <li class="mb-2">
+              <i class="bi bi-envelope-fill me-2"></i>
+              moccoffee@example.com
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <hr class="border-secondary mt-4" />
+
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center py-3">
+        <p class="text-white-50 mb-2 mb-md-0">
+          &copy; <span id="current-year">2026</span> Mộc Coffee.
+          All rights reserved.
+        </p>
+
+        <a href="#" class="text-white-50">
+          Điều khoản và chính sách
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal xác nhận đặt bàn thành công -->
+  <div class="modal fade" id="booking-success-modal" tabindex="-1" aria-labelledby="booking-success-title"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0">
+        <div class="modal-body text-center p-5">
+          <div class="success-icon mb-3">
+            <i class="bi bi-check-circle-fill"></i>
+          </div>
+
+          <h2 class="h3 fw-bold" id="booking-success-title">
+            Đặt bàn thành công
+          </h2>
+
+          <p class="text-secondary">
+            Yêu cầu đặt bàn của bạn đã được ghi nhận.
+          </p>
+
+          <div class="bg-light rounded p-3 mb-4">
+            <span class="text-secondary">Mã đặt bàn:</span>
+            <strong id="booking-code" class="ms-1">
+              MC000000
+            </strong>
+          </div>
+
+          <a href="success.html" class="btn btn-coffee">
+            Xem thông tin đặt bàn
+          </a>
+
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nút quay lại đầu trang -->
+  <button type="button" id="back-to-top" class="btn btn-coffee rounded-circle" title="Quay lại đầu trang"
+    aria-label="Quay lại đầu trang">
+    <i class="bi bi-arrow-up"></i>
+  </button>
+
+  <!-- Bootstrap JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- JavaScript của dự án -->
+  <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/booking.js"></script>
+</body>
+
+</html>

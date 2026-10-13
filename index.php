@@ -107,7 +107,7 @@ $featuredProducts = $pdo->query($sql)->fetchAll();
             </li>
 
             <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
-              <a class="nav-link" href="admin/login.html" title="Đăng nhập quản trị">
+              <a class="nav-link" href="admin/login.php" title="Đăng nhập quản trị">
                 <i class="bi bi-person-circle fs-5"></i>
               </a>
             </li>

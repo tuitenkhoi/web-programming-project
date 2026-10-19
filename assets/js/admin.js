@@ -303,11 +303,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-<<<<<<< HEAD
-  initializeLoginPage();
-=======
   // Trang đăng nhập thật được xử lý trong admin-api.js.
->>>>>>> 3036a5bd52b830fca782721b2d9335bccd0e8296
 
   /* =========================================================
      4. DASHBOARD
@@ -1654,11 +1650,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-<<<<<<< HEAD
-  initializeProductsPage();
-=======
   // Trang sản phẩm thật được xử lý trong admin-api.js.
->>>>>>> 3036a5bd52b830fca782721b2d9335bccd0e8296
 
   /* =========================================================
      8. QUẢN LÝ BÀN
@@ -2357,8 +2349,4 @@ document.addEventListener("DOMContentLoaded", function () {
       );
     });
   });
-<<<<<<< HEAD
 });
-=======
-});
->>>>>>> 3036a5bd52b830fca782721b2d9335bccd0e8296

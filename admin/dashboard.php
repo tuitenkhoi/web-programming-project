@@ -24,8 +24,9 @@ $stats = [
 $stats['revenue'] = (float) $pdo->query(
     "SELECT COALESCE(SUM(total_amount), 0)
      FROM orders
-     WHERE DATE(created_at) = CURDATE()
-       AND payment_status = 'paid'"
+     WHERE payment_status = 'paid'
+       AND created_at >= CURDATE()
+       AND created_at < CURDATE() + INTERVAL 1 DAY"
 )->fetchColumn();
 
 /*
@@ -34,7 +35,8 @@ $stats['revenue'] = (float) $pdo->query(
 $stats['orders'] = (int) $pdo->query(
     "SELECT COUNT(*)
      FROM orders
-     WHERE DATE(created_at) = CURDATE()"
+     WHERE created_at >= CURDATE()
+       AND created_at < CURDATE() + INTERVAL 1 DAY"
 )->fetchColumn();
 
 /*

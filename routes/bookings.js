@@ -40,4 +40,31 @@ router.post('/', async(req, res) => {
     }
 });
 
+// Lấy danh sách toàn bộ các đơn đặt bàn (admin)
+router.get('/', async (req, res) => {
+    try {
+        const [bookings] = await db.query(`
+            SELECT b.*, t.name as table_name
+            FROM bookings b
+            LEFT JOIN tables t ON b.table_id = t.id
+            ORDER BY b.created_at DESC
+        `);
+        res.json(bookings);
+    } catch(err) {
+        res.status(500).json({message: 'Lỗi lấy danh sách booking!', error: err.message });
+    }
+});
+
+//Cập nhật trạng thái đơn đặt bàn
+router.patch('/:id/status', async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body; //confirm hoac cancel
+
+    try {
+        await db.query('UPDATE bookings SET status = ? WHERE id = ?', [status, id]);
+        res.json({ message: 'Cập nhật trạng thái đơn đặt bàn thành công'});
+    } catch (err) {
+        res.status(500).json({ message: 'Lỗi cập nhật trạng thái', error: err.message });
+    }
+});
 module.exports = router;

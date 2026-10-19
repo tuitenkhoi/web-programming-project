@@ -11,6 +11,8 @@ app.use(express.static('.'));
 // Đăng ký Route API cho Khôi
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/tables', require('./routes/tables'));
+app.use('/api/bookings', require('./routes/bookings'));
+app.use('/api/dashboard', require('./routes/dashboard'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

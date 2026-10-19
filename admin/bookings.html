@@ -1293,7 +1293,53 @@
   <!-- JavaScript -->
   <script src="../assets/js/admin.js"></script>
   <script src="assets/js/booking-client.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        loadBookings();
 
+        async function loadBookings() {
+            try {
+                const response = await fetch('/api/bookings');
+                const bookings = await response.json();
+                const tbody = document.querySelector('#bookingTableBody'); // Thay id bằng id tbody của bạn
+
+                if (tbody) {
+                    tbody.innerHTML = bookings.map(b => `
+                        <tr>
+                            <td>#${b.id}</td>
+                            <td>${b.customer_name}</td>
+                            <td>${b.phone}</td>
+                            <td>${new Date(b.booking_time).toLocaleString()}</td>
+                            <td>${b.number_of_guests} người</td>
+                            <td><span class="badge ${b.status === 'confirmed' ? 'bg-success' : (b.status === 'cancelled' ? 'bg-danger' : 'bg-warning')}">${b.status}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-success" onclick="updateBookingStatus(${b.id}, 'confirmed')">Xác nhận</button>
+                                <button class="btn btn-sm btn-danger" onclick="updateBookingStatus(${b.id}, 'cancelled')">Hủy</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Lỗi tải danh sách booking:', err);
+            }
+        }
+
+        window.updateBookingStatus = async function (id, status) {
+            try {
+                const res = await fetch(`/api/bookings/${id}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                const data = await res.json();
+                alert(data.message);
+                loadBookings();
+            } catch (err) {
+                alert('Lỗi cập nhật trạng thái!');
+            }
+        };
+    });
+  </script>
 </body>
 
 </html>

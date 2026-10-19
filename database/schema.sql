@@ -195,3 +195,21 @@ CREATE TABLE IF NOT EXISTS order_items (
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
+-- Tài khoản quản trị mẫu phục vụ môi trường học tập.
+-- Email: admin@moccoffee.local
+-- Mật khẩu: MocAdmin@123
+INSERT IGNORE INTO users (
+    full_name,
+    email,
+    password_hash,
+    phone,
+    role,
+    status
+) VALUES (
+    'Quản Trị Mộc Coffee',
+    'admin@moccoffee.local',
+    '$2b$10$Gs1e9xBU/Zats5lSINYdgOyq3.kd4yAUAblh6Bcpe86oNf46BH1mm',
+    '0900000000',
+    'admin',
+    1
+);

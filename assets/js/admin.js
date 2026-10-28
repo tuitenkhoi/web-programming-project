@@ -170,7 +170,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const rememberInput = $("#remember-login");
     const togglePasswordButton = $("#toggle-password-button");
     const passwordIcon = $("#password-toggle-icon");
-    const fillDemoButton = $("#fill-demo-account-button");
     const errorAlert = $("#login-error-alert");
     const errorMessage = $("#login-error-message");
     const successAlert = $("#login-success-alert");
@@ -201,29 +200,6 @@ document.addEventListener("DOMContentLoaded", function () {
         isPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"
       );
     });
-
-    fillDemoButton?.addEventListener("click", function () {
-      usernameInput.value = "admin";
-      passwordInput.value = "123456";
-
-      errorAlert?.classList.add("d-none");
-
-      showToast("Đã điền tài khoản thử nghiệm.");
-    });
-
-    $("#copy-demo-username")?.addEventListener(
-      "click",
-      function () {
-        copyText("admin", "Đã sao chép tên đăng nhập.");
-      }
-    );
-
-    $("#copy-demo-password")?.addEventListener(
-      "click",
-      function () {
-        copyText("123456", "Đã sao chép mật khẩu.");
-      }
-    );
 
     // Đăng nhập thật (gọi /api/auth/login) được xử lý trong script của login.html.
 

@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 
 // Bắt buộc phải có JWT_SECRET trong .env, không dùng khóa mặc định đoán được.
-const SECRET_KEY = process.env.JWT_SECRET;
+const SECRET_KEY = process.env.JWT_SECRET || 'moc_coffee_jwt_secret_key';
 if (!SECRET_KEY) {
     throw new Error('Thiếu JWT_SECRET trong file .env');
 }

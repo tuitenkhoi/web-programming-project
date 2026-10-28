@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="../assets/css/style.css" />
   <link rel="stylesheet" href="../assets/css/admin.css" />
   <link rel="stylesheet" href="../assets/css/responsive.css" />
+  <script src="../assets/js/admin-auth.js"></script>
 </head>
 
 <body class="admin-login-body">
@@ -158,7 +159,7 @@
               <!-- Tên đăng nhập -->
               <div class="mb-3">
                 <label for="login-username" class="form-label fw-semibold">
-                  Tên đăng nhập
+                  Email
                   <span class="text-danger">*</span>
                 </label>
 
@@ -167,12 +168,12 @@
                     <i class="bi bi-person"></i>
                   </span>
 
-                  <input type="text" id="login-username" name="username" class="form-control"
-                    placeholder="Nhập tên đăng nhập" minlength="3" maxlength="50" autocomplete="username" autofocus
+                  <input type="email" id="login-username" name="email" class="form-control"
+                    placeholder="Nhập email admin" minlength="5" maxlength="150" autocomplete="email" autofocus
                     required />
 
                   <div class="invalid-feedback">
-                    Vui lòng nhập tên đăng nhập từ 3 ký tự.
+                    Vui lòng nhập email hợp lệ.
                   </div>
                 </div>
               </div>
@@ -374,45 +375,60 @@
 
   <!-- JavaScript của dự án -->
   <script src="../assets/js/admin.js"></script>
-<<<<<<< HEAD
 
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const form = document.querySelector('form');
-        if (form) {
-            form.addEventListener('submit', async function (e) {
-                e.preventDefault();
-                const usernameInput = document.querySelector('input[type="text"]').value.trim();
-                const passwordInput = document.querySelector('input[type="password"]').value.trim();
+    (function () {
+      var A = window.AdminAuth;
+      var params = new URLSearchParams(location.search);
+      var errBox = document.getElementById('login-error-alert');
+      var errMsg = document.getElementById('login-error-message');
 
-                try {
-                    const response = await fetch('/api/auth/login', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ username: usernameInput, password: passwordInput })
-                    });
+      function showError(m) { errMsg.textContent = m; errBox.classList.remove('d-none'); }
 
-                    const data = await response.json();
-                    if (response.ok) {
-                        localStorage.setItem('token', data.token);
-                        alert('Đăng nhập thành công!');
-                        window.location.href = 'dashboard.html';
-                    } else {
-                        alert(data.message || 'Đăng nhập thất bại!');
-                    }
-                } catch (err) {
-                    console.error('Lỗi kết nối API:', err);
-                }
-            });
+      if (A.isValid(A.getToken())) { location.replace('dashboard.html'); return; }
+      if (params.get('expired')) showError('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.');
+      else if (params.get('required')) showError('Vui lòng đăng nhập để tiếp tục.');
+
+      // Capture phase: chạy trước handler mẫu trong admin.js
+      document.addEventListener('submit', async function (e) {
+        if (e.target.id !== 'admin-login-form') return;
+        e.preventDefault();
+        e.stopPropagation();
+
+        var username = document.getElementById('login-username').value.trim();
+        var password = document.getElementById('login-password').value;
+        errBox.classList.add('d-none');
+
+        if (username.indexOf('@') < 1 || password.length < 6) {
+          showError('Vui lòng nhập email hợp lệ và mật khẩu tối thiểu 6 ký tự.');
+          return;
         }
-    });
+
+        var btn = document.getElementById('login-submit-button');
+        btn.disabled = true;
+        document.getElementById('login-button-content').classList.add('d-none');
+        document.getElementById('login-loading-content').classList.remove('d-none');
+
+        try {
+          var res = await fetch('/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: username, password: password })
+          });
+          var data = await res.json().catch(function () { return {}; });
+          if (!res.ok || !data.token) throw new Error(data.message || 'Đăng nhập thất bại!');
+          A.setToken(data.token);
+          document.getElementById('login-success-alert').classList.remove('d-none');
+          location.href = 'dashboard.html';
+        } catch (err) {
+          showError(err.message === 'Failed to fetch' ? 'Không kết nối được máy chủ.' : err.message);
+          btn.disabled = false;
+          document.getElementById('login-button-content').classList.remove('d-none');
+          document.getElementById('login-loading-content').classList.add('d-none');
+        }
+      }, true);
+    })();
   </script>
 </body>
 
 </html>
-=======
-  <script src="../assets/js/admin-api.js"></script>
-</body>
-
-</html>
->>>>>>> 3036a5bd52b830fca782721b2d9335bccd0e8296

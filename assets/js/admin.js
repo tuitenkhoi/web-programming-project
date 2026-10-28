@@ -225,61 +225,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     );
 
-    loginForm.addEventListener("submit", function (event) {
-      event.preventDefault();
-      event.stopPropagation();
-
-      errorAlert?.classList.add("d-none");
-      successAlert?.classList.add("d-none");
-
-      loginForm.classList.add("was-validated");
-
-      if (!loginForm.checkValidity()) {
-        return;
-      }
-
-      const username = usernameInput.value.trim();
-      const password = passwordInput.value;
-
-      submitButton.disabled = true;
-      buttonContent?.classList.add("d-none");
-      loadingContent?.classList.remove("d-none");
-
-      window.setTimeout(function () {
-        if (username === "admin" && password === "123456") {
-          if (rememberInput.checked) {
-            localStorage.setItem(
-              "mocCoffeeAdminUsername",
-              username
-            );
-          } else {
-            localStorage.removeItem(
-              "mocCoffeeAdminUsername"
-            );
-          }
-
-          sessionStorage.setItem(
-            "mocCoffeeAdminLoggedIn",
-            "true"
-          );
-
-          successAlert?.classList.remove("d-none");
-
-          window.setTimeout(function () {
-            window.location.href = "dashboard.html";
-          }, 800);
-        } else {
-          errorMessage.textContent =
-            "Tên đăng nhập hoặc mật khẩu không chính xác.";
-
-          errorAlert?.classList.remove("d-none");
-
-          submitButton.disabled = false;
-          buttonContent?.classList.remove("d-none");
-          loadingContent?.classList.add("d-none");
-        }
-      }, 700);
-    });
+    // Đăng nhập thật (gọi /api/auth/login) được xử lý trong script của login.html.
 
     const forgotPasswordForm = $("#forgot-password-form");
 
@@ -303,11 +249,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-<<<<<<< HEAD
   initializeLoginPage();
-=======
-  // Trang đăng nhập thật được xử lý trong admin-api.js.
->>>>>>> 3036a5bd52b830fca782721b2d9335bccd0e8296
 
   /* =========================================================
      4. DASHBOARD
@@ -1654,11 +1596,7 @@ document.addEventListener("DOMContentLoaded", function () {
     );
   }
 
-<<<<<<< HEAD
-  initializeProductsPage();
-=======
   // Trang sản phẩm thật được xử lý trong admin-api.js.
->>>>>>> 3036a5bd52b830fca782721b2d9335bccd0e8296
 
   /* =========================================================
      8. QUẢN LÝ BÀN
@@ -2357,8 +2295,4 @@ document.addEventListener("DOMContentLoaded", function () {
       );
     });
   });
-<<<<<<< HEAD
 });
-=======
-});
->>>>>>> 3036a5bd52b830fca782721b2d9335bccd0e8296

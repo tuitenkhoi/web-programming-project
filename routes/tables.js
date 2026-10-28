@@ -1,29 +1,43 @@
 const express = require('express');
 const router = express.Router();
+const db = require('../config/db');
+const { verifyToken } = require('../middleware/auth');
 
-// Giả lập dữ liệu bàn để test nhanh trước khi nối Database
-let tables = [
-    { id: 1, name: 'Bàn 01', capacity: 4, status: 'available' },
-    { id: 2, name: 'Bàn 02', capacity: 2, status: 'occupied' },
-    { id: 3, name: 'Bàn 03', capacity: 6, status: 'reserved' }
-];
+const VALID_STATUS = ['available', 'occupied', 'reserved'];
 
-// Lấy danh sách sơ đồ bàn
-router.get('/', (req, res) => {
-    res.json(tables);
+// 1. Lấy danh sách sơ đồ bàn (công khai để form khách chọn bàn)
+router.get('/', async (req, res) => {
+    try {
+        const [tables] = await db.query('SELECT * FROM tables ORDER BY id');
+        res.json(tables);
+    } catch (err) {
+        console.error('Lỗi CSDL:', err);
+        res.status(500).json({ message: 'Lỗi truy vấn cơ sở dữ liệu!' });
+    }
 });
 
-// Cập nhật trạng thái bàn (available / occupied / reserved)
-router.patch('/:id/status', (req, res) => {
-    const { id } = req.params;
-    const { status } = req.body;
-    
-    const table = tables.find(t => t.id == id);
-    if (table) {
-        table.status = status;
-        return res.json({ message: 'Cập nhật trạng thái thành công!', table });
+// 2. Cập nhật trạng thái bàn (admin)
+router.patch('/:id/status', verifyToken, async (req, res) => {
+    const id = Number(req.params.id);
+    const { status } = req.body || {};
+
+    if (!Number.isInteger(id) || id <= 0) {
+        return res.status(400).json({ message: 'Mã bàn không hợp lệ!' });
     }
-    res.status(404).json({ message: 'Không tìm thấy bàn!' });
+    if (!VALID_STATUS.includes(status)) {
+        return res.status(400).json({ message: 'Trạng thái bàn không hợp lệ!' });
+    }
+
+    try {
+        const [result] = await db.query('UPDATE tables SET status = ? WHERE id = ?', [status, id]);
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Không tìm thấy bàn cần cập nhật!' });
+        }
+        res.json({ message: 'Cập nhật trạng thái bàn thành công!', status });
+    } catch (err) {
+        console.error('Lỗi CSDL:', err);
+        res.status(500).json({ message: 'Lỗi khi cập nhật cơ sở dữ liệu!' });
+    }
 });
 
 module.exports = router;

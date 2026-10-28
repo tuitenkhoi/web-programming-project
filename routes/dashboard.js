@@ -2,20 +2,26 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 
-// GET /api/dashboard/stats - Lấy tổng quan chỉ số
+// GET /api/dashboard/stats - Tổng quan chỉ số (server.js đã gắn verifyToken)
 router.get('/stats', async (req, res) => {
     try {
-        const [[tablesCount]] = await db.query('SELECT COUNT(*) as total FROM tables');
-        const [[bookingsCount]] = await db.query("SELECT COUNT(*) as total FROM bookings WHERE status = 'pending'");
-        const [[ordersCount]] = await db.query("SELECT COUNT(*) as total FROM orders WHERE status = 'completed'");
+        const count = async (sql) => {
+            const [[row]] = await db.query(sql);
+            return row.total;
+        };
 
-        res.json({
-            totalTables: tablesCount.total,
-            pendingBookings: bookingsCount.total,
-            completedOrders: ordersCount.total
-        });
+        const [totalTables, occupiedTables, reservedTables, pendingBookings, completedOrders] = await Promise.all([
+            count('SELECT COUNT(*) AS total FROM tables'),
+            count("SELECT COUNT(*) AS total FROM tables WHERE status = 'occupied'"),
+            count("SELECT COUNT(*) AS total FROM tables WHERE status = 'reserved'"),
+            count("SELECT COUNT(*) AS total FROM bookings WHERE status = 'pending'"),
+            count("SELECT COUNT(*) AS total FROM orders WHERE status = 'completed'")
+        ]);
+
+        res.json({ totalTables, occupiedTables, reservedTables, pendingBookings, completedOrders });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error('Lỗi dashboard:', err);
+        res.status(500).json({ message: 'Lỗi lấy số liệu tổng quan!' });
     }
 });
 

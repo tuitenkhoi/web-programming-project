@@ -12,18 +12,64 @@ app.use(express.json());
 // Sửa danh sách này cho khớp cấu trúc thư mục của bạn.
 const STATIC_DIRS = ['admin', 'assets', 'pages'];
 
-// Không bao giờ trả mã nguồn PHP hay file ẩn
-app.use((req, res, next) => {
-    if (/\.php$/i.test(req.path) || /(^|\/)\./.test(req.path)) {
+const PUBLIC_EXTENSIONS = new Set([
+    '.html',
+    '.css',
+    '.js',
+    '.png',
+    '.jpg',
+    '.jpeg',
+    '.gif',
+    '.webp',
+    '.avif',
+    '.svg',
+    '.ico',
+    '.woff',
+    '.woff2',
+    '.ttf',
+    '.otf',
+]);
+
+function allowPublicFile(req, res, next) {
+    let decodedPath;
+
+    try {
+        decodedPath = decodeURIComponent(req.path);
+    } catch {
+        return res.status(400).end();
+    }
+
+    const segments = decodedPath.split('/');
+    const extension = path.extname(decodedPath).toLowerCase();
+
+    const blocked =
+        decodedPath.includes('\\') ||
+        decodedPath.includes('\0') ||
+        segments.some((segment) => segment.startsWith('.')) ||
+        !PUBLIC_EXTENSIONS.has(extension);
+
+    if (blocked) {
         return res.status(404).end();
     }
+
     next();
-});
+}
 
 STATIC_DIRS.forEach((dir) => {
-    app.use('/' + dir, express.static(path.join(__dirname, dir), { index: false, dotfiles: 'deny' }));
+    app.use(
+        '/' + dir,
+        allowPublicFile,
+        express.static(path.join(__dirname, dir), {
+            index: false,
+            dotfiles: 'deny',
+            redirect: false,
+        })
+    );
 });
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+
+app.get(['/', '/index.html'], (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // API
 app.use('/api/auth', require('./routes/auth'));

@@ -7,3 +7,11 @@ dist/
 # Ảnh sản phẩm được upload khi chạy ứng dụng
 backend/uploads/products/*
 !backend/uploads/products/.gitkeep
+
+# Node.js dependencies at any level
+node_modules/
+
+# Local environment configuration
+.env
+.env.*
+!.env.example

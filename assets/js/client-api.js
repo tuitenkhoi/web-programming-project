@@ -1,7 +1,7 @@
 "use strict";
 
 (function () {
-  const API_ORIGIN = "http://localhost:3000";
+  const API_ORIGIN = window.location.origin;
   const API_BASE_URL = `${API_ORIGIN}/api`;
 
   async function request(path, options = {}) {

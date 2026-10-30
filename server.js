@@ -3,6 +3,14 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { verifyToken } = require('./middleware/auth');
+const {
+    getCategories,
+} = require('./backend/src/controllers/category.controller');
+
+const {
+    getProducts,
+    getProductById,
+} = require('./backend/src/controllers/product.controller');
 
 const app = express();
 app.use(cors());
@@ -71,7 +79,57 @@ app.get(['/', '/index.html'], (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+const UPLOAD_IMAGE_EXTENSIONS = new Set([
+    '.jpg',
+    '.jpeg',
+    '.png',
+    '.webp',
+]);
+
+app.use(
+    '/uploads/products',
+    allowPublicFile,
+    (req, res, next) => {
+        let decodedPath;
+
+        try {
+            decodedPath = decodeURIComponent(req.path);
+        } catch {
+            return res.status(400).end();
+        }
+
+        const extension = path.extname(decodedPath).toLowerCase();
+
+        if (!UPLOAD_IMAGE_EXTENSIONS.has(extension)) {
+            return res.status(404).end();
+        }
+
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        next();
+    },
+    express.static(
+        path.join(__dirname, 'backend/uploads/products'),
+        {
+            index: false,
+            dotfiles: 'deny',
+            redirect: false,
+        }
+    )
+);
+
 // API
+app.get('/api/health', (req, res) => {
+    res.json({
+        success: true,
+        message: 'Mộc Coffee API đang hoạt động',
+    });
+});
+
+app.get('/api/categories', getCategories);
+
+app.get('/api/products', getProducts);
+
+app.get('/api/products/:id', getProductById);
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/dashboard', verifyToken, require('./routes/dashboard')); // toàn bộ cần token
 app.use('/api/tables', require('./routes/tables'));     // GET công khai, PATCH cần token (bên trong route)

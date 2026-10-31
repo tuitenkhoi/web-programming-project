@@ -2,7 +2,10 @@ require('dotenv').config(); // phải nạp .env trước khi require middleware
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { verifyToken } = require('./middleware/auth');
+const {
+    verifyToken,
+    requireAdmin,
+} = require('./middleware/auth');
 const {
     getCategories,
 } = require('./backend/src/controllers/category.controller');
@@ -130,11 +133,22 @@ app.get('/api/health', (req, res) => {
 app.get('/api/categories', getCategories);
 
 app.get('/api/products', getProducts);
+app.get('/api/admin/me', verifyToken, requireAdmin, (req, res) => {
+    res.json({
+        success: true,
+        data: req.user,
+    });
+});
 
 app.get('/api/products/:id', getProductById);
 app.use('/api/orders', orderRoutes);
 app.use('/api/auth', require('./routes/auth'));
-app.use('/api/dashboard', verifyToken, require('./routes/dashboard')); // toàn bộ cần token
+app.use(
+    '/api/dashboard',
+    verifyToken,
+    requireAdmin,
+    require('./routes/dashboard')
+); // toàn bộ cần token
 app.use('/api/tables', require('./routes/tables'));     // GET công khai, PATCH cần token (bên trong route)
 app.use('/api/bookings', require('./routes/bookings')); // POST công khai, GET/PATCH cần token (bên trong route)
 

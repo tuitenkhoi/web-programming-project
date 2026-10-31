@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-const { verifyToken } = require('../middleware/auth');
+const {
+    verifyToken,
+    requireAdmin,
+} = require('../middleware/auth');
 
 const VALID_STATUS = ['available', 'occupied', 'reserved'];
 
@@ -17,7 +20,7 @@ router.get('/', async (req, res) => {
 });
 
 // 2. Cập nhật trạng thái bàn (admin)
-router.patch('/:id/status', verifyToken, async (req, res) => {
+router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
     const id = Number(req.params.id);
     const { status } = req.body || {};
 

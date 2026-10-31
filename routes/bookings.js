@@ -1,7 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db'); // kết nối CSDL
-const { verifyToken } = require('../middleware/auth');
+const {
+    verifyToken,
+    requireAdmin,
+} = require('../middleware/auth');
 
 const VALID_STATUS = ['pending', 'confirmed', 'cancelled'];
 
@@ -80,7 +83,7 @@ router.post('/', async (req, res) => {
 });
 
 // ===== Danh sách đơn đặt bàn (admin) =====
-router.get('/', verifyToken, async (req, res) => {
+router.get('/', verifyToken, requireAdmin, async (req, res) => {
     const { status } = req.query;
     if (status !== undefined && !VALID_STATUS.includes(status)) {
         return res.status(400).json({ message: 'Trạng thái lọc không hợp lệ!' });
@@ -108,7 +111,7 @@ router.get('/', verifyToken, async (req, res) => {
 });
 
 // ===== Duyệt / hủy đơn đặt bàn (admin) =====
-router.patch('/:id/status', verifyToken, async (req, res) => {
+router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
     const id = Number(req.params.id);
     const { status } = req.body || {}; // pending | confirmed | cancelled
 

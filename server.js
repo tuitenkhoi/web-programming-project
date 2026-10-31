@@ -12,6 +12,8 @@ const {
     getProductById,
 } = require('./backend/src/controllers/product.controller');
 
+const orderRoutes = require('./backend/src/routes/order.routes');
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -130,6 +132,7 @@ app.get('/api/categories', getCategories);
 app.get('/api/products', getProducts);
 
 app.get('/api/products/:id', getProductById);
+app.use('/api/orders', orderRoutes);
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/dashboard', verifyToken, require('./routes/dashboard')); // toàn bộ cần token
 app.use('/api/tables', require('./routes/tables'));     // GET công khai, PATCH cần token (bên trong route)

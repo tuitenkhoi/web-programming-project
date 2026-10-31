@@ -380,54 +380,321 @@ router.get('/', verifyToken, requireAdmin, async (req, res) => {
 // ===== Duyệt / hủy đơn đặt bàn (admin) =====
 router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
     const id = Number(req.params.id);
-    const { status } = req.body || {}; // pending | confirmed | cancelled
+    const status = req.body?.status;
 
-    if (!Number.isInteger(id) || id <= 0) {
-        return res.status(400).json({ message: 'Mã đơn đặt bàn không hợp lệ!' });
+    const allowed = [
+        'pending',
+        'confirmed',
+        'seated',
+        'completed',
+        'cancelled',
+    ];
+
+    if (
+        !/^[1-9]\d*$/.test(req.params.id) ||
+        !Number.isSafeInteger(id)
+    ) {
+        return res.status(400).json({
+            success: false,
+            message: 'Mã booking không hợp lệ.',
+        });
     }
-    if (!VALID_STATUS.includes(status)) {
-        return res.status(400).json({ message: 'Trạng thái không hợp lệ!' });
+
+    if (typeof status !== 'string' || !allowed.includes(status)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Trạng thái không hợp lệ.',
+        });
     }
+
+    const transitions = {
+        pending: ['confirmed', 'cancelled'],
+        confirmed: ['seated', 'cancelled'],
+        seated: ['completed'],
+        completed: [],
+        cancelled: [],
+    };
+
+    const fail = (httpStatus, message) => {
+        const error = new Error(message);
+        error.httpStatus = httpStatus;
+        throw error;
+    };
+
+    const sqlVnTime = (milliseconds) =>
+        new Date(milliseconds + 7 * 60 * 60 * 1000)
+            .toISOString()
+            .slice(0, 19)
+            .replace('T', ' ');
+
+    let connection;
+    let inTransaction = false;
 
     try {
-        const [rows] = await db.query('SELECT id, table_id FROM bookings WHERE id = ?', [id]);
-        if (rows.length === 0) {
-            return res.status(404).json({ message: 'Không tìm thấy đơn đặt bàn!' });
+        connection = await db.getConnection();
+        await connection.beginTransaction();
+        inTransaction = true;
+
+        const [lookup] = await connection.execute(
+            'SELECT table_id FROM bookings WHERE id = ?',
+            [id]
+        );
+
+        if (!lookup.length) {
+            fail(404, 'Không tìm thấy booking.');
         }
-        const tableId = rows[0].table_id;
 
-        await db.query('UPDATE bookings SET status = ? WHERE id = ?', [status, id]);
+        const tableId = lookup[0].table_id;
 
-        // Đồng bộ sơ đồ bàn
-        let tableStatus = null;
-        if (tableId) {
-            if (status === 'confirmed') {
-                // Chỉ giữ chỗ khi bàn đang trống (không ghi đè bàn đang có khách)
-                const [r] = await db.query(
-                    "UPDATE tables SET status = 'reserved' WHERE id = ? AND status = 'available'",
-                    [tableId]
+        // Khóa bàn trước, cùng thứ tự với API tạo booking.
+        const [tables] = await connection.execute(
+            `SELECT id, table_code, status
+             FROM coffee_tables
+             WHERE id = ?
+             FOR UPDATE`,
+            [tableId]
+        );
+
+        if (!tables.length) {
+            fail(409, 'Bàn của booking không còn tồn tại.');
+        }
+
+        const [bookings] = await connection.execute(
+            `SELECT
+                id,
+                table_id,
+                status,
+                DATE_FORMAT(
+                    TIMESTAMP(booking_date, booking_time),
+                    '%Y-%m-%dT%H:%i:%s'
+                ) AS starts_at
+             FROM bookings
+             WHERE id = ?
+             FOR UPDATE`,
+            [id]
+        );
+
+        if (!bookings.length) {
+            fail(404, 'Không tìm thấy booking.');
+        }
+
+        const booking = bookings[0];
+        const table = tables[0];
+
+        if (String(booking.table_id) !== String(tableId)) {
+            fail(
+                409,
+                'Bàn của booking vừa thay đổi. Hãy tải lại danh sách.'
+            );
+        }
+
+        let tableStatus = table.status;
+        const unchanged = booking.status === status;
+
+        if (!unchanged) {
+            if (!transitions[booking.status]?.includes(status)) {
+                fail(
+                    409,
+                    'Không được chuyển từ ' +
+                    booking.status + ' sang ' + status + '.'
                 );
-                if (r.affectedRows > 0) tableStatus = 'reserved';
-            } else {
-                // Hủy/đưa về chờ: trả bàn về trống nếu không còn đơn confirmed nào khác giữ bàn này
-                const [[other]] = await db.query(
-                    "SELECT COUNT(*) AS cnt FROM bookings WHERE table_id = ? AND status = 'confirmed' AND id <> ?",
+            }
+
+            if (status === 'confirmed' || status === 'seated') {
+                const startMs = Date.parse(
+                    booking.starts_at + '+07:00'
+                );
+
+                const durationMs = 120 * 60 * 1000;
+                const now = Date.now();
+
+                if (!Number.isFinite(startMs)) {
+                    fail(
+                        409,
+                        'Ngày giờ booking không hợp lệ. Cần kiểm tra dữ liệu.'
+                    );
+                }
+
+                if (now >= startMs + durationMs) {
+                    fail(
+                        409,
+                        'Lượt đặt bàn đã hết thời gian, không thể xác nhận hoặc nhận bàn.'
+                    );
+                }
+
+                if (table.status === 'maintenance') {
+                    fail(409, 'Bàn đang bảo trì.');
+                }
+
+                const [conflicts] = await connection.execute(
+                    `SELECT id
+                     FROM bookings
+                     WHERE table_id = ?
+                       AND id <> ?
+                       AND status IN ('pending', 'confirmed', 'seated')
+                       AND TIMESTAMP(booking_date, booking_time) < ?
+                       AND TIMESTAMP(booking_date, booking_time) > ?
+                     LIMIT 1
+                     FOR UPDATE`,
+                    [
+                        tableId,
+                        id,
+                        sqlVnTime(startMs + durationMs),
+                        sqlVnTime(startMs - durationMs),
+                    ]
+                );
+
+                if (conflicts.length) {
+                    fail(
+                        409,
+                        'Booking bị trùng lịch với lượt đặt khác.'
+                    );
+                }
+
+                if (status === 'seated') {
+                    if (now < startMs) {
+                        fail(
+                            409,
+                            'Chưa đến giờ nhận bàn của booking.'
+                        );
+                    }
+
+                    if (table.status !== 'available') {
+                        fail(
+                            409,
+                            'Bàn chưa trống, chưa thể xếp khách vào bàn.'
+                        );
+                    }
+
+                    const [otherSeated] = await connection.execute(
+                        `SELECT id
+                         FROM bookings
+                         WHERE table_id = ?
+                           AND id <> ?
+                           AND status = 'seated'
+                         LIMIT 1
+                         FOR UPDATE`,
+                        [tableId, id]
+                    );
+
+                    if (otherSeated.length) {
+                        fail(
+                            409,
+                            'Bàn còn booking khác đang phục vụ. Cần kiểm tra dữ liệu.'
+                        );
+                    }
+
+                    tableStatus = 'occupied';
+                }
+            }
+
+            if (status === 'completed') {
+                if (table.status !== 'occupied') {
+                    fail(
+                        409,
+                        'Trạng thái bàn không khớp booking đang phục vụ. Cần kiểm tra dữ liệu.'
+                    );
+                }
+
+                const [otherSeated] = await connection.execute(
+                    `SELECT id
+                     FROM bookings
+                     WHERE table_id = ?
+                       AND id <> ?
+                       AND status = 'seated'
+                     LIMIT 1
+                     FOR UPDATE`,
                     [tableId, id]
                 );
-                if (other.cnt === 0) {
-                    const [r] = await db.query(
-                        "UPDATE tables SET status = 'available' WHERE id = ? AND status = 'reserved'",
-                        [tableId]
+
+                if (otherSeated.length) {
+                    fail(
+                        409,
+                        'Bàn còn booking khác đang phục vụ.'
                     );
-                    if (r.affectedRows > 0) tableStatus = 'available';
                 }
+
+                const [openOrders] = await connection.execute(
+                    `SELECT id
+                     FROM orders
+                     WHERE table_code = ?
+                       AND status <> 'cancelled'
+                       AND (
+                           status <> 'completed'
+                           OR payment_status NOT IN ('paid', 'refunded')
+                       )
+                     LIMIT 1
+                     FOR UPDATE`,
+                    [table.table_code]
+                );
+
+                if (openOrders.length) {
+                    fail(
+                        409,
+                        'Bàn còn đơn hàng chưa hoàn tất hoặc chưa xử lý thanh toán.'
+                    );
+                }
+
+                tableStatus = 'available';
+            }
+
+            await connection.execute(
+                'UPDATE bookings SET status = ? WHERE id = ?',
+                [status, id]
+            );
+
+            if (tableStatus !== table.status) {
+                await connection.execute(
+                    'UPDATE coffee_tables SET status = ? WHERE id = ?',
+                    [tableStatus, tableId]
+                );
             }
         }
 
-        res.json({ message: 'Cập nhật trạng thái đơn đặt bàn thành công', status, tableStatus });
-    } catch (err) {
-        console.error('Lỗi cập nhật trạng thái booking:', err);
-        res.status(500).json({ message: 'Lỗi cập nhật trạng thái' });
+        await connection.commit();
+        inTransaction = false;
+
+        return res.json({
+            success: true,
+            message: unchanged
+                ? 'Booking đã ở trạng thái này, không cập nhật lại.'
+                : 'Cập nhật booking thành công.',
+            data: {
+                id,
+                status,
+                table_id: tableId,
+                table_code: table.table_code,
+                table_status: tableStatus,
+                unchanged,
+            },
+            status,
+            tableStatus,
+        });
+    } catch (error) {
+        if (connection && inTransaction) {
+            try {
+                await connection.rollback();
+            } catch (rollbackError) {
+                console.error(
+                    'Lỗi rollback cập nhật booking:',
+                    rollbackError.code
+                );
+            }
+        }
+
+        console.error(
+            'Lỗi cập nhật booking:',
+            error.code || error.httpStatus || error.name
+        );
+
+        return res.status(error.httpStatus || 500).json({
+            success: false,
+            message: error.httpStatus
+                ? error.message
+                : 'Không thể hoàn tất cập nhật. Hãy tải lại dữ liệu trước khi thử lại.',
+        });
+    } finally {
+        if (connection) connection.release();
     }
 });
 

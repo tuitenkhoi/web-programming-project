@@ -6,13 +6,10 @@ const {
     requireAdmin,
 } = require('../middleware/auth');
 
-const VALID_STATUS = ['available', 'occupied', 'reserved'];
-
-// 1. Lấy danh sách sơ đồ bàn (công khai để form khách chọn bàn)
 router.get('/', async (req, res) => {
     try {
-        const [tables] = await db.query(`
-            SELECT
+        const [tables] = await db.query(
+            `SELECT
                 id,
                 table_code,
                 table_name,
@@ -20,41 +17,219 @@ router.get('/', async (req, res) => {
                 capacity,
                 area,
                 status
-            FROM coffee_tables
-            ORDER BY id
-        `);
+             FROM coffee_tables
+             ORDER BY id`
+        );
 
         res.json(tables);
-    } catch (err) {
-        console.error('Lỗi lấy danh sách bàn:', err.code);
+    } catch (error) {
+        console.error('Lỗi lấy danh sách bàn:', error.code);
 
         res.status(500).json({
-            message: 'Lỗi truy vấn cơ sở dữ liệu!'
+            message: 'Lỗi truy vấn cơ sở dữ liệu!',
         });
     }
 });
 
-// 2. Cập nhật trạng thái bàn (admin)
 router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
     const id = Number(req.params.id);
-    const { status } = req.body || {};
+    const status = req.body?.status;
+    const allowed = ['available', 'occupied', 'maintenance'];
 
-    if (!Number.isInteger(id) || id <= 0) {
-        return res.status(400).json({ message: 'Mã bàn không hợp lệ!' });
+    if (
+        !/^[1-9]\d*$/.test(req.params.id) ||
+        !Number.isSafeInteger(id)
+    ) {
+        return res.status(400).json({
+            success: false,
+            message: 'Mã bàn không hợp lệ.',
+        });
     }
-    if (!VALID_STATUS.includes(status)) {
-        return res.status(400).json({ message: 'Trạng thái bàn không hợp lệ!' });
+
+    if (typeof status !== 'string' || !allowed.includes(status)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Chỉ chấp nhận available, occupied hoặc maintenance.',
+        });
     }
+
+    const transitions = {
+        available: ['occupied', 'maintenance'],
+        occupied: ['available'],
+        maintenance: ['available'],
+    };
+
+    const fail = (httpStatus, message) => {
+        const error = new Error(message);
+        error.httpStatus = httpStatus;
+        throw error;
+    };
+
+    const sqlVnTime = (milliseconds) =>
+        new Date(milliseconds + 7 * 60 * 60 * 1000)
+            .toISOString()
+            .slice(0, 19)
+            .replace('T', ' ');
+
+    let connection;
+    let inTransaction = false;
 
     try {
-        const [result] = await db.query('UPDATE tables SET status = ? WHERE id = ?', [status, id]);
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'Không tìm thấy bàn cần cập nhật!' });
+        connection = await db.getConnection();
+        await connection.beginTransaction();
+        inTransaction = true;
+
+        const [tables] = await connection.execute(
+            `SELECT id, table_code, status
+             FROM coffee_tables
+             WHERE id = ?
+             FOR UPDATE`,
+            [id]
+        );
+
+        if (!tables.length) {
+            fail(404, 'Không tìm thấy bàn.');
         }
-        res.json({ message: 'Cập nhật trạng thái bàn thành công!', status });
-    } catch (err) {
-        console.error('Lỗi CSDL:', err);
-        res.status(500).json({ message: 'Lỗi khi cập nhật cơ sở dữ liệu!' });
+
+        const table = tables[0];
+        const unchanged = table.status === status;
+
+        if (!unchanged) {
+            if (!transitions[table.status]?.includes(status)) {
+                fail(
+                    409,
+                    'Không được chuyển trực tiếp từ ' +
+                    table.status + ' sang ' + status + '.'
+                );
+            }
+
+            const [seated] = await connection.execute(
+                `SELECT id
+                 FROM bookings
+                 WHERE table_id = ?
+                   AND status = 'seated'
+                 LIMIT 1
+                 FOR UPDATE`,
+                [id]
+            );
+
+            if (seated.length) {
+                fail(
+                    409,
+                    'Bàn có booking đang phục vụ. Hãy xử lý qua API booking.'
+                );
+            }
+
+            const [openOrders] = await connection.execute(
+                `SELECT id
+                 FROM orders
+                 WHERE table_code = ?
+                   AND status <> 'cancelled'
+                   AND (
+                       status <> 'completed'
+                       OR payment_status NOT IN ('paid', 'refunded')
+                   )
+                 LIMIT 1
+                 FOR UPDATE`,
+                [table.table_code]
+            );
+
+            if (openOrders.length) {
+                fail(
+                    409,
+                    'Bàn còn đơn hàng chưa hoàn tất hoặc chưa xử lý thanh toán.'
+                );
+            }
+
+            const now = Date.now();
+            const durationMs = 120 * 60 * 1000;
+
+            if (status === 'occupied' || status === 'maintenance') {
+                let sql = `
+                    SELECT id
+                    FROM bookings
+                    WHERE table_id = ?
+                      AND status IN ('pending', 'confirmed')
+                      AND TIMESTAMP(booking_date, booking_time) > ?
+                `;
+
+                const params = [
+                    id,
+                    sqlVnTime(now - durationMs),
+                ];
+
+                if (status === 'occupied') {
+                    sql += `
+                        AND TIMESTAMP(booking_date, booking_time) < ?
+                    `;
+
+                    params.push(sqlVnTime(now + durationMs));
+                }
+
+                sql += ' LIMIT 1 FOR UPDATE';
+
+                const [reservations] = await connection.execute(
+                    sql,
+                    params
+                );
+
+                if (reservations.length) {
+                    fail(
+                        409,
+                        status === 'occupied'
+                            ? 'Bàn có lịch đặt chồng với 120 phút tới. Không nhận khách vãng lai bằng thao tác này.'
+                            : 'Bàn còn lịch đặt chưa hết hạn. Cần xử lý các booking trước khi bảo trì.'
+                    );
+                }
+            }
+
+            await connection.execute(
+                'UPDATE coffee_tables SET status = ? WHERE id = ?',
+                [status, id]
+            );
+        }
+
+        await connection.commit();
+        inTransaction = false;
+
+        res.json({
+            success: true,
+            message: unchanged
+                ? 'Bàn đã ở trạng thái này, không cập nhật lại.'
+                : 'Cập nhật trạng thái bàn thành công.',
+            status,
+            data: {
+                id,
+                table_code: table.table_code,
+                status,
+                unchanged,
+            },
+        });
+    } catch (error) {
+        if (connection && inTransaction) {
+            try {
+                await connection.rollback();
+            } catch (rollbackError) {
+                console.error(
+                    'Lỗi rollback trạng thái bàn:',
+                    rollbackError.code
+                );
+            }
+        }
+
+        console.error(
+            'Lỗi cập nhật bàn:',
+            error.code || error.httpStatus || error.name
+        );
+
+        res.status(error.httpStatus || 500).json({
+            success: false,
+            message: error.httpStatus
+                ? error.message
+                : 'Không thể cập nhật bàn. Hãy tải lại dữ liệu trước khi thử lại.',
+        });
+    } finally {
+        if (connection) connection.release();
     }
 });
 

@@ -169,10 +169,25 @@ app.use((err, req, res, next) => {
     res.status(500).json({ message: 'Lỗi máy chủ!' });
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT || 5000);
+
 if (require.main === module) {
-    app.listen(PORT, () => {
+    const server = app.listen(PORT);
+
+    server.once('listening', () => {
         console.log(`Server đang chạy tại http://localhost:${PORT}`);
+        console.log(`PID: ${process.pid}`);
+        console.log(`Thư mục dự án: ${__dirname}`);
+    });
+
+    server.on('error', (error) => {
+        if (error.code === 'EADDRINUSE') {
+            console.error(`Không thể khởi động: cổng ${PORT} đang được sử dụng.`);
+        } else {
+            console.error('Lỗi khởi động server:', error.code || error.message);
+        }
+
+        process.exitCode = 1;
     });
 }
 

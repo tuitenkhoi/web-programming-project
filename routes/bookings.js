@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { randomBytes } = require('node:crypto');
 const db = require('../config/db'); // kết nối CSDL
 const {
     verifyToken,
@@ -7,6 +8,13 @@ const {
 } = require('../middleware/auth');
 
 const VALID_STATUS = ['pending', 'confirmed', 'cancelled'];
+const BOOKING_FILTER_STATUS = [
+    'pending',
+    'confirmed',
+    'seated',
+    'completed',
+    'cancelled',
+];
 
 const pad = (n) => String(n).padStart(2, '0');
 const toMySqlDateTime = (d) =>
@@ -14,99 +22,358 @@ const toMySqlDateTime = (d) =>
 
 // ===== Khách đặt bàn (công khai) =====
 router.post('/', async (req, res) => {
-    const body = req.body || {};
-    const customer_name = String(body.customer_name || '').trim();
-    const phone = String(body.phone || '').trim();
-    const guests = Number(body.number_of_guests);
-    const when = new Date(body.booking_time);
-    const hasTable = body.table_id !== undefined && body.table_id !== null && body.table_id !== '';
-    const table_id = hasTable ? Number(body.table_id) : null;
+    let connection;
+    let transactionStarted = false;
 
-    // 1. Validate dữ liệu đầu vào
-    if (!customer_name || !phone || !body.booking_time || !body.number_of_guests) {
-        return res.status(400).json({ message: 'Vui lòng điền đầy đủ các thông tin bắt buộc!' });
-    }
-    if (customer_name.length < 2 || customer_name.length > 100) {
-        return res.status(400).json({ message: 'Tên khách hàng phải từ 2 đến 100 ký tự!' });
-    }
-    if (!/^[0-9]{9,11}$/.test(phone)) {
-        return res.status(400).json({ message: 'Số điện thoại không hợp lệ!' });
-    }
-    if (!Number.isInteger(guests) || guests < 1 || guests > 20) {
-        return res.status(400).json({ message: 'Số khách phải là số nguyên từ 1 đến 20!' });
-    }
-    if (Number.isNaN(when.getTime())) {
-        return res.status(400).json({ message: 'Thời gian đặt bàn không hợp lệ!' });
-    }
-    if (when.getTime() < Date.now() - 60 * 1000) {
-        return res.status(400).json({ message: 'Thời gian đặt bàn không được ở quá khứ!' });
-    }
-    if (hasTable && (!Number.isInteger(table_id) || table_id <= 0)) {
-        return res.status(400).json({ message: 'Mã bàn không hợp lệ!' });
-    }
+    const reject = (status, message) => {
+        const error = new Error(message);
+        error.httpStatus = status;
+        throw error;
+    };
+
+    const readText = (value, label, maxLength, required = false) => {
+        if (value === undefined || value === null) value = '';
+
+        if (typeof value !== 'string') {
+            reject(400, label + ' phải là chuỗi ký tự.');
+        }
+
+        const text = value.trim();
+
+        if ((required && !text) || text.length > maxLength) {
+            reject(400, label + ' bị thiếu hoặc vượt độ dài cho phép.');
+        }
+
+        return text;
+    };
+
+    const VN_OFFSET_MS = 7 * 60 * 60 * 1000;
+    const MINUTE_MS = 60 * 1000;
+    const DAY_MS = 24 * 60 * MINUTE_MS;
+    const SLOT_MS = 120 * MINUTE_MS;
+
+    const vnDate = (milliseconds) =>
+        new Date(milliseconds + VN_OFFSET_MS)
+            .toISOString()
+            .slice(0, 10);
+
+    const vnSqlTime = (milliseconds) =>
+        new Date(milliseconds + VN_OFFSET_MS)
+            .toISOString()
+            .slice(0, 19)
+            .replace('T', ' ');
 
     try {
-        const bookingTime = toMySqlDateTime(when);
+        const body = req.body;
 
-        if (table_id !== null) {
-            const [tables] = await db.query('SELECT * FROM tables WHERE id = ?', [table_id]);
-            if (tables.length === 0) {
-                return res.status(400).json({ message: 'Bàn được chọn không tồn tại!' });
-            }
-            if (tables[0].capacity != null && guests > tables[0].capacity) {
-                return res.status(400).json({ message: 'Số khách vượt quá sức chứa của bàn!' });
-            }
-            const [clash] = await db.query(
-                "SELECT id FROM bookings WHERE table_id = ? AND booking_time = ? AND status <> 'cancelled' LIMIT 1",
-                [table_id, bookingTime]
+        if (!body || typeof body !== 'object' || Array.isArray(body)) {
+            reject(400, 'Dữ liệu đặt bàn phải là một đối tượng JSON.');
+        }
+
+        const customerName = readText(
+            body.customer_name, 'Họ tên', 100, true
+        );
+
+        const customerPhone = readText(
+            body.customer_phone, 'Số điện thoại', 20, true
+        );
+
+        const customerEmail = readText(
+            body.customer_email, 'Email', 150
+        );
+
+        const bookingDate = readText(
+            body.booking_date, 'Ngày đặt', 10, true
+        );
+
+        const rawTime = readText(
+            body.booking_time, 'Giờ đặt', 8, true
+        );
+
+        const tableCode = readText(
+            body.table_code, 'Mã bàn', 20, true
+        ).toUpperCase();
+
+        const note = readText(body.note, 'Ghi chú', 300);
+
+        if (customerName.length < 2) {
+            reject(400, 'Họ tên phải có ít nhất 2 ký tự.');
+        }
+
+        if (!/^0\d{9}$/.test(customerPhone)) {
+            reject(
+                400,
+                'Số điện thoại phải gồm 10 chữ số và bắt đầu bằng 0.'
             );
-            if (clash.length > 0) {
-                return res.status(409).json({ message: 'Bàn đã có người đặt vào thời điểm này!' });
+        }
+
+        if (
+            customerEmail &&
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)
+        ) {
+            reject(400, 'Email không hợp lệ.');
+        }
+
+        if (!/^[A-Z0-9][A-Z0-9_-]{0,19}$/.test(tableCode)) {
+            reject(400, 'Mã bàn không hợp lệ.');
+        }
+
+        const guestValue = body.guest_count;
+
+        if (
+            !['string', 'number'].includes(typeof guestValue) ||
+            !/^[1-9]\d*$/.test(String(guestValue))
+        ) {
+            reject(400, 'Số khách phải là số nguyên dương.');
+        }
+
+        const guestCount = Number(guestValue);
+
+        if (!Number.isSafeInteger(guestCount) || guestCount > 20) {
+            reject(400, 'Số khách phải từ 1 đến 20.');
+        }
+
+        if (
+            !/^20\d{2}-\d{2}-\d{2}$/.test(bookingDate) ||
+            !/^(?:[01]\d|2[0-3]):[0-5]\d(?::00)?$/.test(rawTime)
+        ) {
+            reject(400, 'Ngày hoặc giờ đặt bàn không đúng định dạng.');
+        }
+
+        const bookingTime = rawTime.slice(0, 5);
+        const localStart = bookingDate + 'T' + bookingTime + ':00';
+        const startMs = Date.parse(localStart + '+07:00');
+
+        if (
+            !Number.isFinite(startMs) ||
+            vnSqlTime(startMs) !== localStart.replace('T', ' ')
+        ) {
+            reject(400, 'Ngày đặt bàn không tồn tại.');
+        }
+
+        const now = Date.now();
+
+        if (startMs < now + 30 * MINUTE_MS) {
+            reject(400, 'Vui lòng đặt bàn trước ít nhất 30 phút.');
+        }
+
+        if (bookingDate > vnDate(now + 30 * DAY_MS)) {
+            reject(400, 'Chỉ được đặt bàn trước tối đa 30 ngày.');
+        }
+
+        connection = await db.getConnection();
+        await connection.beginTransaction();
+        transactionStarted = true;
+
+        const [tables] = await connection.execute(
+            `SELECT id, table_code, table_name, capacity, area, status
+             FROM coffee_tables
+             WHERE table_code = ?
+             FOR UPDATE`,
+            [tableCode]
+        );
+
+        if (!tables.length) {
+            reject(404, 'Bàn được chọn không tồn tại.');
+        }
+
+        const table = tables[0];
+
+        if (!['available', 'occupied'].includes(table.status)) {
+            reject(409, 'Bàn đang bảo trì hoặc không nhận đặt trước.');
+        }
+
+        if (guestCount > Number(table.capacity)) {
+            reject(400, 'Số khách vượt quá sức chứa của bàn.');
+        }
+
+        if (startMs < Date.now() + 30 * MINUTE_MS) {
+            reject(
+                400,
+                'Giờ đã chọn không còn đáp ứng thời gian đặt trước 30 phút.'
+            );
+        }
+
+        const [conflicts] = await connection.execute(
+            `SELECT id
+             FROM bookings
+             WHERE table_id = ?
+               AND status IN ('pending', 'confirmed', 'seated')
+               AND TIMESTAMP(booking_date, booking_time) < ?
+               AND TIMESTAMP(booking_date, booking_time) > ?
+             LIMIT 1
+             FOR UPDATE`,
+            [
+                table.id,
+                vnSqlTime(startMs + SLOT_MS),
+                vnSqlTime(startMs - SLOT_MS),
+            ]
+        );
+
+        if (conflicts.length) {
+            reject(
+                409,
+                'Bàn đã có lịch đặt trùng trong khoảng 120 phút này.'
+            );
+        }
+
+        const bookingCode =
+            'BK' +
+            bookingDate.replaceAll('-', '') +
+            randomBytes(10).toString('hex').toUpperCase();
+
+        const [result] = await connection.execute(
+            `INSERT INTO bookings (
+                booking_code,
+                table_id,
+                customer_name,
+                customer_phone,
+                customer_email,
+                booking_date,
+                booking_time,
+                guest_count,
+                note,
+                status
+             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')`,
+            [
+                bookingCode,
+                table.id,
+                customerName,
+                customerPhone,
+                customerEmail || null,
+                bookingDate,
+                bookingTime + ':00',
+                guestCount,
+                note || null,
+            ]
+        );
+
+        await connection.commit();
+        transactionStarted = false;
+
+        return res.status(201).json({
+            success: true,
+            message: 'Đã lưu yêu cầu đặt bàn. Vui lòng chờ xác nhận.',
+            data: {
+                id: result.insertId,
+                booking_code: bookingCode,
+                table_id: table.id,
+                table_code: table.table_code,
+                table_name: table.table_name,
+                capacity: Number(table.capacity),
+                area: table.area,
+                booking_date: bookingDate,
+                booking_time: bookingTime + ':00',
+                booking_end: vnSqlTime(startMs + SLOT_MS),
+                guest_count: guestCount,
+                status: 'pending',
+                duration_minutes: 120,
+            },
+        });
+    } catch (error) {
+        if (connection && transactionStarted) {
+            try {
+                await connection.rollback();
+            } catch (rollbackError) {
+                console.error(
+                    'Lỗi rollback booking:',
+                    rollbackError.code
+                );
             }
         }
 
-        // 2. Thêm đơn đặt bàn mới (trạng thái: pending)
-        const sql = `
-            INSERT INTO bookings (customer_name, phone, booking_time, number_of_guests, table_id, status)
-            VALUES (?, ?, ?, ?, ?, 'pending')
-        `;
-        const [result] = await db.query(sql, [customer_name, phone, bookingTime, guests, table_id]);
+        if (error.httpStatus) {
+            return res.status(error.httpStatus).json({
+                success: false,
+                message: error.message,
+            });
+        }
 
-        res.status(201).json({
-            message: 'Gửi yêu cầu đặt bàn thành công! Chúng tôi sẽ liên hệ lại để xác nhận',
-            bookingId: result.insertId
+        console.error(
+            'Lỗi tạo booking:',
+            error.code || error.name
+        );
+
+        if (
+            ['ER_LOCK_DEADLOCK', 'ER_LOCK_WAIT_TIMEOUT']
+                .includes(error.code)
+        ) {
+            return res.status(503).json({
+                success: false,
+                message: 'Hệ thống đang bận. Vui lòng kiểm tra và thử lại sau.',
+            });
+        }
+
+        return res.status(500).json({
+            success: false,
+            message: 'Không thể hoàn tất yêu cầu. Hãy kiểm tra booking trước khi gửi lại.',
         });
-    } catch (err) {
-        console.error('Lỗi khi lưu booking:', err);
-        res.status(500).json({ message: 'Lỗi máy chủ! Không thể đặt bàn.' });
+    } finally {
+        if (connection) connection.release();
     }
 });
 
 // ===== Danh sách đơn đặt bàn (admin) =====
 router.get('/', verifyToken, requireAdmin, async (req, res) => {
-    const { status } = req.query;
-    if (status !== undefined && !VALID_STATUS.includes(status)) {
-        return res.status(400).json({ message: 'Trạng thái lọc không hợp lệ!' });
+    const status = req.query.status;
+
+    if (
+        status !== undefined &&
+        (
+            typeof status !== 'string' ||
+            !BOOKING_FILTER_STATUS.includes(status)
+        )
+    ) {
+        return res.status(400).json({
+            message: 'Trạng thái lọc không hợp lệ!',
+        });
     }
 
     try {
         let sql = `
-            SELECT b.*, t.name AS table_name
-            FROM bookings b
-            LEFT JOIN tables t ON b.table_id = t.id
+            SELECT
+                b.id,
+                b.booking_code,
+                b.table_id,
+                b.customer_name,
+                b.customer_phone,
+                b.customer_phone AS phone,
+                b.customer_email,
+                DATE_FORMAT(b.booking_date, '%Y-%m-%d') AS booking_date,
+                TIME_FORMAT(b.booking_time, '%H:%i:%s') AS booking_time,
+                b.guest_count,
+                b.guest_count AS number_of_guests,
+                b.note,
+                b.status,
+                b.created_at,
+                b.updated_at,
+                t.table_code,
+                t.table_name,
+                t.capacity,
+                t.area
+            FROM bookings AS b
+            INNER JOIN coffee_tables AS t
+                ON t.id = b.table_id
         `;
+
         const params = [];
-        if (status) {
+
+        if (status !== undefined) {
             sql += ' WHERE b.status = ?';
             params.push(status);
         }
+
         sql += ' ORDER BY b.created_at DESC, b.id DESC';
 
-        const [bookings] = await db.query(sql, params);
+        const [bookings] = await db.execute(sql, params);
+
         res.json(bookings);
-    } catch (err) {
-        console.error('Lỗi lấy danh sách booking:', err);
-        res.status(500).json({ message: 'Lỗi lấy danh sách booking!' });
+    } catch (error) {
+        console.error('Lỗi lấy danh sách booking:', error.code);
+
+        res.status(500).json({
+            message: 'Không thể lấy danh sách đặt bàn!',
+        });
     }
 });
 

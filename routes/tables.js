@@ -11,11 +11,26 @@ const VALID_STATUS = ['available', 'occupied', 'reserved'];
 // 1. Lấy danh sách sơ đồ bàn (công khai để form khách chọn bàn)
 router.get('/', async (req, res) => {
     try {
-        const [tables] = await db.query('SELECT * FROM tables ORDER BY id');
+        const [tables] = await db.query(`
+            SELECT
+                id,
+                table_code,
+                table_name,
+                table_name AS name,
+                capacity,
+                area,
+                status
+            FROM coffee_tables
+            ORDER BY id
+        `);
+
         res.json(tables);
     } catch (err) {
-        console.error('Lỗi CSDL:', err);
-        res.status(500).json({ message: 'Lỗi truy vấn cơ sở dữ liệu!' });
+        console.error('Lỗi lấy danh sách bàn:', err.code);
+
+        res.status(500).json({
+            message: 'Lỗi truy vấn cơ sở dữ liệu!'
+        });
     }
 });
 

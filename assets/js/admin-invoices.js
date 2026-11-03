@@ -27,7 +27,15 @@ document.addEventListener('DOMContentLoaded', function () {
     function showMessage(text, cls) {
         tbody.innerHTML = '<tr><td colspan="8" class="text-center ' + cls + ' py-4">' + text + '</td></tr>';
     }
+        // Thẻ thống kê trong HTML cũng là số liệu mẫu: đặt về "–" cho tới khi có dữ liệu thật
+    function resetStats() {
+        ['today-revenue', 'today-invoice-count', 'pending-invoice-count', 'paid-invoice-count', 'visible-invoice-count'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = '–';
+        });
+    }
     showMessage('Đang tải...', 'text-secondary');
+    resetStats();
 
     // ----- Dọn phần giao diện mẫu không còn phù hợp -----
     var createBtn = document.getElementById('open-create-invoice-button');
@@ -146,6 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (err) {
             console.error('Lỗi tải danh sách hóa đơn:', err);
             showMessage('Không tải được hóa đơn. Vui lòng thử lại.', 'text-danger');
+            resetStats();
             A.toast(err.message, 'error');
         }
     }

@@ -94,6 +94,17 @@ document.addEventListener('DOMContentLoaded', function () {
         if (emptyBox) emptyBox.classList.toggle('d-none', list.length > 0);
     }
 
+        // Thẻ thống kê trong HTML là số liệu mẫu: đặt về "–" cho tới khi có dữ liệu thật
+    function resetStats() {
+        ['today-booking-count', 'pending-booking-count', 'confirmed-booking-count', 'cancelled-booking-count', 'visible-booking-count'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = '–';
+        });
+    }
+    function showMessage(text, cls) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center ' + cls + ' py-4">' + text + '</td></tr>';
+    }
+
     async function load() {
         try {
             all = await A.api('/api/bookings');
@@ -101,6 +112,8 @@ document.addEventListener('DOMContentLoaded', function () {
             render();
         } catch (err) {
             console.error('Lỗi tải danh sách booking:', err);
+            showMessage('Không tải được danh sách booking. Vui lòng thử lại.', 'text-danger');
+            resetStats();
             A.toast(err.message, 'error');
         }
     }
@@ -134,5 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
         render();
     });
 
+    showMessage('Đang tải...', 'text-secondary');
+    resetStats();
     load();
 });

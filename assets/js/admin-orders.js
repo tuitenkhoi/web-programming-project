@@ -54,7 +54,16 @@ document.addEventListener('DOMContentLoaded', function () {
     function showMessage(text, cls) {
         tbody.innerHTML = '<tr><td colspan="8" class="text-center ' + cls + ' py-4">' + text + '</td></tr>';
     }
+        // Thẻ thống kê và số trên các tab trong HTML cũng là số liệu mẫu: đặt về "–" cho tới khi có dữ liệu thật
+    function resetStats() {
+        ['today-order-count', 'new-order-count', 'preparing-order-count', 'payment-order-count', 'visible-order-count'].forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el) el.textContent = '–';
+        });
+        Array.prototype.slice.call(document.querySelectorAll('.order-status-tab .badge')).forEach(function (b) { b.textContent = '–'; });
+    }
     showMessage('Đang tải...', 'text-secondary');
+    resetStats();
 
     // ----- Dọn phần giao diện mẫu không còn phù hợp -----
     var createBtn = document.getElementById('open-create-order-button');
@@ -198,6 +207,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } catch (err) {
             console.error('Lỗi tải danh sách đơn hàng:', err);
             showMessage('Không tải được đơn hàng. Vui lòng thử lại.', 'text-danger');
+            resetStats();
             A.toast(err.message, 'error');
         }
     }

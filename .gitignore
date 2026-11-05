@@ -1,0 +1,18 @@
+# Thư viện cài bằng npm (chạy `npm install` để tạo lại)
+node_modules/
+
+# Cấu hình bí mật - KHÔNG commit. Dùng .env.example làm mẫu
+.env
+.env.*
+!.env.example
+
+# Ảnh sản phẩm được upload khi chạy ứng dụng
+backend/uploads/products/*
+!backend/uploads/products/.gitkeep
+
+# Rác của hệ điều hành / trình soạn thảo
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log

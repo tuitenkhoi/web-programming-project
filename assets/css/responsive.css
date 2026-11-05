@@ -1,0 +1,1246 @@
+/* =========================================================
+   RESPONSIVE.CSS - MỘC COFFEE
+   Các mốc Bootstrap:
+   - XL: dưới 1200px
+   - LG: dưới 992px
+   - MD: dưới 768px
+   - SM: dưới 576px
+========================================================= */
+
+/* =========================================================
+   1. MÀN HÌNH LỚN
+========================================================= */
+
+@media (min-width: 1400px) {
+  .container {
+    max-width: 1320px;
+  }
+
+  .carousel-item>img {
+    height: 720px;
+  }
+
+  .banner-content {
+    max-width: 720px;
+  }
+
+  .product-detail-image {
+    height: 600px;
+  }
+
+  .booking-summary,
+  .cart-summary,
+  .payment-summary {
+    position: sticky;
+    top: 95px;
+  }
+}
+
+/* =========================================================
+   2. LAPTOP NHỎ VÀ TABLET NGANG
+========================================================= */
+
+@media (max-width: 1199.98px) {
+  /* Trang chủ */
+
+  .carousel-item>img {
+    height: 620px;
+  }
+
+  .carousel-caption {
+    right: 8%;
+    left: 8%;
+  }
+
+  .banner-content {
+    max-width: 620px;
+  }
+
+  .banner-content h1,
+  .banner-content h2 {
+    font-size: 44px;
+  }
+
+  .product-card img {
+    height: 210px;
+  }
+
+  .category-card img {
+    height: 230px;
+  }
+
+  /* Trang chi tiết sản phẩm */
+
+  .product-detail-image {
+    height: 520px;
+  }
+
+  .product-action-box {
+    gap: 15px;
+  }
+
+  /* Trang giỏ hàng */
+
+  .cart-table {
+    min-width: 780px;
+  }
+
+  /* Trang quản trị */
+
+  .admin-content {
+    padding: 24px;
+  }
+
+  .revenue-chart {
+    overflow-x: auto;
+  }
+
+  .best-selling-item {
+    grid-template-columns: 38px minmax(130px, 1fr);
+  }
+
+  .best-selling-item>strong {
+    grid-column: 2;
+  }
+}
+
+/* =========================================================
+   3. TABLET VÀ MENU MOBILE
+========================================================= */
+
+@media (max-width: 991.98px) {
+  /* ==================== NAVBAR ==================== */
+
+  .navbar {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .navbar-collapse {
+    max-height: calc(100vh - 75px);
+    margin-top: 12px;
+    padding: 15px;
+    overflow-y: auto;
+    background-color: #212529;
+    border-radius: 10px;
+  }
+
+  .navbar-nav {
+    align-items: stretch !important;
+  }
+
+  .navbar-nav .nav-item {
+    width: 100%;
+  }
+
+  .navbar-nav .nav-link {
+    padding: 10px 12px;
+  }
+
+  .navbar-nav .btn {
+    width: 100%;
+    margin: 5px 0 !important;
+  }
+
+  /* ==================== BANNER TRANG CHỦ ==================== */
+
+  .carousel-item>img {
+    height: 570px;
+  }
+
+  .carousel-caption {
+    right: 7%;
+    bottom: 70px;
+    left: 7%;
+  }
+
+  .banner-content {
+    max-width: 570px;
+  }
+
+  .banner-content h1,
+  .banner-content h2 {
+    font-size: 39px;
+  }
+
+  .banner-content .lead {
+    font-size: 18px;
+  }
+
+  /* ==================== BANNER TRANG CON ==================== */
+
+  .page-banner {
+    min-height: 330px;
+    padding-top: 130px;
+    padding-bottom: 65px;
+  }
+
+  .page-banner h1 {
+    font-size: 40px;
+  }
+
+  /* ==================== CARD ==================== */
+
+  .feature-icon {
+    width: 68px;
+    height: 68px;
+    font-size: 30px;
+  }
+
+  .category-card img {
+    height: 220px;
+  }
+
+  .product-card img {
+    height: 230px;
+  }
+
+  /* ==================== ĐẶT BÀN ==================== */
+
+  .booking-summary,
+  .cart-summary,
+  .payment-summary {
+    position: static;
+  }
+
+  .booking-steps {
+    max-width: 650px;
+  }
+
+  .booking-section-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 21px;
+  }
+
+  .table-option {
+    min-height: 125px;
+  }
+
+  /* ==================== CHI TIẾT MÓN ==================== */
+
+  .product-detail-page {
+    padding-top: 72px;
+  }
+
+  .product-detail-image {
+    width: 100%;
+    height: 550px;
+  }
+
+  .product-detail-page form {
+    margin-top: 10px;
+  }
+
+  /* ==================== GIỎ HÀNG ==================== */
+
+  .cart-table {
+    min-width: 820px;
+  }
+
+  /* ==================== THANH TOÁN ==================== */
+
+  .payment-option {
+    min-height: 110px;
+  }
+
+  /* ==================== TRANG THÀNH CÔNG ==================== */
+
+  .success-page {
+    padding-top: 72px;
+  }
+
+  /* ==================== QUẢN TRỊ ==================== */
+
+  .admin-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .admin-sidebar.show {
+    transform: translateX(0);
+  }
+
+  .admin-main {
+    margin-left: 0;
+  }
+
+  .admin-content {
+    padding: 22px 18px;
+  }
+
+  body.sidebar-open {
+    overflow: hidden;
+  }
+}
+
+/* =========================================================
+   4. MÁY TÍNH BẢNG DỌC VÀ ĐIỆN THOẠI LỚN
+========================================================= */
+
+@media (max-width: 767.98px) {
+  /* ==================== THIẾT LẬP CHUNG ==================== */
+
+  body {
+    font-size: 15px;
+  }
+
+  section {
+    scroll-margin-top: 70px;
+  }
+
+  .section-title {
+    font-size: 29px;
+  }
+
+  .display-4 {
+    font-size: 38px;
+  }
+
+  .display-5 {
+    font-size: 34px;
+  }
+
+  .display-6 {
+    font-size: 31px;
+  }
+
+  /* ==================== NAVBAR ==================== */
+
+  .navbar-brand {
+    font-size: 19px;
+  }
+
+  .navbar-brand i {
+    font-size: 21px;
+  }
+
+  /* ==================== BANNER TRANG CHỦ ==================== */
+
+  .carousel-item>img {
+    height: 520px;
+  }
+
+  .carousel-caption {
+    right: 5%;
+    bottom: 50px;
+    left: 5%;
+    text-align: center;
+  }
+
+  .banner-content {
+    max-width: 100%;
+    padding: 20px;
+  }
+
+  .banner-content h1,
+  .banner-content h2 {
+    font-size: 33px;
+  }
+
+  .banner-content .lead {
+    font-size: 16px;
+  }
+
+  .banner-content .btn {
+    display: block;
+    width: 100%;
+    margin: 9px 0 !important;
+  }
+
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: 9%;
+  }
+
+  /* ==================== BANNER TRANG CON ==================== */
+
+  .page-banner {
+    min-height: 290px;
+    padding: 120px 15px 55px;
+  }
+
+  .page-banner h1 {
+    font-size: 33px;
+  }
+
+  .page-banner .lead {
+    font-size: 17px;
+  }
+
+  /* ==================== TIỆN ÍCH ==================== */
+
+  .feature-icon {
+    width: 62px;
+    height: 62px;
+    font-size: 27px;
+  }
+
+  /* ==================== DANH MỤC ==================== */
+
+  .category-card img {
+    height: 190px;
+  }
+
+  .category-content {
+    padding: 13px;
+  }
+
+  .category-content h3 {
+    font-size: 17px;
+  }
+
+  /* ==================== SẢN PHẨM ==================== */
+
+  .product-card img {
+    height: 230px;
+  }
+
+  .product-card .card-body {
+    padding: 18px;
+  }
+
+  .sticky-filter {
+    position: static;
+  }
+
+  #category-buttons {
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    padding-bottom: 7px;
+    overflow-x: auto;
+  }
+
+  #category-buttons .btn {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  /* ==================== GIỚI THIỆU ==================== */
+
+  #about img {
+    max-height: 420px;
+    object-fit: cover;
+  }
+
+  /* ==================== QUY TRÌNH ==================== */
+
+  .process-card {
+    padding: 25px 20px;
+  }
+
+  /* ==================== FOOTER ==================== */
+
+  footer {
+    text-align: center;
+  }
+
+  footer .d-flex.gap-3 {
+    justify-content: center;
+  }
+
+  .footer-links li {
+    margin-bottom: 7px;
+  }
+
+  /* ==================== CÁC BƯỚC ==================== */
+
+  .booking-steps {
+    align-items: flex-start;
+  }
+
+  .booking-step {
+    min-width: 70px;
+  }
+
+  .step-number {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .step-label {
+    margin-top: 7px;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .step-line {
+    margin-top: 17px;
+  }
+
+  /* ==================== FORM ĐẶT BÀN ==================== */
+
+  .booking-section-icon {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    font-size: 19px;
+  }
+
+  .area-option {
+    min-height: 120px;
+  }
+
+  .table-option {
+    min-height: 115px;
+    padding: 15px 8px;
+  }
+
+  .table-legend {
+    font-size: 12px;
+  }
+
+  /* ==================== GIỎ HÀNG ==================== */
+
+  .cart-table {
+    min-width: 760px;
+    font-size: 14px;
+  }
+
+  .cart-product-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .quantity-control {
+    min-width: 110px;
+  }
+
+  .service-option {
+    min-height: 90px;
+  }
+
+  /* ==================== THANH TOÁN ==================== */
+
+  .payment-option {
+    min-height: 100px;
+  }
+
+  .payment-detail-box {
+    padding: 18px;
+  }
+
+  .qr-code-wrapper {
+    max-width: 220px;
+    margin: 0 auto;
+  }
+
+  .bank-info-row {
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  /* ==================== CHI TIẾT SẢN PHẨM ==================== */
+
+  .product-detail-image {
+    height: 470px;
+  }
+
+  .product-thumbnail {
+    width: 75px;
+    height: 75px;
+  }
+
+  .product-action-box {
+    align-items: stretch;
+  }
+
+  .product-action-box .btn {
+    min-width: 190px;
+  }
+
+  .product-service-item {
+    min-height: 85px;
+  }
+
+  .nav-tabs {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .nav-tabs .nav-link {
+    white-space: nowrap;
+  }
+
+  /* ==================== THÀNH CÔNG ==================== */
+
+  .success-card .card-body {
+    padding: 35px 20px !important;
+  }
+
+  .success-icon-large {
+    width: 85px;
+    height: 85px;
+    font-size: 44px;
+  }
+
+  .success-code-box {
+    width: 100%;
+  }
+
+  .result-information {
+    padding: 14px;
+  }
+
+  /* ==================== QUẢN TRỊ ==================== */
+
+  .admin-topbar {
+    min-height: 65px;
+    padding: 10px 15px;
+  }
+
+  .admin-topbar h1 {
+    font-size: 17px;
+  }
+
+  .admin-topbar small {
+    display: none;
+  }
+
+  .admin-content {
+    padding: 18px 12px;
+  }
+
+  .admin-stat-card h3 {
+    font-size: 23px;
+  }
+
+  .admin-table {
+    min-width: 850px;
+  }
+
+  .revenue-chart {
+    min-width: 560px;
+  }
+
+  .order-timeline {
+    gap: 18px;
+  }
+
+  .admin-detail-item {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .admin-detail-item>span {
+    flex-basis: auto;
+  }
+
+  .admin-detail-item>strong {
+    text-align: left;
+  }
+}
+
+/* =========================================================
+   5. ĐIỆN THOẠI
+========================================================= */
+
+@media (max-width: 575.98px) {
+  /* ==================== THIẾT LẬP CHUNG ==================== */
+
+  body {
+    font-size: 14px;
+  }
+
+  .container {
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+
+  .py-5 {
+    padding-top: 2.75rem !important;
+    padding-bottom: 2.75rem !important;
+  }
+
+  .section-title {
+    font-size: 26px;
+  }
+
+  .display-4,
+  .display-5,
+  .display-6 {
+    font-size: 29px;
+  }
+
+  .lead {
+    font-size: 16px;
+  }
+
+  /* ==================== NAVBAR ==================== */
+
+  .navbar {
+    padding: 9px 0;
+  }
+
+  .navbar-brand {
+    font-size: 18px;
+  }
+
+  .navbar-collapse {
+    margin-top: 8px;
+    padding: 12px;
+  }
+
+  /* ==================== BANNER TRANG CHỦ ==================== */
+
+  .carousel-item>img {
+    height: 490px;
+  }
+
+  .carousel-caption {
+    right: 4%;
+    bottom: 35px;
+    left: 4%;
+  }
+
+  .banner-content {
+    padding: 17px;
+  }
+
+  .banner-content>p:first-child {
+    font-size: 11px;
+  }
+
+  .banner-content h1,
+  .banner-content h2 {
+    font-size: 28px;
+  }
+
+  .banner-content .lead {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 15px;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .carousel-indicators {
+    margin-bottom: 12px;
+  }
+
+  /* ==================== BANNER TRANG CON ==================== */
+
+  .page-banner {
+    min-height: 260px;
+    padding: 105px 12px 45px;
+  }
+
+  .page-banner h1 {
+    font-size: 29px;
+  }
+
+  .page-banner .lead {
+    font-size: 15px;
+  }
+
+  /* ==================== BREADCRUMB ==================== */
+
+  .breadcrumb {
+    font-size: 13px;
+  }
+
+  /* ==================== DANH MỤC ==================== */
+
+  .category-card img {
+    height: 145px;
+  }
+
+  .category-content {
+    padding: 10px 5px;
+  }
+
+  .category-content h3 {
+    font-size: 15px;
+  }
+
+  /* ==================== SẢN PHẨM ==================== */
+
+  .product-card {
+    max-width: 400px;
+    margin: 0 auto;
+  }
+
+  .product-card img {
+    height: 245px;
+  }
+
+  .product-card .card-body {
+    padding: 16px;
+  }
+
+  .product-card .card-title {
+    font-size: 18px;
+  }
+
+  /* ==================== KÊU GỌI ĐẶT BÀN ==================== */
+
+  .booking-callout h2 {
+    font-size: 26px;
+  }
+
+  .booking-callout .btn {
+    width: 100%;
+  }
+
+  /* ==================== FOOTER ==================== */
+
+  footer {
+    padding-top: 40px !important;
+  }
+
+  footer h2,
+  footer h3 {
+    margin-top: 8px;
+  }
+
+  footer .row>div {
+    margin-bottom: 8px;
+  }
+
+  /* ==================== ĐẶT BÀN ==================== */
+
+  .booking-steps {
+    padding: 0 3px;
+  }
+
+  .booking-step {
+    min-width: 62px;
+  }
+
+  .step-number {
+    width: 32px;
+    height: 32px;
+    font-size: 13px;
+  }
+
+  .step-line {
+    min-width: 18px;
+    margin-top: 15px;
+  }
+
+  .step-label {
+    font-size: 10px;
+  }
+
+  .booking-section-icon {
+    display: none;
+  }
+
+  .booking-section-icon+div {
+    margin-left: 0 !important;
+  }
+
+  .area-option {
+    min-height: 105px;
+  }
+
+  .table-option {
+    min-height: 108px;
+  }
+
+  .booking-summary .card-body {
+    padding: 20px !important;
+  }
+
+  /* ==================== GIỎ HÀNG ==================== */
+
+  .cart-table {
+    min-width: 720px;
+  }
+
+  .cart-product-image {
+    width: 54px;
+    height: 54px;
+  }
+
+  .cart-product-name {
+    max-width: 150px;
+  }
+
+  .quantity-control {
+    min-width: 105px;
+  }
+
+  .cart-summary .card-body {
+    padding: 20px !important;
+  }
+
+  .service-option {
+    min-height: 85px;
+    padding: 15px;
+  }
+
+  /* ==================== THANH TOÁN ==================== */
+
+  .payment-option {
+    min-height: 95px;
+    padding: 14px;
+  }
+
+  .payment-option-icon {
+    width: 43px;
+    height: 43px;
+    font-size: 20px;
+  }
+
+  .payment-summary .card-body {
+    padding: 20px !important;
+  }
+
+  .payment-order-item {
+    gap: 10px;
+  }
+
+  .payment-item-image {
+    width: 55px;
+    height: 55px;
+  }
+
+  /* ==================== CHI TIẾT MÓN ==================== */
+
+  .product-detail-page {
+    padding-top: 64px;
+  }
+
+  .product-breadcrumb {
+    padding-top: 3px;
+  }
+
+  .product-detail-image {
+    height: 365px;
+  }
+
+  .product-detail-badge {
+    top: 12px;
+    left: 12px;
+  }
+
+  .product-thumbnail {
+    width: 65px;
+    height: 65px;
+  }
+
+  .product-option-box {
+    min-height: 80px;
+    padding: 10px 5px;
+  }
+
+  .topping-option {
+    padding: 13px 13px 13px 38px;
+  }
+
+  .product-action-box {
+    flex-direction: column;
+  }
+
+  .product-action-box .btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* ==================== TRANG THÀNH CÔNG ==================== */
+
+  .success-page {
+    padding-top: 65px;
+  }
+
+  .success-icon-large {
+    width: 75px;
+    height: 75px;
+    font-size: 38px;
+  }
+
+  .success-code-box {
+    padding: 13px;
+  }
+
+  #success-actions .btn {
+    width: 100%;
+  }
+
+  .result-product-image {
+    width: 48px;
+    height: 48px;
+  }
+
+  /* ==================== NÚT QUAY LẠI ĐẦU TRANG ==================== */
+
+  #back-to-top {
+    right: 15px;
+    bottom: 15px;
+    width: 42px;
+    height: 42px;
+  }
+
+  /* ==================== TOAST ==================== */
+
+  .toast-container {
+    right: 8px !important;
+    bottom: 8px !important;
+    left: 8px !important;
+    width: auto;
+    padding: 0 !important;
+  }
+
+  .toast {
+    width: 100%;
+  }
+
+  /* ==================== QUẢN TRỊ ==================== */
+
+  .admin-topbar {
+    padding: 9px 10px;
+  }
+
+  .admin-content {
+    padding: 15px 10px;
+  }
+
+  .admin-content .card-header,
+  .admin-content .card-body,
+  .admin-content .card-footer {
+    padding: 16px;
+  }
+
+  .admin-stat-card .card-body {
+    padding: 17px;
+  }
+
+  .admin-stat-icon {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+  }
+
+  .table-management-card {
+    max-width: 390px;
+    margin: 0 auto;
+  }
+
+  .dashboard-quick-action {
+    min-height: 95px;
+    padding: 10px;
+  }
+
+  .dashboard-booking-item {
+    align-items: flex-start;
+  }
+
+  .booking-time-box {
+    flex: 0 0 60px;
+    width: 60px;
+  }
+
+  .modal-footer {
+    flex-wrap: nowrap;
+  }
+
+  .modal-footer .btn {
+    flex: 1;
+  }
+
+  /* ==================== LOGIN ADMIN ==================== */
+
+  .admin-login-form-section {
+    padding: 25px 16px;
+  }
+
+  .admin-login-form-wrapper h2 {
+    font-size: 31px;
+  }
+
+  .demo-account-box {
+    padding: 14px;
+  }
+}
+
+/* =========================================================
+   6. ĐIỆN THOẠI RẤT NHỎ
+========================================================= */
+
+@media (max-width: 374.98px) {
+  .navbar-brand {
+    font-size: 16px;
+  }
+
+  .carousel-item>img {
+    height: 470px;
+  }
+
+  .banner-content h1,
+  .banner-content h2 {
+    font-size: 25px;
+  }
+
+  .category-card img {
+    height: 125px;
+  }
+
+  .product-detail-image {
+    height: 320px;
+  }
+
+  .product-thumbnail {
+    width: 58px;
+    height: 58px;
+  }
+
+  .booking-step {
+    min-width: 52px;
+  }
+
+  .step-label {
+    font-size: 9px;
+  }
+
+  .admin-topbar h1 {
+    font-size: 15px;
+  }
+
+  .admin-topbar .btn {
+    padding: 6px 8px;
+  }
+
+  .dashboard-quick-action span {
+    font-size: 12px;
+  }
+}
+
+/* =========================================================
+   7. ĐIỆN THOẠI NẰM NGANG
+========================================================= */
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .navbar-collapse {
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+  }
+
+  .carousel-item>img {
+    height: 100vh;
+    min-height: 430px;
+  }
+
+  .carousel-caption {
+    bottom: 25px;
+  }
+
+  .banner-content {
+    padding: 15px;
+  }
+
+  .banner-content h1,
+  .banner-content h2 {
+    font-size: 27px;
+  }
+
+  .page-banner {
+    min-height: 100vh;
+  }
+}
+
+/* =========================================================
+   8. THIẾT BỊ CẢM ỨNG
+========================================================= */
+
+@media (hover: none) {
+
+  .product-card:hover,
+  .category-card:hover,
+  .process-card:hover,
+  .admin-stat-card:hover,
+  .table-management-card:hover,
+  .dashboard-quick-action:hover {
+    transform: none;
+  }
+
+  .product-card:active,
+  .category-card:active,
+  .dashboard-quick-action:active {
+    transform: scale(0.98);
+  }
+}
+
+/* =========================================================
+   9. GIẢM HIỆU ỨNG CHUYỂN ĐỘNG
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* =========================================================
+   10. CHẾ ĐỘ IN
+========================================================= */
+
+@media print {
+
+  .navbar,
+  footer,
+  #back-to-top,
+  .toast-container,
+  .carousel-control-prev,
+  .carousel-control-next,
+  .carousel-indicators,
+  .booking-steps,
+  .btn,
+  .sidebar-overlay,
+  .admin-sidebar,
+  .admin-topbar {
+    display: none !important;
+  }
+
+  body {
+    color: #000000;
+    background-color: #ffffff;
+  }
+
+  main,
+  .admin-main {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .card {
+    border: 1px solid #cccccc !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+
+  .table-responsive {
+    overflow: visible !important;
+  }
+
+  .table {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 11px;
+  }
+
+  .page-banner {
+    min-height: auto;
+    padding: 20px;
+    color: #000000 !important;
+    background: none !important;
+  }
+
+  .page-banner * {
+    color: #000000 !important;
+  }
+
+  a {
+    color: #000000 !important;
+    text-decoration: none !important;
+  }
+}

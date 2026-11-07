@@ -154,19 +154,25 @@
         setBadge(dropdown && dropdown.querySelector('button .badge'), items.length);
     }
 
-    async function loadSharedAdminData() {
-        if (onLoginPage) return;
+    var loadingSharedAdminData = false;
+
+    async function loadSharedAdminData(options) {
+        if (onLoginPage || loadingSharedAdminData) return;
+        loadingSharedAdminData = true;
+        var silent = Boolean(options && options.silent);
 
         var menus = document.querySelectorAll('.admin-notifications');
-        menus.forEach(function (menu) {
-            menu.innerHTML = '<li><span class="dropdown-item-text text-secondary">Đang tải thông báo...</span></li>';
-            var dropdown = menu.closest('.dropdown');
-            var badge = dropdown && dropdown.querySelector('button .badge');
-            if (badge) badge.classList.add('d-none');
-        });
+        if (!silent) {
+            menus.forEach(function (menu) {
+                menu.innerHTML = '<li><span class="dropdown-item-text text-secondary">Đang tải thông báo...</span></li>';
+                var dropdown = menu.closest('.dropdown');
+                var badge = dropdown && dropdown.querySelector('button .badge');
+                if (badge) badge.classList.add('d-none');
+            });
 
-        document.querySelectorAll('.admin-menu a[href="bookings.html"] .badge, .admin-menu a[href="orders.html"] .badge')
-            .forEach(function (badge) { badge.classList.add('d-none'); });
+            document.querySelectorAll('.admin-menu a[href="bookings.html"] .badge, .admin-menu a[href="orders.html"] .badge')
+                .forEach(function (badge) { badge.classList.add('d-none'); });
+        }
 
         try {
             var results = await Promise.all([
@@ -176,11 +182,15 @@
             updateSidebarBadges(results[0], results[1].summary || {});
             renderNotifications(results[0]);
         } catch (error) {
-            menus.forEach(function (menu) {
-                menu.classList.remove('d-none');
-                menu.innerHTML = '<li><span class="dropdown-item-text text-danger">Không tải được thông báo.</span></li>';
-            });
+            if (!silent) {
+                menus.forEach(function (menu) {
+                    menu.classList.remove('d-none');
+                    menu.innerHTML = '<li><span class="dropdown-item-text text-danger">Không tải được thông báo.</span></li>';
+                });
+            }
             console.error('Lỗi tải dữ liệu chung trang admin:', error);
+        } finally {
+            loadingSharedAdminData = false;
         }
     }
 
@@ -189,6 +199,15 @@
             a.addEventListener('click', clearToken);
         });
         loadSharedAdminData();
+
+        // Thông báo và badge phải theo dữ liệu mới mà không buộc admin tải lại trang.
+        window.setInterval(function () {
+            if (!document.hidden) loadSharedAdminData({ silent: true });
+        }, 60000);
+
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) loadSharedAdminData({ silent: true });
+        });
     });
 
     window.AdminAuth = {

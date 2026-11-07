@@ -24,9 +24,50 @@ function answer(sql) {
     if (/AS item_count/.test(sql)) return [[{ id: 1, order_code: 'MC1', total_amount: '1', subtotal: '1', discount_amount: '0', service_fee: '0', order_type: 'takeaway', payment_method: 'cash', payment_status: 'pending', status: 'pending', item_count: '2' }]];
     if (/COUNT\(\*\) AS total FROM orders/.test(sql)) return [[{ total: 45 }]];
     if (/AS all_orders/.test(sql)) return [[{ all_orders: 45, today_orders: 3, pending_orders: 2, awaiting_payment: 4 }]];
-    if (/AS total, COALESCE/.test(sql)) return [[{ total: 8, occupied: '2' }]];
-    if (/AS reserved/.test(sql)) return [[{ reserved: 1, pending: '3' }]];
-    if (/AS completed/.test(sql)) return [[{ completed: 5 }]];
+        // Dashboard: thống kê trạng thái bàn
+    if (/has_reservation/.test(sql)) {
+        return [[{
+            total: 8,
+            available: '4',
+            occupied: '2',
+            reserved: '1',
+            maintenance: '1',
+        }]];
+    }
+
+    // Dashboard: thống kê đặt bàn hôm nay
+    if (/AS today_bookings/.test(sql)) {
+        return [[{
+            today_bookings: '4',
+            pending_today: '3',
+        }]];
+    }
+
+    // Dashboard: tổng đơn và doanh thu hôm nay
+    if (/AS total_orders/.test(sql)) {
+        return [[{
+            total_orders: '10',
+            completed_orders: '5',
+            paid_orders_today: '2',
+            today_revenue: '150000',
+            yesterday_revenue: '100000',
+            today_key: '2026-11-07',
+        }]];
+    }
+
+    // Dashboard: biểu đồ doanh thu theo ngày hoặc tháng
+    if (/AS period_key/.test(sql)) {
+        return [[
+            {
+                period_key: '2026-11-06',
+                amount: '100000',
+            },
+            {
+                period_key: '2026-11-07',
+                amount: '150000',
+            },
+        ]];
+    }
     return [[]];
 }
 const record = (kind) => async (sql, params) => { calls.push({ kind, sql: String(sql).replace(/\s+/g, ' '), params }); return answer(sql); };
@@ -72,9 +113,59 @@ test('Đăng nhập sai bị từ chối', async () => {
     assert.ok([400, 401].includes(res.status));
 });
 
-test('Dashboard trả đủ 5 chỉ số', async () => {
-    const res = await call('/api/dashboard/stats', { headers: AUTH });
-    assert.deepEqual(res.body, { totalTables: 8, occupiedTables: 2, reservedTables: 1, pendingBookings: 3, completedOrders: 5 });
+test('Dashboard trả số liệu động đầy đủ', async () => {
+    const res = await call(
+        '/api/dashboard/stats?period=7-days',
+        {
+            headers: AUTH,
+        }
+    );
+
+    assert.equal(res.status, 200);
+
+    assert.deepEqual(res.body, {
+        totalTables: 8,
+        availableTables: 4,
+        occupiedTables: 2,
+        reservedTables: 1,
+        maintenanceTables: 1,
+
+        todayBookings: 4,
+        pendingBookings: 3,
+
+        totalOrders: 10,
+        completedOrders: 5,
+        paidOrdersToday: 2,
+
+        todayRevenue: 150000,
+        yesterdayRevenue: 100000,
+
+        todayKey: '2026-11-07',
+
+        revenue: {
+            period: '7-days',
+            total: 250000,
+            series: [
+                {
+                    key: '2026-11-06',
+                    amount: 100000,
+                },
+                {
+                    key: '2026-11-07',
+                    amount: 150000,
+                },
+            ],
+        },
+    });
+
+    const invalidPeriod = await call(
+        '/api/dashboard/stats?period=abc',
+        {
+            headers: AUTH,
+        }
+    );
+
+    assert.equal(invalidPeriod.status, 400);
 });
 
 test('Danh sách đơn có phân trang và số liệu tổng', async () => {

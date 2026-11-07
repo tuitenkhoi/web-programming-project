@@ -101,10 +101,10 @@
                 setBadge(badge, stats.pendingBookings);
             });
 
-        var openOrders = Number(orderSummary.pending_orders || 0) +
+        var openOrders =
+            Number(orderSummary.pending_orders || 0) +
             Number(orderSummary.preparing_orders || 0) +
-            Number(orderSummary.ready_orders || 0) +
-            Number(orderSummary.awaiting_payment || 0);
+            Number(orderSummary.ready_orders || 0);
 
         document.querySelectorAll('.admin-menu a[href="orders.html"] .badge')
             .forEach(function (badge) {

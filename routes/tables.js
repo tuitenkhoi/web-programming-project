@@ -195,6 +195,12 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
         await connection.commit();
         inTransaction = false;
 
+        require('../realtime').emit('table:updated', {
+            id,
+            table_code: table.table_code,
+            status,
+        });
+
         res.json({
             success: true,
             message: unchanged

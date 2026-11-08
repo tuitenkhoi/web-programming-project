@@ -104,16 +104,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const COUPON_STORAGE_KEY =
     "mocCoffeeCouponCode";
 
-  const VALID_COUPON_CODE = "MOCCOFFEE10";
-
-  const DISCOUNT_PERCENT = 10;
-
   const SERVICE_FEE_PERCENT = 5;
 
   let cart = loadCart();
 
   let appliedCouponCode =
     localStorage.getItem(COUPON_STORAGE_KEY) || "";
+
+  let appliedVoucher = null;
 
   /* =========================================================
      3. CÁC HÀM HỖ TRỢ
@@ -452,12 +450,19 @@ document.addEventListener("DOMContentLoaded", function () {
       0
     );
 
-    const discount =
-      appliedCouponCode === VALID_COUPON_CODE
-        ? Math.round(
-            (subtotal * DISCOUNT_PERCENT) / 100
-          )
-        : 0;
+    let discount = 0;
+
+    if (appliedVoucher && subtotal >= Number(appliedVoucher.min_order || 0)) {
+      discount = appliedVoucher.discount_type === "percent"
+        ? Math.round(subtotal * Number(appliedVoucher.value) / 100)
+        : Math.round(Number(appliedVoucher.value));
+
+      if (appliedVoucher.max_discount !== null) {
+        discount = Math.min(discount, Number(appliedVoucher.max_discount));
+      }
+
+      discount = Math.max(0, Math.min(discount, subtotal));
+    }
 
     const useAtTable =
       orderAtTableRadio?.checked ?? true;
@@ -778,6 +783,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function () {
       cart = [];
       appliedCouponCode = "";
+      appliedVoucher = null;
 
       localStorage.removeItem(COUPON_STORAGE_KEY);
 
@@ -811,7 +817,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     couponMessage.innerHTML =
       '<i class="bi bi-check-circle-fill me-1"></i>' +
-      `Đã áp dụng giảm ${DISCOUNT_PERCENT}%.`;
+      `Đã áp dụng ${appliedVoucher?.name || appliedCouponCode}.`;
   }
 
   function displayCouponError(message) {
@@ -827,7 +833,7 @@ document.addEventListener("DOMContentLoaded", function () {
       message;
   }
 
-  function applyCoupon() {
+  async function applyCoupon() {
     const enteredCode = couponInput.value
       .trim()
       .toUpperCase();
@@ -842,20 +848,6 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    if (enteredCode !== VALID_COUPON_CODE) {
-      appliedCouponCode = "";
-
-      localStorage.removeItem(COUPON_STORAGE_KEY);
-
-      displayCouponError(
-        "Mã giảm giá không tồn tại hoặc đã hết hạn."
-      );
-
-      updateSummary();
-
-      return;
-    }
-
     if (cart.length === 0) {
       displayCouponError(
         "Giỏ hàng đang trống."
@@ -864,17 +856,31 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
-    appliedCouponCode = enteredCode;
+    couponButton.disabled = true;
 
-    localStorage.setItem(
-      COUPON_STORAGE_KEY,
-      appliedCouponCode
-    );
-
-    displayCouponSuccess();
-    updateSummary();
-
-    showToast("Áp dụng mã giảm giá thành công.");
+    try {
+      const subtotal = cart.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      );
+      appliedVoucher = await window.MocCoffeeApi.validateVoucher(
+        enteredCode,
+        subtotal
+      );
+      appliedCouponCode = enteredCode;
+      localStorage.setItem(COUPON_STORAGE_KEY, appliedCouponCode);
+      displayCouponSuccess();
+      updateSummary();
+      showToast("Áp dụng voucher thành công.");
+    } catch (error) {
+      appliedCouponCode = "";
+      appliedVoucher = null;
+      localStorage.removeItem(COUPON_STORAGE_KEY);
+      displayCouponError(error.message || "Voucher không hợp lệ.");
+      updateSummary();
+    } finally {
+      couponButton.disabled = false;
+    }
   }
 
   couponButton?.addEventListener(
@@ -1051,15 +1057,9 @@ document.addEventListener("DOMContentLoaded", function () {
      16. KHỞI TẠO
   ========================================================= */
 
-  if (
-    appliedCouponCode === VALID_COUPON_CODE &&
-    couponInput
-  ) {
+  if (appliedCouponCode && couponInput) {
     couponInput.value = appliedCouponCode;
-    displayCouponSuccess();
-  } else {
-    appliedCouponCode = "";
-    localStorage.removeItem(COUPON_STORAGE_KEY);
+    applyCoupon();
   }
 
   updateOrderType();

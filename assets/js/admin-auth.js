@@ -156,6 +156,33 @@
 
     var loadingSharedAdminData = false;
 
+    function connectRealtime() {
+        function start() {
+            if (!window.io || window.__mocCoffeeSocket) return;
+            var socket = window.io({
+                transports: ['websocket', 'polling'],
+                auth: { token: getToken() }
+            });
+            window.__mocCoffeeSocket = socket;
+            ['order:created', 'order:updated', 'booking:created', 'booking:updated', 'table:updated']
+                .forEach(function (eventName) {
+                    socket.on(eventName, function (detail) {
+                        loadSharedAdminData({ silent: true });
+                        window.dispatchEvent(new CustomEvent('mocCoffeeRealtime', {
+                            detail: { event: eventName, data: detail }
+                        }));
+                    });
+                });
+        }
+
+        if (window.io) return start();
+        var script = document.createElement('script');
+        script.src = '/socket.io/socket.io.js';
+        script.async = true;
+        script.onload = start;
+        document.head.appendChild(script);
+    }
+
     async function loadSharedAdminData(options) {
         if (onLoginPage || loadingSharedAdminData) return;
         loadingSharedAdminData = true;
@@ -199,6 +226,7 @@
             a.addEventListener('click', clearToken);
         });
         loadSharedAdminData();
+        connectRealtime();
 
         // Thông báo và badge phải theo dữ liệu mới mà không buộc admin tải lại trang.
         window.setInterval(function () {

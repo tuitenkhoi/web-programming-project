@@ -11,6 +11,19 @@ document.addEventListener("DOMContentLoaded", function () {
   const $$ = (selector, parent = document) =>
     Array.from(parent.querySelectorAll(selector));
 
+  // Thêm lối vào tài khoản khách trên tất cả trang công khai mà không lặp HTML.
+  const adminLoginLink = document.querySelector('a[href$="admin/login.html"]');
+  if (adminLoginLink && !document.querySelector('[data-customer-account-link]')) {
+    const item = document.createElement("li");
+    item.className = "nav-item ms-lg-2 mt-2 mt-lg-0";
+    const insidePages = window.location.pathname.includes("/pages/");
+    const profile = window.MocCoffeeApi?.getCustomerProfile?.();
+    item.innerHTML = `<a class="nav-link" data-customer-account-link href="${insidePages ? "account.html" : "pages/account.html"}" title="Tài khoản khách hàng">
+      <i class="bi bi-person-badge fs-5"></i><span class="ms-1">${profile ? "Tài khoản" : "Đăng nhập"}</span>
+    </a>`;
+    adminLoginLink.closest("li")?.before(item);
+  }
+
   function formatCurrency(value) {
     const number = Number(value) || 0;
 

@@ -365,6 +365,12 @@ const updateOrderStatus = async (req, res) => {
         }
         await connection.commit();
 
+        require("../../../realtime").emit("order:updated", {
+            id,
+            status: newStatus,
+            payment_status: order.payment_status,
+        });
+
         return res.json({
             success: true,
             message: `Đã chuyển đơn sang "${STATUS_TEXT[newStatus]}"`,
@@ -407,6 +413,12 @@ const confirmOrderPayment = async (req, res) => {
         }
 
         const [rows] = await pool.execute("SELECT * FROM orders WHERE id = ?", [id]);
+
+        require("../../../realtime").emit("order:updated", {
+            id,
+            status: rows[0].status,
+            payment_status: "paid",
+        });
 
         return res.json({
             success: true,

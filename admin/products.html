@@ -158,29 +158,7 @@
           </button>
 
           <ul class="dropdown-menu dropdown-menu-end admin-notifications d-none">
-            <li>
-              <h6 class="dropdown-header">Thông báo mới</h6>
-            </li>
-
-            <li>
-              <a class="dropdown-item" href="#">
-                <strong>Matcha đá xay sắp hết nguyên liệu</strong>
-
-                <small class="d-block text-secondary">
-                  5 phút trước
-                </small>
-              </a>
-            </li>
-
-            <li>
-              <a class="dropdown-item" href="#">
-                <strong>Cà phê sữa đá bán được 42 ly</strong>
-
-                <small class="d-block text-secondary">
-                  Trong hôm nay
-                </small>
-              </a>
-            </li>
+            <li><span class="dropdown-item-text text-secondary">Đang tải thông báo...</span></li>
           </ul>
         </div>
 
@@ -484,387 +462,8 @@
               </thead>
 
               <tbody id="product-table-body">
-                <!-- Món 1 -->
-                <tr class="admin-product-row" data-id="SP001" data-name="Cà phê sữa đá" data-category="coffee"
-                  data-price="35000" data-status="available">
-                  <td class="ps-4">
-                    <div class="d-flex align-items-center">
-                      <img src="../assets/images/products/ca-phe-sua-da.jpg" class="admin-product-image"
-                        alt="Cà phê sữa đá" />
-
-                      <div class="ms-3">
-                        <strong>Cà phê sữa đá</strong>
-
-                        <small class="d-block text-secondary">
-                          Món bán chạy
-                        </small>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td>#SP001</td>
-                  <td>Cà phê</td>
-                  <td class="fw-semibold">35.000đ</td>
-                  <td>42 ly</td>
-
-                  <td>
-                    <span class="badge text-bg-success">
-                      Đang bán
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <button type="button" class="dropdown-item view-product-button" data-id="SP001"
-                            data-bs-toggle="modal" data-bs-target="#product-detail-modal">
-                            <i class="bi bi-eye me-2"></i>
-                            Xem chi tiết
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item edit-product-button" data-id="SP001"
-                            data-bs-toggle="modal" data-bs-target="#product-form-modal">
-                            <i class="bi bi-pencil-square me-2"></i>
-                            Chỉnh sửa
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item text-warning change-product-status" data-id="SP001"
-                            data-status="unavailable">
-                            <i class="bi bi-pause-circle me-2"></i>
-                            Đánh dấu hết món
-                          </button>
-                        </li>
-
-                        <li>
-                          <hr class="dropdown-divider" />
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item text-danger delete-product-button" data-id="SP001"
-                            data-bs-toggle="modal" data-bs-target="#delete-product-modal">
-                            <i class="bi bi-trash3 me-2"></i>
-                            Xóa món
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Món 2 -->
-                <tr class="admin-product-row" data-id="SP002" data-name="Bạc xỉu" data-category="coffee"
-                  data-price="39000" data-status="available">
-                  <td class="ps-4">
-                    <div class="d-flex align-items-center">
-                      <img src="../assets/images/products/bac-xiu.jpg" class="admin-product-image" alt="Bạc xỉu" />
-
-                      <div class="ms-3">
-                        <strong>Bạc xỉu</strong>
-
-                        <small class="d-block text-secondary">
-                          Cà phê sữa
-                        </small>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td>#SP002</td>
-                  <td>Cà phê</td>
-                  <td class="fw-semibold">39.000đ</td>
-                  <td>28 ly</td>
-
-                  <td>
-                    <span class="badge text-bg-success">
-                      Đang bán
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <button type="button" class="dropdown-item view-product-button" data-id="SP002"
-                            data-bs-toggle="modal" data-bs-target="#product-detail-modal">
-                            <i class="bi bi-eye me-2"></i>
-                            Xem chi tiết
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item edit-product-button" data-id="SP002"
-                            data-bs-toggle="modal" data-bs-target="#product-form-modal">
-                            <i class="bi bi-pencil-square me-2"></i>
-                            Chỉnh sửa
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item text-warning change-product-status" data-id="SP002"
-                            data-status="unavailable">
-                            <i class="bi bi-pause-circle me-2"></i>
-                            Đánh dấu hết món
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Món 3 -->
-                <tr class="admin-product-row" data-id="SP003" data-name="Trà đào cam sả" data-category="tea"
-                  data-price="49000" data-status="available">
-                  <td class="ps-4">
-                    <div class="d-flex align-items-center">
-                      <img src="../assets/images/products/tra-dao-cam-sa.jpg" class="admin-product-image"
-                        alt="Trà đào cam sả" />
-
-                      <div class="ms-3">
-                        <strong>Trà đào cam sả</strong>
-
-                        <small class="d-block text-secondary">
-                          Món được yêu thích
-                        </small>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td>#SP003</td>
-                  <td>Trà trái cây</td>
-                  <td class="fw-semibold">49.000đ</td>
-                  <td>35 ly</td>
-
-                  <td>
-                    <span class="badge text-bg-success">
-                      Đang bán
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <button type="button" class="dropdown-item view-product-button" data-id="SP003"
-                            data-bs-toggle="modal" data-bs-target="#product-detail-modal">
-                            <i class="bi bi-eye me-2"></i>
-                            Xem chi tiết
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item edit-product-button" data-id="SP003"
-                            data-bs-toggle="modal" data-bs-target="#product-form-modal">
-                            <i class="bi bi-pencil-square me-2"></i>
-                            Chỉnh sửa
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item text-warning change-product-status" data-id="SP003"
-                            data-status="unavailable">
-                            <i class="bi bi-pause-circle me-2"></i>
-                            Đánh dấu hết món
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Món 4 -->
-                <tr class="admin-product-row" data-id="SP004" data-name="Matcha đá xay" data-category="ice-blended"
-                  data-price="55000" data-status="unavailable">
-                  <td class="ps-4">
-                    <div class="d-flex align-items-center">
-                      <img src="../assets/images/products/matcha-da-xay.jpg" class="admin-product-image"
-                        alt="Matcha đá xay" />
-
-                      <div class="ms-3">
-                        <strong>Matcha đá xay</strong>
-
-                        <small class="d-block text-danger">
-                          Sắp hết nguyên liệu
-                        </small>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td>#SP004</td>
-                  <td>Đá xay</td>
-                  <td class="fw-semibold">55.000đ</td>
-                  <td>21 ly</td>
-
-                  <td>
-                    <span class="badge text-bg-warning">
-                      Tạm hết món
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <button type="button" class="dropdown-item view-product-button" data-id="SP004"
-                            data-bs-toggle="modal" data-bs-target="#product-detail-modal">
-                            <i class="bi bi-eye me-2"></i>
-                            Xem chi tiết
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item edit-product-button" data-id="SP004"
-                            data-bs-toggle="modal" data-bs-target="#product-form-modal">
-                            <i class="bi bi-pencil-square me-2"></i>
-                            Chỉnh sửa
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item text-success change-product-status" data-id="SP004"
-                            data-status="available">
-                            <i class="bi bi-play-circle me-2"></i>
-                            Mở bán lại
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Món 5 -->
-                <tr class="admin-product-row" data-id="SP005" data-name="Chocolate đá xay" data-category="ice-blended"
-                  data-price="59000" data-status="available">
-                  <td class="ps-4">
-                    <div class="d-flex align-items-center">
-                      <img src="../assets/images/products/chocolate-da-xay.jpg" class="admin-product-image"
-                        alt="Chocolate đá xay" />
-
-                      <div class="ms-3">
-                        <strong>Chocolate đá xay</strong>
-
-                        <small class="d-block text-secondary">
-                          Đá xay
-                        </small>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td>#SP005</td>
-                  <td>Đá xay</td>
-                  <td class="fw-semibold">59.000đ</td>
-                  <td>18 ly</td>
-
-                  <td>
-                    <span class="badge text-bg-success">
-                      Đang bán
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <button type="button" class="dropdown-item view-product-button" data-id="SP005"
-                            data-bs-toggle="modal" data-bs-target="#product-detail-modal">
-                            <i class="bi bi-eye me-2"></i>
-                            Xem chi tiết
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item edit-product-button" data-id="SP005"
-                            data-bs-toggle="modal" data-bs-target="#product-form-modal">
-                            <i class="bi bi-pencil-square me-2"></i>
-                            Chỉnh sửa
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Món 6 -->
-                <tr class="admin-product-row" data-id="SP006" data-name="Bánh tiramisu" data-category="cake"
-                  data-price="45000" data-status="available">
-                  <td class="ps-4">
-                    <div class="d-flex align-items-center">
-                      <img src="../assets/images/products/banh-tiramisu.jpg" class="admin-product-image"
-                        alt="Bánh tiramisu" />
-
-                      <div class="ms-3">
-                        <strong>Bánh tiramisu</strong>
-
-                        <small class="d-block text-secondary">
-                          Bánh ngọt
-                        </small>
-                      </div>
-                    </div>
-                  </td>
-
-                  <td>#SP006</td>
-                  <td>Bánh ngọt</td>
-                  <td class="fw-semibold">45.000đ</td>
-                  <td>16 phần</td>
-
-                  <td>
-                    <span class="badge text-bg-success">
-                      Đang bán
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <button type="button" class="dropdown-item view-product-button" data-id="SP006"
-                            data-bs-toggle="modal" data-bs-target="#product-detail-modal">
-                            <i class="bi bi-eye me-2"></i>
-                            Xem chi tiết
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item edit-product-button" data-id="SP006"
-                            data-bs-toggle="modal" data-bs-target="#product-form-modal">
-                            <i class="bi bi-pencil-square me-2"></i>
-                            Chỉnh sửa
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
+                <tr><td colspan="8" class="text-center py-4 text-secondary">Đang tải sản phẩm...</td></tr>
+</tbody>
             </table>
           </div>
 
@@ -1145,57 +744,56 @@
         <div class="modal-body p-4">
           <div class="row g-4">
             <div class="col-12 col-md-5">
-              <img id="detail-product-image" src="../assets/images/products/ca-phe-sua-da.jpg" class="img-fluid rounded"
-                alt="Cà phê sữa đá" />
+              <img id="detail-product-image" src="../assets/images/products/default-product.jpg" class="img-fluid rounded"
+                alt="Hình sản phẩm" />
             </div>
 
             <div class="col-12 col-md-7">
               <div class="d-flex justify-content-between align-items-start">
                 <div>
                   <small id="detail-product-category" class="text-uppercase text-secondary">
-                    Cà phê
+                    —
                   </small>
 
                   <h3 id="detail-product-name" class="h3 fw-bold">
-                    Cà phê sữa đá
+                    Đang tải...
                   </h3>
                 </div>
 
                 <span id="detail-product-status" class="badge text-bg-success">
-                  Đang bán
+                  —
                 </span>
               </div>
 
               <p id="detail-product-price" class="fs-3 fw-bold text-danger">
-                35.000đ
+                0đ
               </p>
 
               <p id="detail-product-description" class="text-secondary">
-                Cà phê rang xay nguyên chất kết hợp với sữa đặc tạo
-                nên hương vị đậm đà.
+                —
               </p>
 
               <hr />
 
               <div class="admin-detail-item">
                 <span>Mã món</span>
-                <strong id="detail-product-id">#SP001</strong>
+                <strong id="detail-product-id">—</strong>
               </div>
 
               <div class="admin-detail-item">
                 <span>Đã bán hôm nay</span>
-                <strong id="detail-product-sold">42 ly</strong>
+                <strong id="detail-product-sold">—</strong>
               </div>
 
               <div class="admin-detail-item">
                 <span>Món nổi bật</span>
-                <strong id="detail-product-featured">Có</strong>
+                <strong id="detail-product-featured">—</strong>
               </div>
 
               <div class="admin-detail-item">
                 <span>Ngày cập nhật</span>
                 <strong id="detail-product-updated">
-                  22/09/2026
+                  —
                 </strong>
               </div>
             </div>
@@ -1239,7 +837,7 @@
           <p class="text-center mb-0">
             Bạn có chắc chắn muốn xóa món
             <strong id="delete-product-name">
-              Cà phê sữa đá
+              món đã chọn
             </strong>?
           </p>
 

@@ -257,6 +257,12 @@ router.post('/', async (req, res) => {
         await connection.commit();
         transactionStarted = false;
 
+        require('../realtime').emit('booking:created', {
+            id: result.insertId,
+            booking_code: bookingCode,
+            status: 'pending',
+        });
+
         return res.status(201).json({
             success: true,
             message: 'Đã lưu yêu cầu đặt bàn. Vui lòng chờ xác nhận.',
@@ -670,6 +676,13 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
 
         await connection.commit();
         inTransaction = false;
+
+        require('../realtime').emit('booking:updated', {
+            id,
+            status,
+            table_code: table.table_code,
+            table_status: tableStatus,
+        });
 
         return res.json({
             success: true,

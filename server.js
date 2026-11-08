@@ -4,6 +4,7 @@ const cors = require('cors');
 const compression = require('compression');
 const helmet = require('helmet');
 const path = require('path');
+const http = require('http');
 const db = require('./config/db');
 const { inspectSchema } =require('./config/schemaCheck');
 const rateLimit = require('./middleware/rateLimit');
@@ -173,6 +174,9 @@ app.get('/api/health', async (req, res) => {
 // Khách trong quán dùng chung wifi = chung 1 IP nên giới hạn đơn hàng để rộng.
 app.use('/api/orders', rateLimit({ windowMs: 10 * 60 * 1000, max: 100, methods: ['POST'] }));
 app.use('/api/bookings', rateLimit({ windowMs: 10 * 60 * 1000, max: 30, methods: ['POST'] }));
+app.use('/api/auth/customer', rateLimit({ windowMs: 15 * 60 * 1000, max: 30, methods: ['POST'] }));
+app.use('/api/customer/orders/lookup', rateLimit({ windowMs: 10 * 60 * 1000, max: 30, methods: ['POST'] }));
+app.use('/api/reviews', rateLimit({ windowMs: 10 * 60 * 1000, max: 30, methods: ['POST'] }));
 
 
 // Mỗi router tự lo GET công khai, còn thêm/sửa/xóa thì cần admin
@@ -187,6 +191,9 @@ app.get('/api/admin/me', verifyToken, requireAdmin, (req, res) => {
 
 app.use('/api/orders', orderRoutes);
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/customer', require('./routes/customer'));
+app.use('/api/vouchers', require('./routes/vouchers'));
+app.use('/api/reviews', require('./routes/reviews'));
 app.use(
     '/api/dashboard',
     verifyToken,
@@ -229,7 +236,9 @@ const PORT = Number(process.env.PORT || 5000);
 
 
 if (require.main === module) {
-    const server = app.listen(PORT);
+    const server = http.createServer(app);
+    require('./realtime').initialize(server);
+    server.listen(PORT);
 
     // Tắt server êm: ngừng nhận request mới, chờ request đang chạy xong rồi đóng pool MySQL
     const shutdown = (signal) => {

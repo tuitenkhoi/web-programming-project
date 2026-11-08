@@ -1,10 +1,13 @@
 "use strict";
 
 (function () {
+  const CUSTOMER_TOKEN_KEY = "mocCoffeeCustomerToken";
+  const CUSTOMER_PROFILE_KEY = "mocCoffeeCustomerProfile";
   const API_ORIGIN = window.location.origin;
   const API_BASE_URL = `${API_ORIGIN}/api`;
 
   async function request(path, options = {}) {
+    const token = localStorage.getItem(CUSTOMER_TOKEN_KEY);
     const response = await fetch(`${API_BASE_URL}${path}`, {
       method: options.method || "GET",
       headers: {
@@ -12,6 +15,9 @@
           ? { "Content-Type": "application/json; charset=utf-8" }
           : {}),
         ...(options.headers || {}),
+        ...(token && options.auth !== false
+          ? { Authorization: `Bearer ${token}` }
+          : {}),
       },
       body: options.body
         ? JSON.stringify(options.body)
@@ -33,6 +39,40 @@
     }
 
     return result;
+  }
+
+  function setCustomerSession(data) {
+    localStorage.setItem(CUSTOMER_TOKEN_KEY, data.token);
+    localStorage.setItem(CUSTOMER_PROFILE_KEY, JSON.stringify(data.user));
+  }
+
+  function clearCustomerSession() {
+    localStorage.removeItem(CUSTOMER_TOKEN_KEY);
+    localStorage.removeItem(CUSTOMER_PROFILE_KEY);
+  }
+
+  function getCustomerProfile() {
+    try {
+      return JSON.parse(localStorage.getItem(CUSTOMER_PROFILE_KEY) || "null");
+    } catch {
+      return null;
+    }
+  }
+
+  async function customerLogin(email, password) {
+    const result = await request("/auth/customer/login", {
+      method: "POST", body: { email, password }, auth: false,
+    });
+    setCustomerSession(result.data);
+    return result.data;
+  }
+
+  async function customerRegister(payload) {
+    const result = await request("/auth/customer/register", {
+      method: "POST", body: payload, auth: false,
+    });
+    setCustomerSession(result.data);
+    return result.data;
   }
 
   function resolveProductImage(product, insidePages = true) {
@@ -137,5 +177,16 @@
     getProductById,
     createOrder,
     createBooking,
+    customerLogin,
+    customerRegister,
+    setCustomerSession,
+    clearCustomerSession,
+    getCustomerProfile,
+    getCustomerOrders: async () => (await request("/customer/orders")).data || [],
+    lookupOrder: async (payload) => (await request("/customer/orders/lookup", { method: "POST", body: payload, auth: false })).data,
+    getVouchers: async () => (await request("/vouchers", { auth: false })).data || [],
+    validateVoucher: async (code, subtotal) => (await request("/vouchers/validate", { method: "POST", body: { code, subtotal }, auth: false })).data,
+    getProductReviews: async (productId) => request(`/reviews/product/${encodeURIComponent(productId)}`, { auth: false }),
+    createReview: async (payload) => request("/reviews", { method: "POST", body: payload }),
   };
 })();

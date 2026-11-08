@@ -138,6 +138,17 @@ async function verifyToken(req, res, next) {
     next();
 }
 
+// Cho phép endpoint dùng được cho cả khách vãng lai và khách đã đăng nhập.
+// Nếu request có token thì vẫn xác thực đầy đủ, không âm thầm bỏ qua token sai.
+function optionalToken(req, res, next) {
+    if (!req.headers.authorization) {
+        req.user = null;
+        return next();
+    }
+
+    return verifyToken(req, res, next);
+}
+
 function requireAdmin(req, res, next) {
     if (!req.user) {
         return res.status(401).json({
@@ -158,8 +169,30 @@ function requireAdmin(req, res, next) {
     next();
 }
 
+function requireCustomer(req, res, next) {
+    if (!req.user) {
+        return res.status(401).json({
+            success: false,
+            message: 'Bạn chưa đăng nhập.',
+            code: 'NO_USER',
+        });
+    }
+
+    if (req.user.role !== 'customer') {
+        return res.status(403).json({
+            success: false,
+            message: 'Chức năng này chỉ dành cho khách hàng.',
+            code: 'FORBIDDEN',
+        });
+    }
+
+    next();
+}
+
 module.exports = {
     verifyToken,
+    optionalToken,
     requireAdmin,
+    requireCustomer,
     SECRET_KEY,
 };

@@ -167,39 +167,7 @@
           </button>
 
           <ul class="dropdown-menu dropdown-menu-end admin-notifications d-none">
-            <li>
-              <h6 class="dropdown-header">Thông báo mới</h6>
-            </li>
-
-            <li>
-              <a class="dropdown-item" href="bookings.html">
-                <strong>Có yêu cầu đặt bàn mới</strong>
-
-                <small class="d-block text-secondary">
-                  Nguyễn Minh Anh đặt bàn lúc 18:30
-                </small>
-              </a>
-            </li>
-
-            <li>
-              <a class="dropdown-item" href="orders.html">
-                <strong>Đơn hàng mới tại bàn T03</strong>
-
-                <small class="d-block text-secondary">
-                  5 phút trước
-                </small>
-              </a>
-            </li>
-
-            <li>
-              <a class="dropdown-item" href="orders.html">
-                <strong>Bàn T05 yêu cầu thanh toán</strong>
-
-                <small class="d-block text-secondary">
-                  10 phút trước
-                </small>
-              </a>
-            </li>
+            <li><span class="dropdown-item-text text-secondary">Đang tải thông báo...</span></li>
           </ul>
         </div>
 
@@ -547,96 +515,8 @@
                   </thead>
 
                   <tbody id="dashboard-recent-orders">
-                    <tr>
-                      <td class="ps-4">
-                        <a href="orders.html" class="fw-semibold">
-                          #OD086
-                        </a>
-                      </td>
-
-                      <td>Bàn T03</td>
-                      <td>10:25</td>
-                      <td class="fw-semibold">185.000đ</td>
-
-                      <td class="pe-4">
-                        <span class="badge text-bg-warning">
-                          Đang chế biến
-                        </span>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td class="ps-4">
-                        <a href="orders.html" class="fw-semibold">
-                          #OD085
-                        </a>
-                      </td>
-
-                      <td>Bàn T07</td>
-                      <td>10:18</td>
-                      <td class="fw-semibold">268.000đ</td>
-
-                      <td class="pe-4">
-                        <span class="badge text-bg-primary">
-                          Đang phục vụ
-                        </span>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td class="ps-4">
-                        <a href="orders.html" class="fw-semibold">
-                          #OD084
-                        </a>
-                      </td>
-
-                      <td>Bàn T05</td>
-                      <td>10:05</td>
-                      <td class="fw-semibold">139.000đ</td>
-
-                      <td class="pe-4">
-                        <span class="badge text-bg-info">
-                          Chờ thanh toán
-                        </span>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td class="ps-4">
-                        <a href="orders.html" class="fw-semibold">
-                          #OD083
-                        </a>
-                      </td>
-
-                      <td>Mang đi</td>
-                      <td>09:55</td>
-                      <td class="fw-semibold">98.000đ</td>
-
-                      <td class="pe-4">
-                        <span class="badge text-bg-success">
-                          Hoàn thành
-                        </span>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td class="ps-4">
-                        <a href="orders.html" class="fw-semibold">
-                          #OD082
-                        </a>
-                      </td>
-
-                      <td>Bàn T02</td>
-                      <td>09:40</td>
-                      <td class="fw-semibold">175.000đ</td>
-
-                      <td class="pe-4">
-                        <span class="badge text-bg-success">
-                          Hoàn thành
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
+                    <tr><td colspan="5" class="text-center py-4 text-secondary">Đang tải đơn hàng...</td></tr>
+</tbody>
                 </table>
               </div>
             </div>
@@ -661,94 +541,8 @@
             </div>
 
             <div class="card-body p-4" id="dashboard-upcoming-bookings">
-              <!-- Đặt bàn 1 -->
-              <div class="dashboard-booking-item">
-                <div class="booking-time-box">
-                  <strong>18:30</strong>
-                  <small>Hôm nay</small>
-                </div>
-
-                <div class="flex-grow-1">
-                  <div class="d-flex justify-content-between gap-2">
-                    <strong>Nguyễn Minh Anh</strong>
-
-                    <span class="badge text-bg-warning">
-                      Chờ xác nhận
-                    </span>
-                  </div>
-
-                  <small class="text-secondary">
-                    Bàn T04 · 4 khách · Trong nhà
-                  </small>
-                </div>
-              </div>
-
-              <!-- Đặt bàn 2 -->
-              <div class="dashboard-booking-item">
-                <div class="booking-time-box">
-                  <strong>19:00</strong>
-                  <small>Hôm nay</small>
-                </div>
-
-                <div class="flex-grow-1">
-                  <div class="d-flex justify-content-between gap-2">
-                    <strong>Trần Hoàng Nam</strong>
-
-                    <span class="badge text-bg-success">
-                      Đã xác nhận
-                    </span>
-                  </div>
-
-                  <small class="text-secondary">
-                    Bàn T07 · 6 khách · Ngoài trời
-                  </small>
-                </div>
-              </div>
-
-              <!-- Đặt bàn 3 -->
-              <div class="dashboard-booking-item">
-                <div class="booking-time-box">
-                  <strong>20:00</strong>
-                  <small>Hôm nay</small>
-                </div>
-
-                <div class="flex-grow-1">
-                  <div class="d-flex justify-content-between gap-2">
-                    <strong>Lê Ngọc Hân</strong>
-
-                    <span class="badge text-bg-success">
-                      Đã xác nhận
-                    </span>
-                  </div>
-
-                  <small class="text-secondary">
-                    Bàn T08 · 8 khách · Ban công
-                  </small>
-                </div>
-              </div>
-
-              <!-- Đặt bàn 4 -->
-              <div class="dashboard-booking-item mb-0">
-                <div class="booking-time-box">
-                  <strong>08:30</strong>
-                  <small>Ngày mai</small>
-                </div>
-
-                <div class="flex-grow-1">
-                  <div class="d-flex justify-content-between gap-2">
-                    <strong>Phạm Quốc Bảo</strong>
-
-                    <span class="badge text-bg-warning">
-                      Chờ xác nhận
-                    </span>
-                  </div>
-
-                  <small class="text-secondary">
-                    Bàn T01 · 2 khách · Trong nhà
-                  </small>
-                </div>
-              </div>
-            </div>
+              <p class="text-center py-4 text-secondary mb-0">Đang tải lịch đặt bàn...</p>
+</div>
           </div>
         </div>
       </section>
@@ -773,82 +567,8 @@
             </div>
 
             <div class="card-body p-4" id="dashboard-best-sellers">
-              <!-- Món 1 -->
-              <div class="best-selling-item">
-                <div class="best-selling-rank">1</div>
-
-                <div class="flex-grow-1">
-                  <div class="d-flex justify-content-between mb-2">
-                    <strong>Cà phê sữa đá</strong>
-                    <span>42 ly</span>
-                  </div>
-
-                  <div class="progress" role="progressbar" aria-label="Cà phê sữa đá" aria-valuenow="90"
-                    aria-valuemin="0" aria-valuemax="100">
-                    <div class="progress-bar bg-success" style="width: 90%"></div>
-                  </div>
-                </div>
-
-                <strong class="text-success">1.470.000đ</strong>
-              </div>
-
-              <!-- Món 2 -->
-              <div class="best-selling-item">
-                <div class="best-selling-rank">2</div>
-
-                <div class="flex-grow-1">
-                  <div class="d-flex justify-content-between mb-2">
-                    <strong>Trà đào cam sả</strong>
-                    <span>35 ly</span>
-                  </div>
-
-                  <div class="progress" role="progressbar" aria-label="Trà đào cam sả" aria-valuenow="75"
-                    aria-valuemin="0" aria-valuemax="100">
-                    <div class="progress-bar bg-primary" style="width: 75%"></div>
-                  </div>
-                </div>
-
-                <strong class="text-success">1.715.000đ</strong>
-              </div>
-
-              <!-- Món 3 -->
-              <div class="best-selling-item">
-                <div class="best-selling-rank">3</div>
-
-                <div class="flex-grow-1">
-                  <div class="d-flex justify-content-between mb-2">
-                    <strong>Bạc xỉu</strong>
-                    <span>28 ly</span>
-                  </div>
-
-                  <div class="progress" role="progressbar" aria-label="Bạc xỉu" aria-valuenow="60" aria-valuemin="0"
-                    aria-valuemax="100">
-                    <div class="progress-bar bg-warning" style="width: 60%"></div>
-                  </div>
-                </div>
-
-                <strong class="text-success">1.092.000đ</strong>
-              </div>
-
-              <!-- Món 4 -->
-              <div class="best-selling-item mb-0">
-                <div class="best-selling-rank">4</div>
-
-                <div class="flex-grow-1">
-                  <div class="d-flex justify-content-between mb-2">
-                    <strong>Matcha đá xay</strong>
-                    <span>21 ly</span>
-                  </div>
-
-                  <div class="progress" role="progressbar" aria-label="Matcha đá xay" aria-valuenow="45"
-                    aria-valuemin="0" aria-valuemax="100">
-                    <div class="progress-bar bg-danger" style="width: 45%"></div>
-                  </div>
-                </div>
-
-                <strong class="text-success">1.155.000đ</strong>
-              </div>
-            </div>
+              <p class="text-center py-4 text-secondary mb-0">Đang tải món bán chạy...</p>
+</div>
           </div>
         </div>
 

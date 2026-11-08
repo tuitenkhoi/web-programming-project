@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="vi" class="no-js">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Tài khoản và lịch sử mua hàng Mộc Coffee." />
+  <title>Tài khoản khách hàng - Mộc Coffee</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/responsive.css" />
+  <link rel="stylesheet" href="../assets/css/theme.css" />
+  <link rel="stylesheet" href="../assets/css/pages.css" />
+</head>
+<body class="inner-page bg-light">
+  <nav class="navbar navbar-dark bg-dark fixed-top shadow">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="../index.html"><i class="bi bi-cup-hot-fill me-2"></i>Mộc Coffee</a>
+      <a class="btn btn-outline-light" href="menu.html">Thực đơn</a>
+    </div>
+  </nav>
+
+  <main class="container py-5" style="margin-top:72px;max-width:1000px">
+    <div id="account-alert" class="alert d-none" role="alert"></div>
+
+    <section id="guest-section" class="row g-4">
+      <div class="col-12 col-lg-6">
+        <div class="card border-0 shadow-sm h-100"><div class="card-body p-4">
+          <h1 class="h4 mb-4">Đăng nhập khách hàng</h1>
+          <form id="customer-login-form">
+            <label class="form-label" for="login-email">Email</label>
+            <input class="form-control mb-3" id="login-email" type="email" required maxlength="150" />
+            <label class="form-label" for="login-password">Mật khẩu</label>
+            <input class="form-control mb-4" id="login-password" type="password" required minlength="8" maxlength="72" />
+            <button class="btn btn-coffee w-100" type="submit">Đăng nhập</button>
+          </form>
+        </div></div>
+      </div>
+
+      <div class="col-12 col-lg-6">
+        <div class="card border-0 shadow-sm h-100"><div class="card-body p-4">
+          <h2 class="h4 mb-4">Tạo tài khoản</h2>
+          <form id="customer-register-form">
+            <input class="form-control mb-3" name="full_name" placeholder="Họ và tên" required minlength="2" maxlength="100" />
+            <input class="form-control mb-3" name="phone" placeholder="Số điện thoại" required pattern="0[0-9]{9}" />
+            <input class="form-control mb-3" name="email" type="email" placeholder="Email" required maxlength="150" />
+            <input class="form-control mb-4" name="password" type="password" placeholder="Mật khẩu từ 8 ký tự" required minlength="8" maxlength="72" />
+            <button class="btn btn-outline-coffee w-100" type="submit">Đăng ký</button>
+          </form>
+        </div></div>
+      </div>
+
+      <div class="col-12">
+        <div class="card border-0 shadow-sm"><div class="card-body p-4">
+          <h2 class="h5">Tra cứu đơn khách vãng lai</h2>
+          <form id="order-lookup-form" class="row g-3">
+            <div class="col-md-5"><input class="form-control" name="order_code" placeholder="Mã đơn hàng" required /></div>
+            <div class="col-md-5"><input class="form-control" name="phone" placeholder="Số điện thoại" required pattern="0[0-9]{9}" /></div>
+            <div class="col-md-2"><button class="btn btn-dark w-100" type="submit">Tra cứu</button></div>
+          </form>
+          <div id="lookup-result" class="mt-3"></div>
+        </div></div>
+      </div>
+    </section>
+
+    <section id="member-section" class="d-none">
+      <div class="card border-0 shadow-sm mb-4"><div class="card-body p-4 d-flex flex-wrap justify-content-between gap-3">
+        <div><h1 id="member-name" class="h4 mb-1"></h1><p id="member-contact" class="text-secondary mb-0"></p></div>
+        <button id="customer-logout" class="btn btn-outline-danger" type="button">Đăng xuất</button>
+      </div></div>
+
+      <div class="card border-0 shadow-sm mb-4"><div class="card-body p-4">
+        <h2 class="h5 mb-3">Voucher đang có</h2>
+        <div id="voucher-list" class="row g-3"></div>
+      </div></div>
+
+      <div class="card border-0 shadow-sm"><div class="card-body p-4">
+        <h2 class="h5 mb-3">Lịch sử mua hàng</h2>
+        <div id="order-history"><p class="text-secondary">Đang tải...</p></div>
+      </div></div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/client-api.js"></script>
+  <script src="../assets/js/account.js"></script>
+</body>
+</html>

@@ -96,7 +96,7 @@ const validateRequest = (body) => {
         return { error: "Phương thức thanh toán không hợp lệ" };
     }
 
-    if (couponCode && couponCode !== "MOCCOFFEE10") {
+    if (couponCode && !/^[A-Z0-9-]{3,30}$/.test(couponCode)) {
         return { error: "Mã giảm giá không hợp lệ" };
     }
 
@@ -178,7 +178,10 @@ const createOrder = async (req, res) => {
         });
     }
 
-        const order = validation.value;
+    const order = validation.value;
+    const userId = req.user?.role === "customer"
+        ? Number(req.user.id)
+        : null;
     let connection;
 
     try {
@@ -243,16 +246,11 @@ const createOrder = async (req, res) => {
             (total, item) => total + item.lineTotal,
             0
         );
-        const discountAmount = order.couponCode === "MOCCOFFEE10"
-            ? Math.round(subtotal * 0.1)
-            : 0;
+        let discountAmount = 0;
+        let voucher = null;
         const serviceFee = order.orderType === "at_table"
             ? Math.round((subtotal * 0.05) / 1000) * 1000
             : 0;
-        const totalAmount = Math.max(
-            0,
-            subtotal - discountAmount + serviceFee
-        );
         const paymentStatus = order.paymentMethod === "bank_transfer"
             ? "pending_verification"
             : "pending";
@@ -260,6 +258,55 @@ const createOrder = async (req, res) => {
 
         connection = await pool.getConnection();
         await connection.beginTransaction();
+
+        if (order.couponCode) {
+            const [voucherRows] = await connection.execute(
+                `SELECT id, code, discount_type, value, min_order, max_discount,
+                        usage_limit, per_user_limit, used_count
+                   FROM vouchers
+                  WHERE code = ? AND status = 1
+                    AND starts_at <= NOW() AND ends_at >= NOW()
+                  LIMIT 1 FOR UPDATE`,
+                [order.couponCode]
+            );
+            voucher = voucherRows[0];
+
+            if (!voucher || (voucher.usage_limit !== null && Number(voucher.used_count) >= Number(voucher.usage_limit))) {
+                const error = new Error("Voucher không tồn tại, đã hết hạn hoặc hết lượt sử dụng");
+                error.httpStatus = 400;
+                throw error;
+            }
+            if (subtotal < Number(voucher.min_order)) {
+                const error = new Error(`Đơn hàng phải đạt tối thiểu ${Number(voucher.min_order).toLocaleString("vi-VN")}đ để dùng voucher`);
+                error.httpStatus = 400;
+                throw error;
+            }
+
+            const [usageRows] = await connection.execute(
+                userId
+                    ? `SELECT COUNT(*) AS total FROM voucher_usages WHERE voucher_id = ? AND user_id = ?`
+                    : `SELECT COUNT(*) AS total FROM voucher_usages WHERE voucher_id = ? AND customer_phone = ?`,
+                [voucher.id, userId || order.customerPhone]
+            );
+            if (Number(usageRows[0].total) >= Number(voucher.per_user_limit)) {
+                const error = new Error("Bạn đã sử dụng hết số lượt của voucher này");
+                error.httpStatus = 409;
+                throw error;
+            }
+
+            discountAmount = voucher.discount_type === "percent"
+                ? Math.round(subtotal * Number(voucher.value) / 100)
+                : Math.round(Number(voucher.value));
+            if (voucher.max_discount !== null) {
+                discountAmount = Math.min(discountAmount, Number(voucher.max_discount));
+            }
+            discountAmount = Math.max(0, Math.min(discountAmount, subtotal));
+        }
+
+        const totalAmount = Math.max(
+            0,
+            subtotal - discountAmount + serviceFee
+        );
 
         // Khóa và cập nhật bàn trong cùng transaction với đơn hàng.
         // Nhờ vậy không có trạng thái đơn đã tạo nhưng sơ đồ vẫn báo bàn trống.
@@ -294,6 +341,7 @@ const createOrder = async (req, res) => {
         const [orderResult] = await connection.execute(
             `INSERT INTO orders (
                 order_code,
+                user_id,
                 customer_name,
                 customer_phone,
                 customer_email,
@@ -308,9 +356,10 @@ const createOrder = async (req, res) => {
                 payment_method,
                 payment_status,
                 status
-             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 orderCode,
+                userId,
                 order.customerName,
                 order.customerPhone,
                 order.customerEmail,
@@ -362,7 +411,28 @@ const createOrder = async (req, res) => {
             [itemRows]
         );
 
+        if (voucher) {
+            await connection.execute(
+                `INSERT INTO voucher_usages
+                    (voucher_id, order_id, user_id, customer_phone, discount_amount)
+                 VALUES (?, ?, ?, ?, ?)`,
+                [voucher.id, orderResult.insertId, userId, order.customerPhone, discountAmount]
+            );
+            await connection.execute(
+                "UPDATE vouchers SET used_count = used_count + 1 WHERE id = ?",
+                [voucher.id]
+            );
+        }
+
         await connection.commit();
+
+        try {
+            require("../../../realtime").emit("order:created", {
+                id: orderResult.insertId,
+                order_code: orderCode,
+                status: "pending",
+            });
+        } catch { /* realtime không được phép làm hỏng giao dịch */ }
 
         return res.status(201).json({
 

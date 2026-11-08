@@ -161,29 +161,7 @@
           </button>
 
           <ul class="dropdown-menu dropdown-menu-end admin-notifications d-none">
-            <li>
-              <h6 class="dropdown-header">Thông báo mới</h6>
-            </li>
-
-            <li>
-              <a class="dropdown-item" href="#">
-                <strong>Đơn mới tại bàn T03</strong>
-
-                <small class="d-block text-secondary">
-                  Vừa nhận được
-                </small>
-              </a>
-            </li>
-
-            <li>
-              <a class="dropdown-item" href="#">
-                <strong>Bàn T05 yêu cầu thanh toán</strong>
-
-                <small class="d-block text-secondary">
-                  5 phút trước
-                </small>
-              </a>
-            </li>
+            <li><span class="dropdown-item-text text-secondary">Đang tải thông báo...</span></li>
           </ul>
         </div>
 
@@ -513,435 +491,8 @@
               </thead>
 
               <tbody id="order-table-body">
-                <!-- Đơn 1 -->
-                <tr class="order-row" data-id="OD086" data-table="T03" data-customer="Nguyễn Văn Minh"
-                  data-date="2026-09-22" data-type="at-table" data-status="new" data-amount="185000">
-                  <td class="ps-4">
-                    <strong>#OD086</strong>
-
-                    <small class="d-block text-secondary">
-                      4 món
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Bàn T03</strong>
-
-                    <small class="d-block text-secondary">
-                      Dùng tại bàn
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Nguyễn Văn Minh</strong>
-
-                    <small class="d-block text-secondary">
-                      0912 345 678
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>10:25</strong>
-
-                    <small class="d-block text-secondary">
-                      22/09/2026
-                    </small>
-                  </td>
-
-                  <td>4</td>
-
-                  <td class="fw-bold text-danger">
-                    185.000đ
-                  </td>
-
-                  <td>
-                    <span class="badge text-bg-danger">
-                      Đơn mới
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <button type="button" class="dropdown-item view-order-button" data-id="OD086"
-                            data-bs-toggle="modal" data-bs-target="#order-detail-modal">
-                            <i class="bi bi-eye me-2"></i>
-                            Xem chi tiết
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item text-warning update-order-status-button"
-                            data-id="OD086" data-status="preparing">
-                            <i class="bi bi-fire me-2"></i>
-                            Bắt đầu chế biến
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item edit-order-button" data-id="OD086"
-                            data-bs-toggle="modal" data-bs-target="#order-form-modal">
-                            <i class="bi bi-pencil-square me-2"></i>
-                            Chỉnh sửa đơn
-                          </button>
-                        </li>
-
-                        <li>
-                          <hr class="dropdown-divider" />
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item text-danger cancel-order-button" data-id="OD086"
-                            data-bs-toggle="modal" data-bs-target="#cancel-order-modal">
-                            <i class="bi bi-x-circle me-2"></i>
-                            Hủy đơn
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Đơn 2 -->
-                <tr class="order-row" data-id="OD085" data-table="T07" data-customer="Trần Thu Hương"
-                  data-date="2026-09-22" data-type="at-table" data-status="preparing" data-amount="268000">
-                  <td class="ps-4">
-                    <strong>#OD085</strong>
-
-                    <small class="d-block text-secondary">
-                      6 món
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Bàn T07</strong>
-
-                    <small class="d-block text-secondary">
-                      Dùng tại bàn
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Trần Thu Hương</strong>
-
-                    <small class="d-block text-secondary">
-                      0987 654 321
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>10:18</strong>
-
-                    <small class="d-block text-secondary">
-                      22/09/2026
-                    </small>
-                  </td>
-
-                  <td>6</td>
-
-                  <td class="fw-bold text-danger">
-                    268.000đ
-                  </td>
-
-                  <td>
-                    <span class="badge text-bg-warning">
-                      Đang chế biến
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <button type="button" class="dropdown-item view-order-button" data-id="OD085"
-                            data-bs-toggle="modal" data-bs-target="#order-detail-modal">
-                            <i class="bi bi-eye me-2"></i>
-                            Xem chi tiết
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item text-primary update-order-status-button"
-                            data-id="OD085" data-status="ready">
-                            <i class="bi bi-check2-circle me-2"></i>
-                            Hoàn tất chế biến
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Đơn 3 -->
-                <tr class="order-row" data-id="OD084" data-table="T05" data-customer="Lê Hoàng Nam"
-                  data-date="2026-09-22" data-type="at-table" data-status="ready" data-amount="139000">
-                  <td class="ps-4">
-                    <strong>#OD084</strong>
-
-                    <small class="d-block text-secondary">
-                      3 món
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Bàn T05</strong>
-
-                    <small class="d-block text-secondary">
-                      Dùng tại bàn
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Lê Hoàng Nam</strong>
-
-                    <small class="d-block text-secondary">
-                      0903 123 456
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>10:05</strong>
-
-                    <small class="d-block text-secondary">
-                      22/09/2026
-                    </small>
-                  </td>
-
-                  <td>3</td>
-
-                  <td class="fw-bold text-danger">
-                    139.000đ
-                  </td>
-
-                  <td>
-                    <span class="badge text-bg-primary">
-                      Sẵn sàng phục vụ
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <button type="button" class="dropdown-item view-order-button" data-id="OD084"
-                            data-bs-toggle="modal" data-bs-target="#order-detail-modal">
-                            <i class="bi bi-eye me-2"></i>
-                            Xem chi tiết
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item text-primary update-order-status-button"
-                            data-id="OD084" data-status="served">
-                            <i class="bi bi-person-check me-2"></i>
-                            Xác nhận đã phục vụ
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Đơn 4 -->
-                <tr class="order-row" data-id="OD083" data-table="" data-customer="Phạm Quốc Bảo" data-date="2026-09-22"
-                  data-type="takeaway" data-status="payment" data-amount="98000">
-                  <td class="ps-4">
-                    <strong>#OD083</strong>
-
-                    <small class="d-block text-secondary">
-                      2 món
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Mang đi</strong>
-
-                    <small class="d-block text-secondary">
-                      Nhận tại quầy
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Phạm Quốc Bảo</strong>
-
-                    <small class="d-block text-secondary">
-                      0938 123 456
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>09:55</strong>
-
-                    <small class="d-block text-secondary">
-                      22/09/2026
-                    </small>
-                  </td>
-
-                  <td>2</td>
-
-                  <td class="fw-bold text-danger">
-                    98.000đ
-                  </td>
-
-                  <td>
-                    <span class="badge text-bg-info">
-                      Chờ thanh toán
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <button type="button" class="dropdown-item view-order-button" data-id="OD083"
-                            data-bs-toggle="modal" data-bs-target="#order-detail-modal">
-                            <i class="bi bi-eye me-2"></i>
-                            Xem chi tiết
-                          </button>
-                        </li>
-
-                        <li>
-                          <a class="dropdown-item text-success" href="invoices.html">
-                            <i class="bi bi-wallet2 me-2"></i>
-                            Thanh toán đơn hàng
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Đơn 5 -->
-                <tr class="order-row" data-id="OD082" data-table="T02" data-customer="Võ Ngọc Lan"
-                  data-date="2026-09-22" data-type="at-table" data-status="completed" data-amount="175000">
-                  <td class="ps-4">
-                    <strong>#OD082</strong>
-
-                    <small class="d-block text-secondary">
-                      4 món
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Bàn T02</strong>
-
-                    <small class="d-block text-secondary">
-                      Dùng tại bàn
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Võ Ngọc Lan</strong>
-
-                    <small class="d-block text-secondary">
-                      0977 123 456
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>09:40</strong>
-
-                    <small class="d-block text-secondary">
-                      22/09/2026
-                    </small>
-                  </td>
-
-                  <td>4</td>
-
-                  <td class="fw-bold text-danger">
-                    175.000đ
-                  </td>
-
-                  <td>
-                    <span class="badge text-bg-success">
-                      Hoàn thành
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <button type="button" class="btn btn-sm btn-light view-order-button" data-id="OD082"
-                      data-bs-toggle="modal" data-bs-target="#order-detail-modal" title="Xem chi tiết">
-                      <i class="bi bi-eye"></i>
-                    </button>
-                  </td>
-                </tr>
-
-                <!-- Đơn 6 -->
-                <tr class="order-row" data-id="OD081" data-table="T06" data-customer="Đặng Minh Tuấn"
-                  data-date="2026-09-22" data-type="at-table" data-status="cancelled" data-amount="125000">
-                  <td class="ps-4">
-                    <strong>#OD081</strong>
-
-                    <small class="d-block text-secondary">
-                      3 món
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Bàn T06</strong>
-
-                    <small class="d-block text-secondary">
-                      Dùng tại bàn
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Đặng Minh Tuấn</strong>
-
-                    <small class="d-block text-secondary">
-                      0908 456 789
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>09:20</strong>
-
-                    <small class="d-block text-secondary">
-                      22/09/2026
-                    </small>
-                  </td>
-
-                  <td>3</td>
-
-                  <td class="fw-bold text-secondary">
-                    125.000đ
-                  </td>
-
-                  <td>
-                    <span class="badge text-bg-secondary">
-                      Đã hủy
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <button type="button" class="btn btn-sm btn-light view-order-button" data-id="OD081"
-                      data-bs-toggle="modal" data-bs-target="#order-detail-modal" title="Xem chi tiết">
-                      <i class="bi bi-eye"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
+                <tr><td colspan="8" class="text-center py-4 text-secondary">Đang tải đơn hàng...</td></tr>
+</tbody>
             </table>
           </div>
 
@@ -998,273 +549,6 @@
     </main>
   </div>
 
-  <!-- ==================== MODAL TẠO/SỬA ĐƠN ==================== -->
-  <div class="modal fade" id="order-form-modal" tabindex="-1" aria-labelledby="order-form-title" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable">
-      <div class="modal-content border-0">
-        <form id="admin-order-form" novalidate>
-          <div class="modal-header">
-            <h2 class="modal-title h5" id="order-form-title">
-              Tạo đơn hàng mới
-            </h2>
-
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-          </div>
-
-          <div class="modal-body">
-            <input type="hidden" id="admin-order-id" />
-
-            <div class="row g-4">
-              <!-- Thông tin đơn -->
-              <div class="col-12 col-lg-5">
-                <h3 class="h5 mb-3">Thông tin đơn hàng</h3>
-
-                <div class="row g-3">
-                  <div class="col-12">
-                    <label class="form-label fw-semibold">
-                      Hình thức
-                    </label>
-
-                    <div class="d-flex gap-4">
-                      <div class="form-check">
-                        <input type="radio" id="admin-order-at-table" name="adminOrderType" class="form-check-input"
-                          value="at-table" checked />
-
-                        <label for="admin-order-at-table" class="form-check-label">
-                          Dùng tại bàn
-                        </label>
-                      </div>
-
-                      <div class="form-check">
-                        <input type="radio" id="admin-order-takeaway" name="adminOrderType" class="form-check-input"
-                          value="takeaway" />
-
-                        <label for="admin-order-takeaway" class="form-check-label">
-                          Mang đi
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="col-12" id="admin-order-table-group">
-                    <label for="admin-order-table" class="form-label fw-semibold">
-                      Bàn
-                      <span class="text-danger">*</span>
-                    </label>
-
-                    <select id="admin-order-table" class="form-select">
-                      <option value="" selected>
-                        Chọn bàn
-                      </option>
-                      <option value="T01">Bàn T01</option>
-                      <option value="T02">Bàn T02</option>
-                      <option value="T03">Bàn T03</option>
-                      <option value="T04">Bàn T04</option>
-                      <option value="T05">Bàn T05</option>
-                      <option value="T06">Bàn T06</option>
-                      <option value="T07">Bàn T07</option>
-                      <option value="T08">Bàn T08</option>
-                    </select>
-                  </div>
-
-                  <div class="col-12">
-                    <label for="admin-order-customer" class="form-label fw-semibold">
-                      Tên khách hàng
-                    </label>
-
-                    <input type="text" id="admin-order-customer" class="form-control" maxlength="100"
-                      placeholder="Nhập tên khách hàng" />
-                  </div>
-
-                  <div class="col-12">
-                    <label for="admin-order-phone" class="form-label fw-semibold">
-                      Số điện thoại
-                    </label>
-
-                    <input type="tel" id="admin-order-phone" class="form-control" maxlength="10"
-                      placeholder="Nhập số điện thoại" />
-                  </div>
-
-                  <div class="col-12">
-                    <label for="admin-order-note" class="form-label fw-semibold">
-                      Ghi chú
-                    </label>
-
-                    <textarea id="admin-order-note" class="form-control" rows="3" maxlength="300"
-                      placeholder="Ghi chú chung cho đơn..."></textarea>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Chọn món -->
-              <div class="col-12 col-lg-7">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <h3 class="h5 mb-0">Danh sách món</h3>
-
-                  <button type="button" id="add-order-item-button" class="btn btn-sm btn-outline-coffee">
-                    <i class="bi bi-plus-lg me-1"></i>
-                    Thêm món
-                  </button>
-                </div>
-
-                <div class="table-responsive">
-                  <table class="table align-middle">
-                    <thead class="table-light">
-                      <tr>
-                        <th scope="col">Món</th>
-                        <th scope="col" style="width: 100px">
-                          Số lượng
-                        </th>
-                        <th scope="col">Đơn giá</th>
-                        <th scope="col">Thành tiền</th>
-                        <th scope="col"></th>
-                      </tr>
-                    </thead>
-
-                    <tbody id="admin-order-items">
-                      <tr class="admin-order-item-row">
-                        <td>
-                          <select class="form-select order-product-select" required>
-                            <option value="" selected disabled>
-                              Chọn món
-                            </option>
-                            <option value="1" data-price="35000">
-                              Cà phê sữa đá
-                            </option>
-                            <option value="2" data-price="39000">
-                              Bạc xỉu
-                            </option>
-                            <option value="4" data-price="49000">
-                              Trà đào cam sả
-                            </option>
-                            <option value="7" data-price="55000">
-                              Matcha đá xay
-                            </option>
-                            <option value="10" data-price="45000">
-                              Bánh tiramisu
-                            </option>
-                          </select>
-                        </td>
-
-                        <td>
-                          <input type="number" class="form-control order-item-quantity" min="1" max="99" value="1"
-                            required />
-                        </td>
-
-                        <td class="order-item-price">
-                          0đ
-                        </td>
-
-                        <td class="order-item-total fw-semibold">
-                          0đ
-                        </td>
-
-                        <td>
-                          <button type="button" class="btn btn-sm btn-outline-danger remove-order-item" title="Xóa món">
-                            <i class="bi bi-trash3"></i>
-                          </button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-
-                <div id="admin-order-items-error" class="text-danger small d-none">
-                  Đơn hàng phải có ít nhất một món.
-                </div>
-
-                <div class="row justify-content-end mt-3">
-                  <div class="col-12 col-sm-7">
-                    <div class="summary-row">
-                      <span>Tạm tính</span>
-
-                      <strong id="admin-order-subtotal">
-                        0đ
-                      </strong>
-                    </div>
-
-                    <div class="summary-row">
-                      <span>Giảm giá</span>
-
-                      <div class="input-group input-group-sm w-50">
-                        <input type="number" id="admin-order-discount" class="form-control text-end" value="0"
-                          min="0" />
-
-                        <span class="input-group-text">đ</span>
-                      </div>
-                    </div>
-
-                    <hr />
-
-                    <div class="d-flex justify-content-between align-items-center">
-                      <span class="fw-bold">Tổng tiền</span>
-
-                      <strong id="admin-order-total" class="fs-4 text-danger">
-                        0đ
-                      </strong>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-              Hủy
-            </button>
-
-            <button type="submit" class="btn btn-coffee">
-              <i class="bi bi-floppy me-1"></i>
-              Lưu đơn hàng
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Template dòng món -->
-  <template id="admin-order-item-template">
-    <tr class="admin-order-item-row">
-      <td>
-        <select class="form-select order-product-select" required>
-          <option value="" selected disabled>
-            Chọn món
-          </option>
-          <option value="1" data-price="35000">
-            Cà phê sữa đá
-          </option>
-          <option value="2" data-price="39000">
-            Bạc xỉu
-          </option>
-          <option value="4" data-price="49000">
-            Trà đào cam sả
-          </option>
-          <option value="7" data-price="55000">
-            Matcha đá xay
-          </option>
-          <option value="10" data-price="45000">
-            Bánh tiramisu
-          </option>
-        </select>
-      </td>
-
-      <td>
-        <input type="number" class="form-control order-item-quantity" min="1" max="99" value="1" required />
-      </td>
-
-      <td class="order-item-price">0đ</td>
-      <td class="order-item-total fw-semibold">0đ</td>
-
-      <td>
-        <button type="button" class="btn btn-sm btn-outline-danger remove-order-item" title="Xóa món">
-          <i class="bi bi-trash3"></i>
-        </button>
-      </td>
-    </tr>
-  </template>
-
   <!-- ==================== MODAL CHI TIẾT ĐƠN ==================== -->
   <div class="modal fade" id="order-detail-modal" tabindex="-1" aria-labelledby="order-detail-title" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -1284,12 +568,12 @@
               <small class="text-secondary">Mã đơn hàng</small>
 
               <h3 id="detail-order-id" class="h4 mb-0">
-                #OD086
+                —
               </h3>
             </div>
 
             <span id="detail-order-status" class="badge text-bg-danger mt-2 mt-sm-0">
-              Đơn mới
+              Đang tải
             </span>
           </div>
 
@@ -1305,35 +589,35 @@
                   <div class="admin-detail-item">
                     <span>Khách hàng</span>
                     <strong id="detail-order-customer">
-                      Nguyễn Văn Minh
+                      —
                     </strong>
                   </div>
 
                   <div class="admin-detail-item">
                     <span>Số điện thoại</span>
                     <strong id="detail-order-phone">
-                      0912 345 678
+                      —
                     </strong>
                   </div>
 
                   <div class="admin-detail-item">
                     <span>Bàn/Loại đơn</span>
                     <strong id="detail-order-table">
-                      Bàn T03
+                      —
                     </strong>
                   </div>
 
                   <div class="admin-detail-item">
                     <span>Thời gian tạo</span>
                     <strong id="detail-order-time">
-                      22/09/2026 10:25
+                      —
                     </strong>
                   </div>
 
                   <div class="admin-detail-item">
                     <span>Ghi chú</span>
                     <strong id="detail-order-note">
-                      Mang các món ra cùng lúc.
+                      —
                     </strong>
                   </div>
                 </div>
@@ -1364,59 +648,7 @@
 
                   <tbody id="detail-order-items">
                     <tr>
-                      <td>
-                        <strong>Cà phê sữa đá</strong>
-
-                        <small class="d-block text-secondary">
-                          Size M, 70% đường
-                        </small>
-                      </td>
-
-                      <td class="text-center">2</td>
-                      <td class="text-end">35.000đ</td>
-                      <td class="text-end fw-semibold">70.000đ</td>
-
-                      <td>
-                        <span class="badge text-bg-danger">
-                          Mới
-                        </span>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td>
-                        <strong>Trà đào cam sả</strong>
-
-                        <small class="d-block text-secondary">
-                          Size L, 50% đường
-                        </small>
-                      </td>
-
-                      <td class="text-center">1</td>
-                      <td class="text-end">59.000đ</td>
-                      <td class="text-end fw-semibold">59.000đ</td>
-
-                      <td>
-                        <span class="badge text-bg-danger">
-                          Mới
-                        </span>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td>
-                        <strong>Bánh tiramisu</strong>
-                      </td>
-
-                      <td class="text-center">1</td>
-                      <td class="text-end">45.000đ</td>
-                      <td class="text-end fw-semibold">45.000đ</td>
-
-                      <td>
-                        <span class="badge text-bg-danger">
-                          Mới
-                        </span>
-                      </td>
+                      <td colspan="5" class="text-center text-secondary">Đang tải dữ liệu đơn hàng...</td>
                     </tr>
                   </tbody>
                 </table>
@@ -1427,7 +659,7 @@
                   <div class="summary-row">
                     <span>Tạm tính</span>
                     <strong id="detail-order-subtotal">
-                      174.000đ
+                      0đ
                     </strong>
                   </div>
 
@@ -1443,7 +675,7 @@
                     <span>Phí phục vụ</span>
 
                     <strong id="detail-order-service-fee">
-                      11.000đ
+                      0đ
                     </strong>
                   </div>
 
@@ -1455,7 +687,7 @@
                     </span>
 
                     <strong id="detail-order-total" class="fs-4 text-danger">
-                      185.000đ
+                      0đ
                     </strong>
                   </div>
                 </div>
@@ -1535,53 +767,6 @@
           <button type="button" id="detail-next-status-button" class="btn btn-coffee">
             <i class="bi bi-arrow-right-circle me-1"></i>
             Chuyển trạng thái
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== MODAL HỦY ĐƠN ==================== -->
-  <div class="modal fade" id="cancel-order-modal" tabindex="-1" aria-labelledby="cancel-order-title" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0">
-        <div class="modal-header">
-          <h2 class="modal-title h5" id="cancel-order-title">
-            Xác nhận hủy đơn hàng
-          </h2>
-
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-        </div>
-
-        <div class="modal-body">
-          <input type="hidden" id="cancel-order-id" />
-
-          <p>
-            Bạn có chắc chắn muốn hủy đơn
-            <strong id="cancel-order-code">#OD086</strong>?
-          </p>
-
-          <label for="cancel-order-reason" class="form-label fw-semibold">
-            Lý do hủy
-            <span class="text-danger">*</span>
-          </label>
-
-          <textarea id="cancel-order-reason" class="form-control" rows="3" maxlength="200"
-            placeholder="Nhập lý do hủy đơn..."></textarea>
-
-          <div id="cancel-order-error" class="text-danger small mt-1 d-none">
-            Vui lòng nhập lý do hủy.
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-            Quay lại
-          </button>
-
-          <button type="button" id="confirm-cancel-order" class="btn btn-danger">
-            <i class="bi bi-x-circle me-1"></i>
-            Hủy đơn hàng
           </button>
         </div>
       </div>

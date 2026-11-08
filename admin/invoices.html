@@ -159,29 +159,7 @@
           </button>
 
           <ul class="dropdown-menu dropdown-menu-end admin-notifications d-none">
-            <li>
-              <h6 class="dropdown-header">Thông báo mới</h6>
-            </li>
-
-            <li>
-              <a class="dropdown-item" href="#">
-                <strong>Bàn T05 yêu cầu thanh toán</strong>
-
-                <small class="d-block text-secondary">
-                  5 phút trước
-                </small>
-              </a>
-            </li>
-
-            <li>
-              <a class="dropdown-item" href="#">
-                <strong>Đã nhận chuyển khoản</strong>
-
-                <small class="d-block text-secondary">
-                  Hóa đơn #HD0052
-                </small>
-              </a>
-            </li>
+            <li><span class="dropdown-item-text text-secondary">Đang tải thông báo...</span></li>
           </ul>
         </div>
 
@@ -518,477 +496,8 @@
               </thead>
 
               <tbody id="invoice-table-body">
-                <!-- Hóa đơn 1 -->
-                <tr class="invoice-row" data-id="HD0054" data-order="OD086" data-customer="Nguyễn Văn Minh"
-                  data-date="2026-09-22" data-method="cash" data-status="pending" data-amount="185000">
-                  <td class="ps-4">
-                    <strong>#HD0054</strong>
-                  </td>
-
-                  <td>
-                    <a href="orders.html" class="fw-semibold">
-                      #OD086
-                    </a>
-
-                    <small class="d-block text-secondary">
-                      Bàn T03
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Nguyễn Văn Minh</strong>
-
-                    <small class="d-block text-secondary">
-                      0912 345 678
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>22/09/2026</strong>
-
-                    <small class="d-block text-secondary">
-                      10:35
-                    </small>
-                  </td>
-
-                  <td>
-                    <i class="bi bi-cash-stack me-1"></i>
-                    Tiền mặt
-                  </td>
-
-                  <td class="fw-bold text-danger">
-                    185.000đ
-                  </td>
-
-                  <td>
-                    <span class="badge text-bg-warning">
-                      Chờ thanh toán
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <button type="button" class="dropdown-item view-invoice-button" data-id="HD0054"
-                            data-bs-toggle="modal" data-bs-target="#invoice-detail-modal">
-                            <i class="bi bi-eye me-2"></i>
-                            Xem chi tiết
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item text-success confirm-payment-button"
-                            data-id="HD0054" data-bs-toggle="modal" data-bs-target="#confirm-payment-modal">
-                            <i class="bi bi-check-circle me-2"></i>
-                            Xác nhận thanh toán
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item print-one-invoice-button" data-id="HD0054">
-                            <i class="bi bi-printer me-2"></i>
-                            In hóa đơn
-                          </button>
-                        </li>
-
-                        <li>
-                          <hr class="dropdown-divider" />
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item text-danger cancel-invoice-button" data-id="HD0054"
-                            data-bs-toggle="modal" data-bs-target="#cancel-invoice-modal">
-                            <i class="bi bi-x-circle me-2"></i>
-                            Hủy hóa đơn
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Hóa đơn 2 -->
-                <tr class="invoice-row" data-id="HD0053" data-order="OD085" data-customer="Trần Thu Hương"
-                  data-date="2026-09-22" data-method="bank-transfer" data-status="paid" data-amount="268000">
-                  <td class="ps-4">
-                    <strong>#HD0053</strong>
-                  </td>
-
-                  <td>
-                    <a href="orders.html" class="fw-semibold">
-                      #OD085
-                    </a>
-
-                    <small class="d-block text-secondary">
-                      Bàn T07
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Trần Thu Hương</strong>
-
-                    <small class="d-block text-secondary">
-                      0987 654 321
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>22/09/2026</strong>
-
-                    <small class="d-block text-secondary">
-                      10:25
-                    </small>
-                  </td>
-
-                  <td>
-                    <i class="bi bi-qr-code me-1"></i>
-                    Chuyển khoản
-                  </td>
-
-                  <td class="fw-bold text-danger">
-                    268.000đ
-                  </td>
-
-                  <td>
-                    <span class="badge text-bg-success">
-                      Đã thanh toán
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <button type="button" class="dropdown-item view-invoice-button" data-id="HD0053"
-                            data-bs-toggle="modal" data-bs-target="#invoice-detail-modal">
-                            <i class="bi bi-eye me-2"></i>
-                            Xem chi tiết
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item print-one-invoice-button" data-id="HD0053">
-                            <i class="bi bi-printer me-2"></i>
-                            In hóa đơn
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Hóa đơn 3 -->
-                <tr class="invoice-row" data-id="HD0052" data-order="OD084" data-customer="Lê Hoàng Nam"
-                  data-date="2026-09-22" data-method="bank-transfer" data-status="paid" data-amount="139000">
-                  <td class="ps-4">
-                    <strong>#HD0052</strong>
-                  </td>
-
-                  <td>
-                    <a href="orders.html" class="fw-semibold">
-                      #OD084
-                    </a>
-
-                    <small class="d-block text-secondary">
-                      Bàn T05
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Lê Hoàng Nam</strong>
-
-                    <small class="d-block text-secondary">
-                      0903 123 456
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>22/09/2026</strong>
-
-                    <small class="d-block text-secondary">
-                      10:10
-                    </small>
-                  </td>
-
-                  <td>
-                    <i class="bi bi-qr-code me-1"></i>
-                    Chuyển khoản
-                  </td>
-
-                  <td class="fw-bold text-danger">
-                    139.000đ
-                  </td>
-
-                  <td>
-                    <span class="badge text-bg-success">
-                      Đã thanh toán
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <button type="button" class="dropdown-item view-invoice-button" data-id="HD0052"
-                            data-bs-toggle="modal" data-bs-target="#invoice-detail-modal">
-                            <i class="bi bi-eye me-2"></i>
-                            Xem chi tiết
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item print-one-invoice-button" data-id="HD0052">
-                            <i class="bi bi-printer me-2"></i>
-                            In hóa đơn
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Hóa đơn 4 -->
-                <tr class="invoice-row" data-id="HD0051" data-order="OD083" data-customer="Phạm Quốc Bảo"
-                  data-date="2026-09-22" data-method="cash" data-status="paid" data-amount="98000">
-                  <td class="ps-4">
-                    <strong>#HD0051</strong>
-                  </td>
-
-                  <td>
-                    <a href="orders.html" class="fw-semibold">
-                      #OD083
-                    </a>
-
-                    <small class="d-block text-secondary">
-                      Mang đi
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Phạm Quốc Bảo</strong>
-
-                    <small class="d-block text-secondary">
-                      0938 123 456
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>22/09/2026</strong>
-
-                    <small class="d-block text-secondary">
-                      09:58
-                    </small>
-                  </td>
-
-                  <td>
-                    <i class="bi bi-cash-stack me-1"></i>
-                    Tiền mặt
-                  </td>
-
-                  <td class="fw-bold text-danger">
-                    98.000đ
-                  </td>
-
-                  <td>
-                    <span class="badge text-bg-success">
-                      Đã thanh toán
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <button type="button" class="dropdown-item view-invoice-button" data-id="HD0051"
-                            data-bs-toggle="modal" data-bs-target="#invoice-detail-modal">
-                            <i class="bi bi-eye me-2"></i>
-                            Xem chi tiết
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item print-one-invoice-button" data-id="HD0051">
-                            <i class="bi bi-printer me-2"></i>
-                            In hóa đơn
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Hóa đơn 5 -->
-                <tr class="invoice-row" data-id="HD0050" data-order="OD082" data-customer="Võ Ngọc Lan"
-                  data-date="2026-09-22" data-method="cash" data-status="pending" data-amount="175000">
-                  <td class="ps-4">
-                    <strong>#HD0050</strong>
-                  </td>
-
-                  <td>
-                    <a href="orders.html" class="fw-semibold">
-                      #OD082
-                    </a>
-
-                    <small class="d-block text-secondary">
-                      Bàn T02
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Võ Ngọc Lan</strong>
-
-                    <small class="d-block text-secondary">
-                      0977 123 456
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>22/09/2026</strong>
-
-                    <small class="d-block text-secondary">
-                      09:45
-                    </small>
-                  </td>
-
-                  <td>
-                    <i class="bi bi-cash-stack me-1"></i>
-                    Tiền mặt
-                  </td>
-
-                  <td class="fw-bold text-danger">
-                    175.000đ
-                  </td>
-
-                  <td>
-                    <span class="badge text-bg-warning">
-                      Chờ thanh toán
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <div class="dropdown">
-                      <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                      </button>
-
-                      <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                          <button type="button" class="dropdown-item view-invoice-button" data-id="HD0050"
-                            data-bs-toggle="modal" data-bs-target="#invoice-detail-modal">
-                            <i class="bi bi-eye me-2"></i>
-                            Xem chi tiết
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item text-success confirm-payment-button"
-                            data-id="HD0050" data-bs-toggle="modal" data-bs-target="#confirm-payment-modal">
-                            <i class="bi bi-check-circle me-2"></i>
-                            Xác nhận thanh toán
-                          </button>
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item print-one-invoice-button" data-id="HD0050">
-                            <i class="bi bi-printer me-2"></i>
-                            In hóa đơn
-                          </button>
-                        </li>
-
-                        <li>
-                          <hr class="dropdown-divider" />
-                        </li>
-
-                        <li>
-                          <button type="button" class="dropdown-item text-danger cancel-invoice-button" data-id="HD0050"
-                            data-bs-toggle="modal" data-bs-target="#cancel-invoice-modal">
-                            <i class="bi bi-x-circle me-2"></i>
-                            Hủy hóa đơn
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-
-                <!-- Hóa đơn 6 -->
-                <tr class="invoice-row" data-id="HD0049" data-order="OD081" data-customer="Đặng Minh Tuấn"
-                  data-date="2026-09-21" data-method="cash" data-status="cancelled" data-amount="125000">
-                  <td class="ps-4">
-                    <strong>#HD0049</strong>
-                  </td>
-
-                  <td>
-                    <a href="orders.html" class="fw-semibold">
-                      #OD081
-                    </a>
-
-                    <small class="d-block text-secondary">
-                      Bàn T06
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>Đặng Minh Tuấn</strong>
-
-                    <small class="d-block text-secondary">
-                      0908 456 789
-                    </small>
-                  </td>
-
-                  <td>
-                    <strong>21/09/2026</strong>
-
-                    <small class="d-block text-secondary">
-                      21:10
-                    </small>
-                  </td>
-
-                  <td>
-                    <i class="bi bi-cash-stack me-1"></i>
-                    Tiền mặt
-                  </td>
-
-                  <td class="fw-bold text-secondary">
-                    125.000đ
-                  </td>
-
-                  <td>
-                    <span class="badge text-bg-danger">
-                      Đã hủy
-                    </span>
-                  </td>
-
-                  <td class="text-center pe-4">
-                    <button type="button" class="btn btn-sm btn-light view-invoice-button" data-id="HD0049"
-                      data-bs-toggle="modal" data-bs-target="#invoice-detail-modal" title="Xem chi tiết">
-                      <i class="bi bi-eye"></i>
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
+                <tr><td colspan="8" class="text-center py-4 text-secondary">Đang tải hóa đơn...</td></tr>
+</tbody>
             </table>
           </div>
 
@@ -1045,164 +554,6 @@
     </main>
   </div>
 
-  <!-- ==================== MODAL TẠO HÓA ĐƠN ==================== -->
-  <div class="modal fade" id="invoice-form-modal" tabindex="-1" aria-labelledby="invoice-form-title" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
-      <div class="modal-content border-0">
-        <form id="invoice-form" novalidate>
-          <div class="modal-header">
-            <h2 class="modal-title h5" id="invoice-form-title">
-              Tạo hóa đơn mới
-            </h2>
-
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-          </div>
-
-          <div class="modal-body">
-            <div class="row g-3">
-              <!-- Đơn hàng -->
-              <div class="col-12 col-md-6">
-                <label for="invoice-order-id" class="form-label fw-semibold">
-                  Đơn hàng
-                  <span class="text-danger">*</span>
-                </label>
-
-                <select id="invoice-order-id" class="form-select" required>
-                  <option value="" selected disabled>
-                    Chọn đơn hàng
-                  </option>
-                  <option value="OD086">
-                    #OD086 – Bàn T03
-                  </option>
-                  <option value="OD085">
-                    #OD085 – Bàn T07
-                  </option>
-                  <option value="OD084">
-                    #OD084 – Bàn T05
-                  </option>
-                </select>
-
-                <div class="invalid-feedback">
-                  Vui lòng chọn đơn hàng.
-                </div>
-              </div>
-
-              <!-- Khách hàng -->
-              <div class="col-12 col-md-6">
-                <label for="invoice-customer-name" class="form-label fw-semibold">
-                  Tên khách hàng
-                </label>
-
-                <input type="text" id="invoice-customer-name" class="form-control" placeholder="Tên khách hàng" />
-              </div>
-
-              <!-- Tạm tính -->
-              <div class="col-12 col-md-4">
-                <label for="invoice-subtotal" class="form-label fw-semibold">
-                  Tạm tính
-                </label>
-
-                <input type="number" id="invoice-subtotal" class="form-control" min="0" value="0" readonly />
-              </div>
-
-              <!-- Giảm giá -->
-              <div class="col-12 col-md-4">
-                <label for="invoice-discount" class="form-label fw-semibold">
-                  Giảm giá
-                </label>
-
-                <input type="number" id="invoice-discount" class="form-control" min="0" value="0" />
-              </div>
-
-              <!-- Phí phục vụ -->
-              <div class="col-12 col-md-4">
-                <label for="invoice-service-fee" class="form-label fw-semibold">
-                  Phí phục vụ
-                </label>
-
-                <input type="number" id="invoice-service-fee" class="form-control" min="0" value="0" />
-              </div>
-
-              <!-- Tổng tiền -->
-              <div class="col-12">
-                <div class="alert alert-light border">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <span class="fw-semibold">
-                      Tổng thanh toán
-                    </span>
-
-                    <strong id="invoice-form-total" class="fs-4 text-danger">
-                      0đ
-                    </strong>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Phương thức -->
-              <div class="col-12 col-md-6">
-                <label for="invoice-payment-method" class="form-label fw-semibold">
-                  Phương thức thanh toán
-                  <span class="text-danger">*</span>
-                </label>
-
-                <select id="invoice-payment-method" class="form-select" required>
-                  <option value="" selected disabled>
-                    Chọn phương thức
-                  </option>
-                  <option value="cash">Tiền mặt</option>
-                  <option value="bank-transfer">
-                    Chuyển khoản
-                  </option>
-                </select>
-
-                <div class="invalid-feedback">
-                  Vui lòng chọn phương thức thanh toán.
-                </div>
-              </div>
-
-              <!-- Trạng thái -->
-              <div class="col-12 col-md-6">
-                <label for="invoice-form-status" class="form-label fw-semibold">
-                  Trạng thái
-                </label>
-
-                <select id="invoice-form-status" class="form-select">
-                  <option value="pending">
-                    Chờ thanh toán
-                  </option>
-                  <option value="paid">
-                    Đã thanh toán
-                  </option>
-                </select>
-              </div>
-
-              <!-- Ghi chú -->
-              <div class="col-12">
-                <label for="invoice-note" class="form-label fw-semibold">
-                  Ghi chú
-                </label>
-
-                <textarea id="invoice-note" class="form-control" rows="3" maxlength="300"
-                  placeholder="Nhập ghi chú cho hóa đơn..."></textarea>
-              </div>
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-              Hủy
-            </button>
-
-            <button type="submit" class="btn btn-coffee">
-              <i class="bi bi-floppy me-1"></i>
-              Lưu hóa đơn
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
   <!-- ==================== MODAL CHI TIẾT ==================== -->
   <div class="modal fade" id="invoice-detail-modal" tabindex="-1" aria-labelledby="invoice-detail-title"
     aria-hidden="true">
@@ -1241,30 +592,30 @@
           <div class="row g-3 mb-4">
             <div class="col-6">
               <span class="text-secondary">Mã hóa đơn:</span>
-              <strong id="detail-invoice-id">#HD0054</strong>
+              <strong id="detail-invoice-id">—</strong>
             </div>
 
             <div class="col-6 text-end">
               <span class="text-secondary">Mã đơn:</span>
-              <strong id="detail-order-id">#OD086</strong>
+              <strong id="detail-order-id">—</strong>
             </div>
 
             <div class="col-6">
               <span class="text-secondary">Khách hàng:</span>
               <strong id="detail-invoice-customer">
-                Nguyễn Văn Minh
+                —
               </strong>
             </div>
 
             <div class="col-6 text-end">
               <span class="text-secondary">Bàn:</span>
-              <strong id="detail-invoice-table">T03</strong>
+              <strong id="detail-invoice-table">—</strong>
             </div>
 
             <div class="col-6">
               <span class="text-secondary">Thời gian:</span>
               <strong id="detail-invoice-time">
-                22/09/2026 10:35
+                —
               </strong>
             </div>
 
@@ -1272,7 +623,7 @@
               <span class="text-secondary">Trạng thái:</span>
 
               <span id="detail-invoice-status" class="badge text-bg-warning">
-                Chờ thanh toán
+                Đang tải
               </span>
             </div>
           </div>
@@ -1297,41 +648,7 @@
 
               <tbody id="detail-invoice-items">
                 <tr>
-                  <td>
-                    <strong>Cà phê sữa đá</strong>
-
-                    <small class="d-block text-secondary">
-                      Size M, 70% đường
-                    </small>
-                  </td>
-
-                  <td class="text-center">2</td>
-                  <td class="text-end">35.000đ</td>
-                  <td class="text-end fw-semibold">70.000đ</td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <strong>Trà đào cam sả</strong>
-
-                    <small class="d-block text-secondary">
-                      Size L, 50% đường
-                    </small>
-                  </td>
-
-                  <td class="text-center">1</td>
-                  <td class="text-end">59.000đ</td>
-                  <td class="text-end fw-semibold">59.000đ</td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <strong>Bánh tiramisu</strong>
-                  </td>
-
-                  <td class="text-center">1</td>
-                  <td class="text-end">45.000đ</td>
-                  <td class="text-end fw-semibold">45.000đ</td>
+                  <td colspan="4" class="text-center text-secondary">Đang tải dữ liệu hóa đơn...</td>
                 </tr>
               </tbody>
             </table>
@@ -1343,14 +660,14 @@
               <div class="summary-row">
                 <span>Tạm tính</span>
                 <strong id="detail-invoice-subtotal">
-                  174.000đ
+                  0đ
                 </strong>
               </div>
 
               <div class="summary-row">
                 <span>Phí phục vụ</span>
                 <strong id="detail-invoice-service-fee">
-                  11.000đ
+                  0đ
                 </strong>
               </div>
 
@@ -1370,7 +687,7 @@
                 </span>
 
                 <strong id="detail-invoice-total" class="fs-4 text-danger">
-                  185.000đ
+                  0đ
                 </strong>
               </div>
 
@@ -1378,7 +695,7 @@
                 <span>Phương thức</span>
 
                 <strong id="detail-payment-method">
-                  Tiền mặt
+                  —
                 </strong>
               </div>
             </div>
@@ -1393,108 +710,6 @@
           <button type="button" id="print-detail-invoice" class="btn btn-coffee">
             <i class="bi bi-printer me-1"></i>
             In hóa đơn
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== MODAL XÁC NHẬN THANH TOÁN ==================== -->
-  <div class="modal fade" id="confirm-payment-modal" tabindex="-1" aria-labelledby="confirm-payment-title"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0">
-        <div class="modal-header">
-          <h2 class="modal-title h5" id="confirm-payment-title">
-            Xác nhận thanh toán
-          </h2>
-
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-        </div>
-
-        <div class="modal-body">
-          <input type="hidden" id="confirm-payment-invoice-id" />
-
-          <p>
-            Xác nhận hóa đơn
-            <strong id="confirm-payment-code">#HD0054</strong>
-            đã được thanh toán?
-          </p>
-
-          <label for="confirm-payment-method" class="form-label fw-semibold">
-            Phương thức thanh toán
-          </label>
-
-          <select id="confirm-payment-method" class="form-select">
-            <option value="cash">Tiền mặt</option>
-            <option value="bank-transfer">
-              Chuyển khoản
-            </option>
-          </select>
-
-          <div class="alert alert-warning small mt-3 mb-0">
-            <i class="bi bi-exclamation-triangle me-1"></i>
-            Sau khi xác nhận, trạng thái hóa đơn sẽ chuyển thành
-            “Đã thanh toán”.
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-            Quay lại
-          </button>
-
-          <button type="button" id="submit-confirm-payment" class="btn btn-success">
-            <i class="bi bi-check-circle me-1"></i>
-            Xác nhận
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ==================== MODAL HỦY HÓA ĐƠN ==================== -->
-  <div class="modal fade" id="cancel-invoice-modal" tabindex="-1" aria-labelledby="cancel-invoice-title"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0">
-        <div class="modal-header">
-          <h2 class="modal-title h5" id="cancel-invoice-title">
-            Xác nhận hủy hóa đơn
-          </h2>
-
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-        </div>
-
-        <div class="modal-body">
-          <input type="hidden" id="cancel-invoice-id" />
-
-          <p>
-            Bạn có chắc chắn muốn hủy hóa đơn
-            <strong id="cancel-invoice-code">#HD0054</strong>?
-          </p>
-
-          <label for="cancel-invoice-reason" class="form-label fw-semibold">
-            Lý do hủy
-            <span class="text-danger">*</span>
-          </label>
-
-          <textarea id="cancel-invoice-reason" class="form-control" rows="3" maxlength="200"
-            placeholder="Nhập lý do hủy hóa đơn..."></textarea>
-
-          <div id="cancel-invoice-error" class="text-danger small mt-1 d-none">
-            Vui lòng nhập lý do hủy.
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-            Quay lại
-          </button>
-
-          <button type="button" id="submit-cancel-invoice" class="btn btn-danger">
-            <i class="bi bi-x-circle me-1"></i>
-            Hủy hóa đơn
           </button>
         </div>
       </div>

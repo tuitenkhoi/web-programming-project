@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const successModal = document.querySelector("#payment-success-modal");
 
   const pendingOrder = readJSON(KEYS.pendingOrder, null);
+  const customerProfile = window.MocCoffeeApi?.getCustomerProfile?.();
 
   let submitting = false;
   let createdOrder = null;
@@ -233,8 +234,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     if (nameInput) {
-      nameInput.value = pendingOrder.customerName || "";
+      nameInput.value = pendingOrder.customerName || customerProfile?.full_name || "";
     }
+
+    if (phoneInput && customerProfile?.phone) phoneInput.value = customerProfile.phone;
+    if (emailInput && customerProfile?.email) emailInput.value = customerProfile.email;
 
     if (noteInput) {
       noteInput.value = pendingOrder.note || "";

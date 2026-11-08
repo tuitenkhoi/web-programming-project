@@ -51,6 +51,7 @@ npm install
 mysql --default-character-set=utf8mb4 -u root -p < database/schema.sql
 ```
 > Nếu đã có DB từ bản cũ, chạy thêm theo thứ tự: `database/migrations/001_bookings_to_standard.sql`, rồi `database/migrations/002_add_indexes.sql`.
+> Sau bản nâng cấp tài khoản khách, chạy thêm `database/migrations/003_customer_accounts_vouchers_reviews.sql`.
 
 **3. Tạo file cấu hình**
 ```bash
@@ -112,6 +113,12 @@ Ký hiệu: 🌐 công khai · 🔒 cần token admin (`Authorization: Bearer <t
 | Hệ thống | `GET /api/health` | 🌐 | Kiểm tra server và DB |
 | Đăng nhập | `POST /api/auth/login` | 🌐 | Đăng nhập admin, trả token |
 | | `GET /api/admin/me` | 🔒 | Thông tin admin đang đăng nhập |
+| Khách hàng | `POST /api/auth/customer/register` · `POST /api/auth/customer/login` | 🌐 | Đăng ký/đăng nhập khách hàng |
+| | `GET /api/customer/orders` | 🔒 | Lịch sử đơn theo tài khoản |
+| | `POST /api/customer/orders/lookup` | 🌐 | Tra đơn bằng mã đơn và số điện thoại |
+| Voucher | `GET /api/vouchers` · `POST /api/vouchers/validate` | 🌐 | Danh sách và kiểm tra voucher từ DB |
+| Đánh giá | `GET /api/reviews/product/:id` | 🌐 | Đánh giá đã duyệt của sản phẩm |
+| | `POST /api/reviews` | 🔒 | Khách đánh giá món đã mua |
 | Danh mục | `GET /api/categories` · `GET /api/categories/:id` | 🌐 | Danh mục đang bán và chi tiết một danh mục |
 | | `GET /api/categories/admin` · `POST` · `PUT /:id` · `DELETE /:id` | 🔒 | Quản lý danh mục |
 | Sản phẩm | `GET /api/products` · `GET /api/products/:id` | 🌐 | Menu (lọc `?search=` `?category_id=`) |
@@ -150,6 +157,10 @@ assets/              CSS, JS, hình ảnh
 * Không commit `.env`; đặt `JWT_SECRET` dài và ngẫu nhiên.
 * Xóa hoặc đổi mật khẩu mọi tài khoản mẫu/demo trong bảng `users` trước khi công khai.
 * Chạy sau HTTPS và đặt `TRUST_PROXY=1` nếu có reverse proxy.
+
+## Realtime và triển khai
+
+Thông báo đơn hàng, booking và trạng thái bàn của admin được đẩy bằng Socket.IO; polling 60 giây vẫn được giữ làm cơ chế dự phòng. Cấu hình triển khai Render nằm trong `render.yaml`, hướng dẫn chi tiết tại `docs/DEPLOY_RENDER.md`.
 
 ## Đầu ra khi nộp (hạn 07/11/2026)
 * Báo cáo Word + PDF theo template khoa, 20–60 trang (không tính cover và appendix), đủ hình – bảng – sơ đồ: `report/report.docx`.

@@ -11,7 +11,8 @@
     const response = await fetch(`${API_BASE_URL}${path}`, {
       method: options.method || "GET",
       headers: {
-        ...(options.body
+        // FormData (upload file) thì để trình duyệt tự đặt Content-Type kèm boundary
+        ...(options.body && !(options.body instanceof FormData)
           ? { "Content-Type": "application/json; charset=utf-8" }
           : {}),
         ...(options.headers || {}),
@@ -19,9 +20,11 @@
           ? { Authorization: `Bearer ${token}` }
           : {}),
       },
-      body: options.body
-        ? JSON.stringify(options.body)
-        : undefined,
+      body: !options.body
+        ? undefined
+        : options.body instanceof FormData
+          ? options.body
+          : JSON.stringify(options.body),
     });
 
     let result;
@@ -49,6 +52,31 @@
   function clearCustomerSession() {
     localStorage.removeItem(CUSTOMER_TOKEN_KEY);
     localStorage.removeItem(CUSTOMER_PROFILE_KEY);
+  }
+
+  // Đăng xuất thật: gọi API thu hồi token trước, rồi mới xóa localStorage (lỗi mạng vẫn xóa cục bộ)
+  async function customerLogout() {
+    try {
+      await request("/auth/logout", { method: "POST" });
+    } catch (error) {
+      /* token hết hạn/mất mạng: bỏ qua, vẫn đăng xuất phía trình duyệt */
+    }
+    clearCustomerSession();
+  }
+
+  // Đường dẫn ảnh đại diện; chưa có thì dùng ảnh mặc định
+  function avatarUrl(avatar, insidePages = true) {
+    if (avatar) return `${API_ORIGIN}${avatar}`;
+    return insidePages ? "../assets/images/default-avatar.png" : "assets/images/default-avatar.png";
+  }
+
+  // Gửi hồ sơ mới (FormData: full_name, phone, avatar) rồi cập nhật bản lưu trong trình duyệt
+  async function updateProfile(formData) {
+    const result = await request("/auth/customer/me", { method: "PATCH", body: formData });
+    const current = getCustomerProfile() || {};
+    const profile = { ...current, full_name: result.data.full_name, phone: result.data.phone || "", avatar: result.data.avatar || "" };
+    localStorage.setItem(CUSTOMER_PROFILE_KEY, JSON.stringify(profile));
+    return result.data;
   }
 
   function getCustomerProfile() {
@@ -181,7 +209,13 @@
     customerRegister,
     setCustomerSession,
     clearCustomerSession,
+    customerLogout,
+    avatarUrl,
+    updateProfile,
     getCustomerProfile,
+    changePassword: async (payload) => (await request("/auth/customer/change-password", { method: "POST", body: payload })).message,
+    savePreferences: async (payload) => (await request("/auth/customer/preferences", { method: "PATCH", body: payload })).data,
+    getMe: async () => (await request("/auth/customer/me")).data,
     getCustomerOrders: async () => (await request("/customer/orders")).data || [],
     lookupOrder: async (payload) => (await request("/customer/orders/lookup", { method: "POST", body: payload, auth: false })).data,
     getVouchers: async () => (await request("/vouchers", { auth: false })).data || [],

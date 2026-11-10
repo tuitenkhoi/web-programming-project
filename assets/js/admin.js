@@ -202,27 +202,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // Đăng nhập thật (gọi /api/auth/login) được xử lý trong script của login.html.
-
-    const forgotPasswordForm = $("#forgot-password-form");
-
-    forgotPasswordForm?.addEventListener(
-      "submit",
-      function (event) {
-        event.preventDefault();
-
-        forgotPasswordForm.classList.add(
-          "was-validated"
-        );
-
-        if (!forgotPasswordForm.checkValidity()) {
-          return;
-        }
-
-        $("#forgot-password-message")?.classList.remove(
-          "d-none"
-        );
-      }
-    );
   }
 
   initializeLoginPage();

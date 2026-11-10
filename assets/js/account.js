@@ -40,14 +40,61 @@ document.addEventListener("DOMContentLoaded", function () {
     </article>`;
   }
 
+  // ----- Tùy chọn giao diện: áp ngay khi đổi, lưu localStorage (prefs.js) và lên server sau 300ms -----
+  const prefsForm = document.querySelector("#prefs-form");
+  const prefsStatus = document.querySelector("#prefs-status");
+  let prefsTimer;
+
+  function showPrefs(prefs) {
+    const theme = prefs.theme || "system";
+    const radio = prefsForm.querySelector(`input[name="theme"][value="${theme}"]`);
+    if (radio) radio.checked = true;
+    prefsForm.querySelector("#pref-font").value = String(prefs.font_size || 16);
+  }
+
+  prefsForm.addEventListener("change", function () {
+    const prefs = {
+      theme: prefsForm.querySelector('input[name="theme"]:checked')?.value || "system",
+      font_size: Number(prefsForm.querySelector("#pref-font").value),
+    };
+    window.MocPrefs.save(prefs); // đổi giao diện tức thì
+    clearTimeout(prefsTimer);
+    prefsTimer = setTimeout(async () => {
+      if (!api.getCustomerProfile()) return; // chưa đăng nhập: chỉ lưu trong trình duyệt
+      try {
+        await api.savePreferences(prefs);
+        prefsStatus.textContent = "Đã lưu tùy chọn.";
+      } catch (error) { prefsStatus.textContent = error.message; }
+    }, 300);
+  });
+
+  // Đổ thông tin hồ sơ vào phần đầu trang và form chỉnh sửa
+  function fillProfile(profile) {
+    document.querySelector("#member-name").textContent = profile.full_name;
+    document.querySelector("#member-contact").textContent = `${profile.email} · ${profile.phone || "Chưa có SĐT"}`;
+    const avatar = api.avatarUrl(profile.avatar);
+    document.querySelector("#member-avatar").src = avatar;
+    document.querySelector("#avatar-preview").src = avatar;
+    document.querySelector("#profile-email").value = profile.email || "";
+    document.querySelector("#profile-name").value = profile.full_name || "";
+    document.querySelector("#profile-phone").value = profile.phone || "";
+  }
+
   async function loadMember() {
     const profile = api.getCustomerProfile();
     guest.classList.toggle("d-none", Boolean(profile));
     member.classList.toggle("d-none", !profile);
     if (!profile) return;
 
-    document.querySelector("#member-name").textContent = profile.full_name;
-    document.querySelector("#member-contact").textContent = `${profile.email} · ${profile.phone || "Chưa có SĐT"}`;
+    fillProfile(profile);
+    // Lấy hồ sơ mới nhất từ server (avatar, tên, SĐT có thể đã đổi ở thiết bị khác)
+    showPrefs(window.MocPrefs.read());
+    api.getMe().then((fresh) => {
+      if (!fresh) return;
+      fillProfile(fresh);
+      // Tùy chọn trên server là bản chuẩn: đồng bộ về trình duyệt này
+      showPrefs(window.MocPrefs.save({ theme: fresh.theme, font_size: Number(fresh.font_size) }));
+    }).catch(() => {});
 
     try {
       const [orders, vouchers] = await Promise.all([api.getCustomerOrders(), api.getVouchers()]);
@@ -81,9 +128,79 @@ document.addEventListener("DOMContentLoaded", function () {
   document.querySelector("#customer-register-form").addEventListener("submit", async function (event) {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.currentTarget));
+    // Kiểm tra nhập lại mật khẩu ngay ở trình duyệt (server vẫn kiểm tra lại)
+    if (data.password !== data.confirm_password) {
+      message("Mật khẩu nhập lại không khớp");
+      return;
+    }
     try {
       await api.customerRegister(data);
       message("Đăng ký thành công.", "success");
+      await loadMember();
+    } catch (error) { message(error.message); }
+  });
+
+  // ----- Hồ sơ: chọn ảnh (xem trước + kiểm tra phía trình duyệt) và lưu -----
+  const AVATAR_TYPES = ["image/jpeg", "image/png", "image/webp"];
+  const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
+  const avatarInput = document.querySelector("#avatar-input");
+  const avatarError = document.querySelector("#avatar-error");
+
+  avatarInput.addEventListener("change", function () {
+    const file = avatarInput.files[0];
+    avatarError.textContent = "";
+    if (!file) return;
+    if (!AVATAR_TYPES.includes(file.type)) {
+      avatarError.textContent = "Chỉ chấp nhận ảnh JPG, PNG hoặc WEBP.";
+      avatarInput.value = "";
+      return;
+    }
+    if (file.size > AVATAR_MAX_BYTES) {
+      avatarError.textContent = "Ảnh không được vượt quá 2 MB.";
+      avatarInput.value = "";
+      return;
+    }
+    document.querySelector("#avatar-preview").src = URL.createObjectURL(file);
+  });
+
+  document.querySelector("#profile-form").addEventListener("submit", async function (event) {
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append("full_name", document.querySelector("#profile-name").value.trim());
+    formData.append("phone", document.querySelector("#profile-phone").value.trim());
+    if (avatarInput.files[0]) formData.append("avatar", avatarInput.files[0]);
+    try {
+      const updated = await api.updateProfile(formData);
+      avatarInput.value = "";
+      fillProfile(updated);
+      message("Cập nhật hồ sơ thành công.", "success");
+    } catch (error) { message(error.message); }
+  });
+
+  // ----- Đổi mật khẩu: nút hiện/ẩn, thành công thì xóa phiên và về trang đăng nhập -----
+  document.querySelectorAll(".toggle-password").forEach((button) => {
+    button.addEventListener("click", () => {
+      const input = document.getElementById(button.dataset.target);
+      const show = input.type === "password";
+      input.type = show ? "text" : "password";
+      button.setAttribute("aria-label", show ? "Ẩn mật khẩu" : "Hiện mật khẩu");
+      button.querySelector("i").className = show ? "bi bi-eye-slash" : "bi bi-eye";
+    });
+  });
+
+  document.querySelector("#password-form").addEventListener("submit", async function (event) {
+    event.preventDefault();
+    const payload = {
+      current_password: document.querySelector("#pw-current").value,
+      new_password: document.querySelector("#pw-new").value,
+      confirm_password: document.querySelector("#pw-confirm").value,
+    };
+    if (payload.new_password !== payload.confirm_password) return message("Mật khẩu nhập lại không khớp");
+    try {
+      const text = await api.changePassword(payload);
+      api.clearCustomerSession(); // token cũ đã bị server thu hồi, chỉ cần xóa bản lưu cục bộ
+      event.currentTarget.reset();
+      message(text, "success");
       await loadMember();
     } catch (error) { message(error.message); }
   });
@@ -96,10 +213,15 @@ document.addEventListener("DOMContentLoaded", function () {
     catch (error) { result.innerHTML = `<p class="text-danger">${esc(error.message)}</p>`; }
   });
 
-  document.querySelector("#customer-logout").addEventListener("click", function () {
-    api.clearCustomerSession();
+  document.querySelector("#customer-logout").addEventListener("click", async function () {
+    await api.customerLogout();
     loadMember();
   });
+
+  // Quay về từ link kích hoạt trong email (server redirect kèm ?verified=1)
+  if (new URLSearchParams(location.search).get("verified")) {
+    message("Xác minh email thành công. Cảm ơn bạn!", "success");
+  }
 
   loadMember();
 });

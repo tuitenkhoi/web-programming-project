@@ -1,7 +1,8 @@
 // Giới hạn số request theo IP, lưu trong bộ nhớ (đủ dùng cho 1 server Node duy nhất).
 // Dùng cho các API công khai (đặt món, đặt bàn) để tránh bị spam làm đầy DB.
 //   app.use('/api/orders', rateLimit({ windowMs: 60000, max: 20, methods: ['POST'] }));
-function rateLimit({ windowMs = 60 * 1000, max = 30, methods = null, message } = {}) {
+function rateLimit({ windowMs = 60 * 1000, max = 30, methods = null, message, keyFn = null } = {}) {
+    // keyFn(req): đổi cách gom nhóm (mặc định gom theo IP). Ví dụ gom theo email: (req) => req.body?.email
     const hits = new Map(); // ip -> { count, resetAt }
 
     // Dọn các IP đã hết hạn để Map không phình mãi (unref: không giữ tiến trình sống)
@@ -16,11 +17,12 @@ function rateLimit({ windowMs = 60 * 1000, max = 30, methods = null, message } =
         if (methods && !methods.includes(req.method)) return next();
 
         const now = Date.now();
-        let rec = hits.get(req.ip);
+        const key = keyFn ? String(keyFn(req) || req.ip).toLowerCase() : req.ip;
+        let rec = hits.get(key);
 
         if (!rec || rec.resetAt <= now) {
             rec = { count: 0, resetAt: now + windowMs };
-            hits.set(req.ip, rec);
+            hits.set(key, rec);
         }
 
         rec.count++;

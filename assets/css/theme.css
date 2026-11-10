@@ -1028,3 +1028,55 @@ body.home-page .carousel-indicators [data-bs-target].active {
     animation-play-state: paused;
   }
 }
+
+/* =========================================================
+   GIAO DIỆN TỐI (khách chọn ở "Tùy chọn của tôi" hoặc theo hệ điều hành)
+   prefs.js đặt data-theme="dark" trên <html>. Chỉ ĐỔI GIÁ TRỊ các biến đã có
+   sang các màu có sẵn trong bảng màu (không thêm mã màu mới), nên mọi chỗ dùng var(--...)
+   tự đổi theo. Bootstrap tự đổi nhờ thuộc tính data-bs-theme cùng được đặt.
+========================================================= */
+html[data-theme="dark"] {
+  color-scheme: dark;
+
+  --coffee-background: var(--moc-ink);
+  --coffee-cream: var(--moc-primary-dark);
+  --text-color: var(--moc-cream);
+  --text-muted: var(--moc-accent-soft);
+  --border-color: var(--moc-primary);
+  --moc-paper: var(--moc-ink);
+}
+
+/* Nền và chữ chính */
+html[data-theme="dark"] body {
+  color: var(--moc-cream);
+  background-color: var(--moc-ink);
+}
+
+/* Các khối "thẻ" đang nền trắng cố định trong style.css / theme.css */
+html[data-theme="dark"] .category-card,
+html[data-theme="dark"] .product-card,
+html[data-theme="dark"] .process-card,
+html[data-theme="dark"] .feature-card,
+html[data-theme="dark"] .product-detail-page,
+html[data-theme="dark"] .product-thumbnail,
+html[data-theme="dark"] #about .col-6 > .d-flex {
+  color: var(--moc-cream);
+  background-color: var(--moc-primary-dark);
+  border-color: var(--moc-primary);
+}
+
+/* Tiêu đề vốn màu nâu đậm: đổi sang màu kem để đọc được trên nền tối */
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] h4,
+html[data-theme="dark"] h5,
+html[data-theme="dark"] h6,
+html[data-theme="dark"] .product-card .card-title {
+  color: var(--moc-cream);
+}
+
+/* Bootstrap: .bg-light dùng ở các trang con (tài khoản, giỏ hàng...) */
+html[data-theme="dark"] .bg-light {
+  background-color: var(--moc-ink) !important; /* Bootstrap gắn !important vào .bg-light nên chỗ duy nhất này buộc phải ghi đè */
+}

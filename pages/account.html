@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="../assets/css/theme.css" />
   <link rel="stylesheet" href="../assets/css/pages.css" />
   <link rel="stylesheet" href="../assets/css/mobile-fixes.css" />
+  <script src="../assets/js/prefs.js"></script>
 </head>
 <body class="inner-page bg-light">
   <nav class="navbar navbar-dark bg-dark fixed-top shadow">
@@ -39,6 +40,7 @@
             <input class="form-control mb-4" id="login-password" type="password" required minlength="8" maxlength="72" autocomplete="current-password" />
             <button class="btn btn-coffee w-100" type="submit">Đăng nhập</button>
           </form>
+          <p class="text-center mt-3 mb-0"><a href="forgot-password.html">Quên mật khẩu?</a></p>
           <p class="text-center text-secondary mt-4 mb-1">
             Chưa có tài khoản?
             <a href="#register" id="show-register" class="fw-semibold">Đăng ký ngay</a>
@@ -52,9 +54,10 @@
           <h2 class="h4 mb-4">Tạo tài khoản</h2>
           <form id="customer-register-form">
             <input class="form-control mb-3" name="full_name" placeholder="Họ và tên" required minlength="2" maxlength="100" autocomplete="name" />
-            <input class="form-control mb-3" name="phone" placeholder="Số điện thoại" required pattern="0[0-9]{9}" inputmode="numeric" autocomplete="tel" />
+            <input class="form-control mb-3" name="phone" placeholder="Số điện thoại (không bắt buộc)" pattern="0[0-9]{9}" inputmode="numeric" autocomplete="tel" />
             <input class="form-control mb-3" name="email" type="email" placeholder="Email" required maxlength="150" autocomplete="email" />
-            <input class="form-control mb-4" name="password" type="password" placeholder="Mật khẩu từ 8 ký tự" required minlength="8" maxlength="72" autocomplete="new-password" />
+            <input class="form-control mb-3" name="password" type="password" placeholder="Mật khẩu từ 8 ký tự" required minlength="8" maxlength="72" autocomplete="new-password" />
+            <input class="form-control mb-4" name="confirm_password" type="password" placeholder="Nhập lại mật khẩu" required minlength="8" maxlength="72" autocomplete="new-password" />
             <button class="btn btn-coffee w-100" type="submit">Đăng ký</button>
           </form>
           <p class="text-center text-secondary mt-4 mb-0">
@@ -79,8 +82,82 @@
 
     <section id="member-section" class="d-none">
       <div class="card border-0 shadow-sm mb-4"><div class="card-body p-4 d-flex flex-wrap justify-content-between gap-3">
-        <div><h1 id="member-name" class="h4 mb-1"></h1><p id="member-contact" class="text-secondary mb-0"></p></div>
-        <button id="customer-logout" class="btn btn-outline-danger" type="button">Đăng xuất</button>
+        <div class="d-flex align-items-center gap-3">
+          <img id="member-avatar" class="rounded-circle border" width="64" height="64" alt="Ảnh đại diện" src="../assets/images/default-avatar.png" />
+          <div><h1 id="member-name" class="h4 mb-1"></h1><p id="member-contact" class="text-secondary mb-0"></p></div>
+        </div>
+        <button id="customer-logout" class="btn btn-outline-danger align-self-start" type="button">Đăng xuất</button>
+      </div></div>
+
+      <div class="card border-0 shadow-sm mb-4"><div class="card-body p-4">
+        <h2 class="h5 mb-3">Hồ sơ của tôi</h2>
+        <form id="profile-form" class="row g-3" novalidate>
+          <div class="col-12 col-md-4 text-center">
+            <img id="avatar-preview" class="rounded-circle border mb-2" width="96" height="96" alt="Xem trước ảnh đại diện" src="../assets/images/default-avatar.png" />
+            <label class="form-label small d-block" for="avatar-input">Ảnh đại diện (JPG, PNG, WEBP, tối đa 2 MB)</label>
+            <input class="form-control form-control-sm" id="avatar-input" type="file" accept="image/jpeg,image/png,image/webp" />
+            <div id="avatar-error" class="text-danger small mt-1" role="alert"></div>
+          </div>
+          <div class="col-12 col-md-8">
+            <label class="form-label" for="profile-email">Email (không thể thay đổi)</label>
+            <input class="form-control mb-3" id="profile-email" type="email" readonly />
+            <label class="form-label" for="profile-name">Họ và tên</label>
+            <input class="form-control mb-3" id="profile-name" name="full_name" required minlength="2" maxlength="100" autocomplete="name" />
+            <label class="form-label" for="profile-phone">Số điện thoại (không bắt buộc)</label>
+            <input class="form-control mb-3" id="profile-phone" name="phone" pattern="0[0-9]{9}" inputmode="numeric" autocomplete="tel" />
+            <button class="btn btn-coffee" type="submit">Lưu thay đổi</button>
+          </div>
+        </form>
+      </div></div>
+
+      <div class="card border-0 shadow-sm mb-4"><div class="card-body p-4">
+        <h2 class="h5 mb-3">Tùy chọn của tôi</h2>
+        <form id="prefs-form" class="row g-3">
+          <fieldset class="col-12 col-md-7">
+            <legend class="form-label fs-6">Giao diện</legend>
+            <div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="theme" id="theme-light" value="light" /><label class="form-check-label" for="theme-light">Sáng</label></div>
+            <div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="theme" id="theme-dark" value="dark" /><label class="form-check-label" for="theme-dark">Tối</label></div>
+            <div class="form-check form-check-inline"><input class="form-check-input" type="radio" name="theme" id="theme-system" value="system" /><label class="form-check-label" for="theme-system">Theo hệ thống</label></div>
+          </fieldset>
+          <div class="col-12 col-md-5">
+            <label class="form-label" for="pref-font">Cỡ chữ</label>
+            <select class="form-select" id="pref-font" name="font_size">
+              <option value="14">Nhỏ (14px)</option>
+              <option value="16">Vừa (16px)</option>
+              <option value="18">Lớn (18px)</option>
+              <option value="20">Rất lớn (20px)</option>
+            </select>
+          </div>
+        </form>
+        <small id="prefs-status" class="text-secondary" aria-live="polite"></small>
+      </div></div>
+
+      <div class="card border-0 shadow-sm mb-4"><div class="card-body p-4">
+        <h2 class="h5 mb-3">Đổi mật khẩu</h2>
+        <form id="password-form" class="row g-3" novalidate>
+          <div class="col-12 col-md-4">
+            <label class="form-label" for="pw-current">Mật khẩu hiện tại</label>
+            <div class="input-group">
+              <input class="form-control" id="pw-current" type="password" required maxlength="72" autocomplete="current-password" />
+              <button class="btn btn-outline-secondary toggle-password" type="button" data-target="pw-current" aria-label="Hiện mật khẩu"><i class="bi bi-eye"></i></button>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label" for="pw-new">Mật khẩu mới</label>
+            <div class="input-group">
+              <input class="form-control" id="pw-new" type="password" required minlength="8" maxlength="72" autocomplete="new-password" />
+              <button class="btn btn-outline-secondary toggle-password" type="button" data-target="pw-new" aria-label="Hiện mật khẩu"><i class="bi bi-eye"></i></button>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <label class="form-label" for="pw-confirm">Nhập lại mật khẩu mới</label>
+            <div class="input-group">
+              <input class="form-control" id="pw-confirm" type="password" required minlength="8" maxlength="72" autocomplete="new-password" />
+              <button class="btn btn-outline-secondary toggle-password" type="button" data-target="pw-confirm" aria-label="Hiện mật khẩu"><i class="bi bi-eye"></i></button>
+            </div>
+          </div>
+          <div class="col-12"><button class="btn btn-dark" type="submit">Đổi mật khẩu</button></div>
+        </form>
       </div></div>
 
       <div class="card border-0 shadow-sm mb-4"><div class="card-body p-4">

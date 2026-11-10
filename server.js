@@ -120,38 +120,45 @@ const UPLOAD_IMAGE_EXTENSIONS = new Set([
     '.webp',
 ]);
 
-app.use(
-    '/uploads/products',
-    allowPublicFile,
-    (req, res, next) => {
-        let decodedPath;
+// Phục vụ ảnh người dùng tải lên. Dùng chung cho mọi thư mục upload:
+// chỉ cho đuôi ảnh, chặn đường dẫn lạ (file ẩn, dấu \, ký tự rỗng), thêm nosniff, tên file duy nhất nên cache lâu.
+function serveUploads(urlPath, folder) {
+    app.use(
+        urlPath,
+        allowPublicFile,
+        (req, res, next) => {
+            let decodedPath;
 
-        try {
-            decodedPath = decodeURIComponent(req.path);
-        } catch {
-            return res.status(400).end();
-        }
+            try {
+                decodedPath = decodeURIComponent(req.path);
+            } catch {
+                return res.status(400).end();
+            }
 
-        const extension = path.extname(decodedPath).toLowerCase();
+            const extension = path.extname(decodedPath).toLowerCase();
 
-        if (!UPLOAD_IMAGE_EXTENSIONS.has(extension)) {
-            return res.status(404).end();
-        }
+            if (!UPLOAD_IMAGE_EXTENSIONS.has(extension)) {
+                return res.status(404).end();
+            }
 
-        res.setHeader('X-Content-Type-Options', 'nosniff');
-        next();
-    },
-    express.static(
-        path.join(__dirname, 'backend/uploads/products'),
-        {
-            index: false,
-            dotfiles: 'deny',
-            redirect: false,
-            immutable: true, // tên file upload là duy nhất (timestamp + random) nên không bao giờ đổi nội dung
-            maxAge: '30d',
-        }
-    )
-);
+            res.setHeader('X-Content-Type-Options', 'nosniff');
+            next();
+        },
+        express.static(
+            path.join(__dirname, 'backend/uploads', folder),
+            {
+                index: false,
+                dotfiles: 'deny',
+                redirect: false,
+                immutable: true, // tên file upload là duy nhất (timestamp + random) nên không bao giờ đổi nội dung
+                maxAge: '30d',
+            }
+        )
+    );
+}
+
+serveUploads('/uploads/products', 'products');
+serveUploads('/uploads/avatars', 'avatars');
 
 // API
 app.get('/api/health', async (req, res) => {

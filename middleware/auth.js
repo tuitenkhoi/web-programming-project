@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const db = require('../config/db');
+const { isRevoked } = require('./revoke');
 
 const SECRET_KEY = process.env.JWT_SECRET;
 
@@ -77,6 +78,15 @@ async function verifyToken(req, res, next) {
         });
     }
 
+    // Token đã đăng xuất (hoặc user đã đổi mật khẩu) thì không dùng được nữa
+    if (isRevoked(decoded)) {
+        return res.status(401).json({
+            success: false,
+            message: 'Phiên đăng nhập đã kết thúc',
+            code: 'TOKEN_REVOKED',
+        });
+    }
+
     const userId = Number(decoded.id ?? decoded.sub);
 
     const conflictingIds =
@@ -128,6 +138,7 @@ async function verifyToken(req, res, next) {
         });
     }
 
+    req.tokenPayload = decoded; // logout cần jti + exp
     req.user = {
         id: user.id,
         full_name: user.full_name,

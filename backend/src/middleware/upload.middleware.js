@@ -1,16 +1,10 @@
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const fsPromises = require("fs/promises");
 const crypto = require("crypto");
 
-const uploadDirectory = path.join(
-    __dirname,
-    "../../uploads/products"
-);
-
-fs.mkdirSync(uploadDirectory, {
-    recursive: true,
-});
+const uploadsRoot = path.join(__dirname, "../../uploads");
 
 const extensionByMimeType = {
     "image/jpeg": ".jpg",
@@ -18,59 +12,9 @@ const extensionByMimeType = {
     "image/webp": ".webp",
 };
 
-const allowedMimeTypes = new Set(
-    Object.keys(extensionByMimeType)
-);
-
-const storage = multer.diskStorage({
-    destination: (req, file, callback) => {
-        callback(null, uploadDirectory);
-    },
-
-    filename: (req, file, callback) => {
-        const extension =
-            extensionByMimeType[file.mimetype];
-
-        const randomName = crypto
-            .randomBytes(12)
-            .toString("hex");
-
-        const filename =
-            `${Date.now()}-${randomName}${extension}`;
-
-        callback(null, filename);
-    },
-});
-
-const fileFilter = (req, file, callback) => {
-    if (!allowedMimeTypes.has(file.mimetype)) {
-        return callback(
-            new Error(
-                "Chỉ chấp nhận ảnh JPG, PNG hoặc WEBP"
-            )
-        );
-    }
-
-    callback(null, true);
-};
-
-const upload = multer({
-    storage,
-    fileFilter,
-    limits: {
-        fileSize: 5 * 1024 * 1024,
-        files: 1,
-        fields: 10,
-        parts: 11,
-    },
-});
-
-// Kiểm tra NỘI DUNG file (mimetype do client tự khai nên có thể giả).
-// Đọc vài byte đầu để nhận ra JPEG / PNG / WEBP thật; sai thì xóa file và báo lỗi 400.
-// Dùng sau upload.single("image"):  router.post("/", ..., upload.single("image"), verifyImageContent, createProduct)
-const fsPromises = require("fs/promises");
-
-const looksLikeImage = (buffer) => {
+// Nhận dạng loại file thật bằng vài byte đầu ("magic bytes"). Trả về mime hoặc null.
+// mimetype do trình duyệt tự khai nên có thể bị giả; chữ ký ở đầu file thì khó giả hơn nhiều.
+const detectMimeType = (buffer) => {
     const isJpeg = buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff;
     const isPng =
         buffer.length >= 8 &&
@@ -80,43 +24,109 @@ const looksLikeImage = (buffer) => {
         buffer.toString("ascii", 0, 4) === "RIFF" &&
         buffer.toString("ascii", 8, 12) === "WEBP";
 
-    return isJpeg || isPng || isWebp;
+    if (isJpeg) return "image/jpeg";
+    if (isPng) return "image/png";
+    if (isWebp) return "image/webp";
+    return null;
 };
 
-const verifyImageContent = async (req, res, next) => {
-    if (!req.file) {
-        return next(); // không upload ảnh thì bỏ qua
-    }
+const labelByMimeType = { "image/jpeg": "JPG", "image/png": "PNG", "image/webp": "WEBP" };
 
-    let valid = false;
+// Nhà máy tạo bộ upload: mỗi nơi dùng (sản phẩm, avatar...) chỉ khác thư mục, số file, dung lượng và loại cho phép.
+//   destFolder  : thư mục con trong backend/uploads (vd "avatars")
+//   maxFiles    : số file tối đa mỗi lần
+//   maxSizeMB   : dung lượng tối đa mỗi file
+//   allowedMime : mảng mime được phép (hiện hỗ trợ jpeg/png/webp)
+function createUploader({ destFolder, maxFiles = 1, maxSizeMB = 5, allowedMime = Object.keys(extensionByMimeType) }) {
+    const directory = path.join(uploadsRoot, destFolder);
+    fs.mkdirSync(directory, { recursive: true });
 
-    try {
-        const handle = await fsPromises.open(req.file.path, "r");
+    const allowed = new Set(allowedMime);
+    const typeList = allowedMime.map((mime) => labelByMimeType[mime]).join(", ");
+    const typeMessage = `Chỉ chấp nhận ảnh ${typeList}`;
 
-        try {
-            const buffer = Buffer.alloc(12);
-            const { bytesRead } = await handle.read(buffer, 0, 12, 0);
-            valid = looksLikeImage(buffer.subarray(0, bytesRead));
-        } finally {
-            await handle.close();
+    const storage = multer.diskStorage({
+        destination: (req, file, callback) => callback(null, directory),
+        filename: (req, file, callback) => {
+            const randomName = crypto.randomBytes(12).toString("hex");
+            callback(null, `${Date.now()}-${randomName}${extensionByMimeType[file.mimetype]}`);
+        },
+    });
+
+    const fileFilter = (req, file, callback) => {
+        if (!allowed.has(file.mimetype)) {
+            return callback(new Error(typeMessage));
         }
-    } catch (error) {
-        console.error("Lỗi kiểm tra nội dung ảnh:", error.code);
-    }
+        callback(null, true);
+    };
 
-    if (!valid) {
-        await fsPromises.unlink(req.file.path).catch(() => {});
+    const upload = multer({
+        storage,
+        fileFilter,
+        limits: {
+            fileSize: maxSizeMB * 1024 * 1024,
+            files: maxFiles,
+            fields: 10,
+            parts: maxFiles + 10,
+        },
+    });
 
-        return res.status(400).json({
-            success: false,
-            message: "File tải lên không phải ảnh JPG, PNG hoặc WEBP hợp lệ",
+    // Bọc upload.single(...) để lỗi upload trả JSON 400 bằng tiếng Việt đúng với giới hạn của từng nơi
+    const single = (fieldName) => (req, res, next) => {
+        upload.single(fieldName)(req, res, (error) => {
+            if (!error) return next();
+
+            const message =
+                error.name === "MulterError" && error.code === "LIMIT_FILE_SIZE"
+                    ? `Ảnh không được vượt quá ${maxSizeMB} MB`
+                    : error.name === "MulterError"
+                        ? "Lỗi upload: " + error.message
+                        : error.message;
+            return res.status(400).json({ success: false, message });
         });
-    }
+    };
 
-    next();
-};
+    // Kiểm tra NỘI DUNG file sau khi multer đã lưu; sai thì xóa file và báo 400.
+    const verifyContent = async (req, res, next) => {
+        const files = req.files || (req.file ? [req.file] : []);
+        if (!files.length) return next(); // không upload thì bỏ qua
+
+        for (const file of files) {
+            let detected = null;
+
+            try {
+                const handle = await fsPromises.open(file.path, "r");
+                try {
+                    const buffer = Buffer.alloc(12);
+                    const { bytesRead } = await handle.read(buffer, 0, 12, 0);
+                    detected = detectMimeType(buffer.subarray(0, bytesRead));
+                } finally {
+                    await handle.close();
+                }
+            } catch (error) {
+                console.error("Lỗi kiểm tra nội dung ảnh:", error.code);
+            }
+
+            if (!detected || !allowed.has(detected)) {
+                await Promise.all(files.map((f) => fsPromises.unlink(f.path).catch(() => {})));
+                return res.status(400).json({
+                    success: false,
+                    message: `File tải lên không phải ảnh ${typeList} hợp lệ`,
+                });
+            }
+        }
+
+        next();
+    };
+
+    return { upload, single, verifyContent, directory };
+}
+
+// Bộ upload ảnh sản phẩm: giữ nguyên hành vi cũ (1 ảnh, 5 MB, field "image")
+const products = createUploader({ destFolder: "products", maxFiles: 1, maxSizeMB: 5 });
 
 module.exports = {
-    upload,
-    verifyImageContent,
+    createUploader,
+    upload: products.upload,
+    verifyImageContent: products.verifyContent,
 };

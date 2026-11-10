@@ -44,17 +44,21 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    var ICON = { occupied: 'bi-person-check', maintenance: 'bi-tools', available: 'bi-check2-circle' };
+    var BTN = { primary: 'btn-coffee', secondary: 'btn-outline-secondary', success: 'btn-outline-success' };
+
     function card(t) {
         var st = STATUS[t.status] || { text: t.status, cls: '' };
-        var items = (NEXT[t.status] || []).map(function (n) {
-            return '<li><button type="button" class="dropdown-item text-' + n[2] + '" data-act="' + n[0] + '" data-id="' + A.esc(t.id) + '">' + n[1] + '</button></li>';
+        var actions = (NEXT[t.status] || []).map(function (n) {
+            return '<button type="button" class="btn btn-sm ' + (BTN[n[2]] || 'btn-outline-secondary') + '" data-act="' + n[0] + '" data-id="' + A.esc(t.id) + '">' +
+                '<i class="bi ' + (ICON[n[0]] || 'bi-arrow-repeat') + ' me-1"></i>' + n[1] + '</button>';
         }).join('');
         return '<div class="col-12 col-sm-6 col-lg-4 col-xl-3"><article class="table-management-card ' + st.cls + '">' +
-            '<div class="table-card-header"><span class="table-status-label">' + st.text + '</span>' +
-            '<div class="dropdown"><button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Thao tác"><i class="bi bi-three-dots-vertical"></i></button>' +
-            '<ul class="dropdown-menu dropdown-menu-end">' + items + '</ul></div></div>' +
+            '<div class="table-card-header"><span class="table-status-label">' + st.text + '</span></div>' +
             '<div class="table-card-body"><i class="bi bi-table table-card-icon"></i><h4>' + A.esc(t.name) + '</h4>' +
-            '<p>' + (t.capacity != null ? A.esc(t.capacity) + ' người' : '') + '</p></div></article></div>';
+            '<p>' + (t.capacity != null ? A.esc(t.capacity) + ' người' : '') + '</p></div>' +
+            (actions ? '<div class="table-quick-actions">' + actions + '</div>' : '') +
+            '</article></div>';
     }
 
     function stats() {
@@ -94,7 +98,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     grid.addEventListener('click', async function (e) {
         var btn = e.target.closest('button[data-act]');
-        if (!btn) return;
+        if (!btn || btn.disabled) return;
+        btn.disabled = true;
         try {
             var res = await A.api('/api/tables/' + encodeURIComponent(btn.dataset.id) + '/status', {
                 method: 'PATCH',
@@ -104,6 +109,7 @@ document.addEventListener('DOMContentLoaded', function () {
             await load();
         } catch (err) {
             A.toast(err.message, 'error');
+            btn.disabled = false;
         }
     });
 

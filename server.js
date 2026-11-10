@@ -193,6 +193,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/customer', require('./routes/customer'));
 app.use('/api/vouchers', require('./routes/vouchers'));
+app.use('/api/admin/vouchers', verifyToken, requireAdmin, require('./routes/admin-vouchers'));
 app.use('/api/reviews', require('./routes/reviews'));
 app.use(
     '/api/dashboard',

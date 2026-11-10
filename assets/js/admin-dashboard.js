@@ -118,8 +118,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 slots.push({
                     key: monthKey(monthDate),
                     label:
-                        'T' +
-                        String(monthDate.getMonth() + 1),
+                        String(monthDate.getMonth() + 1) +
+                        '/' +
+                        String(monthDate.getFullYear()).slice(-2),
                 });
             }
 
@@ -180,8 +181,13 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        var scrollable = period === '30-days';
+        chart.classList.toggle('revenue-chart--scroll', scrollable);
+        chart.classList.toggle('revenue-chart--months', period === '12-months');
+
         chart.innerHTML = slots
             .map(function (slot) {
+                var valueText = compactMoney(slot.amount);
                 var height =
                     slot.amount > 0
                         ? Math.max(
@@ -195,7 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return (
                     '<div class="revenue-column">' +
                     '<div class="revenue-value">' +
-                    compactMoney(slot.amount) +
+                    valueText +
                     '</div>' +
                     '<div class="revenue-bar-wrapper">' +
                     '<div class="revenue-bar" style="height:' +
@@ -209,6 +215,20 @@ document.addEventListener('DOMContentLoaded', function () {
                 );
             })
             .join('');
+
+        if (scrollable) {
+            chart.scrollLeft = chart.scrollWidth;
+        }
+
+        var hint = document.getElementById('revenue-scroll-hint');
+        if (!hint) {
+            hint = document.createElement('small');
+            hint.id = 'revenue-scroll-hint';
+            hint.className = 'text-secondary d-block text-center mt-2';
+            chart.parentNode.appendChild(hint);
+        }
+        hint.textContent = scrollable ? '← Kéo ngang để xem các ngày trước →' : '';
+        hint.classList.toggle('d-none', !scrollable);
 
         var titles = {
             '7-days': 'Doanh thu 7 ngày gần nhất',

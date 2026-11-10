@@ -1,0 +1,262 @@
+/* =========================================================
+   MOBILE-FIXES.CSS - MỘC COFFEE
+   Nạp SAU các file CSS khác để bổ sung responsive cho mọi
+   màn hình: điện thoại, iPad (dọc/ngang), laptop, màn hình lớn.
+========================================================= */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+img,
+video,
+svg {
+  max-width: 100%;
+}
+
+/* Chỉ ngắt từ ở nội dung dài (mã đơn, email...), KHÔNG áp cho cả trang
+   vì sẽ làm thanh menu bị co và rớt chữ thành từng dòng. */
+.card-body,
+.modal-body,
+td,
+.alert {
+  overflow-wrap: break-word;
+}
+
+/* Trang tài khoản: chừa chỗ dưới navbar cố định */
+.account-main {
+  max-width: 1000px;
+  margin-top: 72px;
+}
+
+.table-responsive {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Safari / iPad cần tiền tố -webkit- cho hiệu ứng kính mờ */
+.navbar,
+body.inner-page .navbar,
+body.home-page .navbar,
+.banner-content,
+.sticky-filter {
+  -webkit-backdrop-filter: blur(12px) saturate(1.2);
+}
+
+/* ---------- Thanh menu không bao giờ tự xuống dòng ---------- */
+.navbar-brand,
+.navbar-nav .nav-link,
+.navbar-nav .btn {
+  white-space: nowrap;
+}
+
+/* ---------- iPad ngang / laptop nhỏ (992px - 1199px) ----------
+   Menu đang mở rộng nhưng chỗ chật: thu nhỏ chữ và khoảng cách. */
+@media (min-width: 992px) and (max-width: 1199.98px) {
+  .navbar > .container {
+    max-width: 100%;
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+
+  body .navbar-brand {
+    margin-right: 0.5rem;
+    font-size: 20px !important;
+  }
+
+  body .navbar-brand i {
+    font-size: 21px;
+  }
+
+  .navbar-nav .nav-link {
+    margin: 0;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .navbar-nav .nav-link::after {
+    display: none;
+  }
+
+  .navbar-nav .btn {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.85rem;
+  }
+
+  .navbar-nav .ms-lg-2 {
+    margin-left: 0.3rem !important;
+  }
+}
+
+/* ---------- iPad dọc + ngang (768px - 1199px) ---------- */
+@media (min-width: 768px) and (max-width: 1199.98px) {
+  /* 100vh trên Safari iPad bị tính cả thanh địa chỉ -> dùng svh nếu có */
+  body.home-page .carousel-item > img {
+    height: clamp(520px, 78svh, 760px);
+  }
+
+  .features-section {
+    margin-top: -60px;
+  }
+
+  .page-banner {
+    min-height: 300px;
+  }
+}
+
+/* ---------- Máy tính bảng và nhỏ hơn ---------- */
+@media (max-width: 991.98px) {
+  .container {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+}
+
+/* ---------- Điện thoại ---------- */
+@media (max-width: 767.98px) {
+  /* 16px để iPhone không tự phóng to khi bấm vào ô nhập */
+  .form-control,
+  .form-select,
+  textarea.form-control {
+    font-size: 16px;
+  }
+
+  /* Nút đủ lớn để chạm */
+  .btn:not(.btn-sm):not(.btn-link):not(.btn-close) {
+    min-height: 44px;
+  }
+
+  .card-body.p-4 {
+    padding: 1.25rem !important;
+  }
+
+  .account-main {
+    padding-top: 1.5rem !important;
+    padding-bottom: 2rem !important;
+  }
+
+  .bank-info-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+
+  .bank-info-row > div,
+  .bank-info-row > strong {
+    max-width: 100%;
+  }
+
+  .payment-order-items {
+    max-height: none;
+  }
+
+  .modal-dialog {
+    margin: 0.75rem;
+  }
+}
+
+/* ---------- Điện thoại rất nhỏ ---------- */
+@media (max-width: 374.98px) {
+  .qr-code-wrapper {
+    max-width: 190px;
+  }
+}
+
+/* ---------- Điện thoại nằm ngang: banner không cao cả màn hình ---------- */
+@media (max-height: 500px) and (orientation: landscape) {
+  .page-banner {
+    min-height: 260px !important;
+    padding-top: 90px;
+    padding-bottom: 30px;
+  }
+}
+
+/* ---------- Màn hình lớn / 2K / 4K ---------- */
+@media (min-width: 1600px) {
+  .container {
+    max-width: 1440px;
+  }
+}
+
+/* ---------- Thiết bị cảm ứng: bớt hiệu ứng hover gây "dính" ---------- */
+@media (hover: none) {
+  .btn-coffee:hover,
+  .btn-outline-coffee:hover {
+    transform: none;
+  }
+}
+
+/* =========================================================
+   BIỂU ĐỒ DOANH THU DASHBOARD
+   - 7 ngày: vừa khung.
+   - 30 ngày: chỉ hiện 7 cột, kéo ngang để xem các ngày trước.
+   - 12 tháng: vừa khung.
+========================================================= */
+.revenue-chart {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.revenue-chart--scroll {
+  gap: 0;
+  justify-content: flex-start;
+  min-width: 0 !important;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #c68b59 #f1ebe7;
+  padding-bottom: 6px;
+}
+
+.revenue-chart--scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.revenue-chart--scroll::-webkit-scrollbar-track {
+  background: #f1ebe7;
+  border-radius: 8px;
+}
+
+.revenue-chart--scroll::-webkit-scrollbar-thumb {
+  background: #c68b59;
+  border-radius: 8px;
+}
+
+.revenue-chart--scroll .revenue-column {
+  flex: 0 0 calc(100% / 7);
+  min-width: 0;
+  scroll-snap-align: end;
+}
+
+.revenue-chart--months {
+  gap: 8px;
+  min-width: 0 !important;
+}
+
+.revenue-chart--months .revenue-column {
+  min-width: 0;
+}
+
+.revenue-chart--months .revenue-column > span {
+  white-space: nowrap;
+}
+
+/* =========================================================
+   QUẢN LÝ BÀN: nút thao tác nằm ngay trên thẻ bàn
+========================================================= */
+.table-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  padding: 0 14px 16px;
+}
+
+.table-quick-actions .btn {
+  flex: 1 1 auto;
+  min-width: 104px;
+  font-weight: 600;
+  white-space: nowrap;
+}

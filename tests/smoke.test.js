@@ -249,3 +249,28 @@ test('Trang chủ và trang tĩnh tải được, có header bảo mật', async
     assert.equal((await fetch(base + '/pages/menu.html')).status, 200);
     assert.equal((await fetch(base + '/admin/login.html')).status, 200);
 });
+
+// ----- S3: đăng xuất thật (thu hồi jti) -----
+const tokenWithJti = () => jwt.sign(
+    { id: 1, role: 'admin', jti: require('node:crypto').randomUUID() },
+    process.env.JWT_SECRET,
+    { algorithm: 'HS256', expiresIn: '1h' }
+);
+
+test('Token chưa đăng xuất vẫn dùng được (/api/admin/me trả 200)', async () => {
+    const res = await call('/api/admin/me', { headers: { Authorization: 'Bearer ' + tokenWithJti() } });
+    assert.equal(res.status, 200);
+});
+
+test('Token sau khi đăng xuất bị 401 ở /api/admin/me', async () => {
+    const headers = { Authorization: 'Bearer ' + tokenWithJti() };
+    assert.equal((await call('/api/admin/me', { headers })).status, 200);
+
+    const out = await call('/api/auth/logout', { method: 'POST', headers });
+    assert.equal(out.status, 200);
+    assert.equal(out.body.message, 'Đã đăng xuất');
+
+    const after = await call('/api/admin/me', { headers });
+    assert.equal(after.status, 401);
+    assert.equal(after.body.message, 'Phiên đăng nhập đã kết thúc');
+});

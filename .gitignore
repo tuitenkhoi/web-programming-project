@@ -9,6 +9,8 @@ node_modules/
 # Ảnh sản phẩm được upload khi chạy ứng dụng
 backend/uploads/products/*
 !backend/uploads/products/.gitkeep
+backend/uploads/avatars/*
+!backend/uploads/avatars/.gitkeep
 
 # Rác của hệ điều hành / trình soạn thảo
 .DS_Store

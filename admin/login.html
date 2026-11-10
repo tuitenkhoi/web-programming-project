@@ -218,10 +218,7 @@
                   </label>
                 </div>
 
-                <button type="button" class="btn btn-link p-0 text-decoration-none" data-bs-toggle="modal"
-                  data-bs-target="#forgot-password-modal">
-                  Quên mật khẩu?
-                </button>
+                <a href="../pages/forgot-password.html" class="text-decoration-none">Quên mật khẩu?</a>
               </div>
 
               <!-- Nút đăng nhập -->
@@ -257,58 +254,6 @@
     </div>
   </main>
 
-  <!-- ==================== MODAL QUÊN MẬT KHẨU ==================== -->
-  <div class="modal fade" id="forgot-password-modal" tabindex="-1" aria-labelledby="forgot-password-title"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0">
-        <form id="forgot-password-form" novalidate>
-          <div class="modal-header">
-            <h2 class="modal-title h5" id="forgot-password-title">
-              Khôi phục mật khẩu
-            </h2>
-
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
-          </div>
-
-          <div class="modal-body">
-            <p class="text-secondary">
-              Nhập địa chỉ email của tài khoản. Hệ thống sẽ gửi
-              hướng dẫn đặt lại mật khẩu.
-            </p>
-
-            <label for="forgot-password-email" class="form-label fw-semibold">
-              Địa chỉ email
-              <span class="text-danger">*</span>
-            </label>
-
-            <input type="email" id="forgot-password-email" class="form-control" placeholder="Ví dụ: admin@moccoffee.vn"
-              autocomplete="email" required />
-
-            <div class="invalid-feedback">
-              Vui lòng nhập địa chỉ email hợp lệ.
-            </div>
-
-            <div id="forgot-password-message" class="alert alert-success mt-3 mb-0 d-none">
-              <i class="bi bi-check-circle-fill me-1"></i>
-              Yêu cầu khôi phục mật khẩu đã được gửi.
-            </div>
-          </div>
-
-          <div class="modal-footer">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-              Hủy
-            </button>
-
-            <button type="submit" id="forgot-password-submit" class="btn btn-coffee">
-              <i class="bi bi-send me-1"></i>
-              Gửi yêu cầu
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
 
   <!-- Toast thông báo sao chép -->
   <div class="toast-container position-fixed bottom-0 end-0 p-3">

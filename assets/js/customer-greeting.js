@@ -46,6 +46,16 @@
     var span = document.createElement('span');
     span.className = 'moc-greeting';
     span.textContent = 'Chào, ' + shortName;
+    // Ảnh đại diện nhỏ; chưa có thì dùng ảnh mặc định (trang con ở /pages/ cần lùi một cấp)
+    var avatar = document.createElement('img');
+    avatar.alt = '';
+    avatar.width = 24;
+    avatar.height = 24;
+    avatar.className = 'rounded-circle ms-1';
+    avatar.src = profile.avatar
+      ? profile.avatar
+      : (location.pathname.indexOf('/pages/') !== -1 ? '../' : '') + 'assets/images/default-avatar.png';
+    link.appendChild(avatar);
     link.appendChild(span);
     link.title = fullName;
     link.style.width = 'auto';
@@ -65,4 +75,30 @@
       break;
     }
   }
+})();
+
+/* Banner nhắc xác minh email: hiện ở mọi trang cho tới khi khách bấm link kích hoạt trong email. */
+(function () {
+  'use strict';
+
+  var token = localStorage.getItem('mocCoffeeCustomerToken');
+  if (!token) return;
+
+  fetch('/api/auth/customer/me', { headers: { Authorization: 'Bearer ' + token } })
+    .then(function (res) { return res.ok ? res.json() : null; })
+    .then(function (body) {
+      if (!body || !body.data || body.data.email_verified_at) return;
+
+      var style = document.createElement('style');
+      style.textContent =
+        '.moc-verify-banner{position:fixed;left:0;right:0;top:56px;z-index:1029;margin:0;border-radius:0;text-align:center}';
+      document.head.appendChild(style);
+
+      var banner = document.createElement('div');
+      banner.className = 'alert alert-warning moc-verify-banner';
+      banner.setAttribute('role', 'alert');
+      banner.textContent = 'Email của bạn chưa được xác minh — vui lòng kiểm tra hộp thư';
+      document.body.appendChild(banner);
+    })
+    .catch(function () { /* mất mạng thì thôi, không làm phiền khách */ });
 })();

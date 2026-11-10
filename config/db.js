@@ -5,7 +5,8 @@ const pool = mysql.createPool({
     host: process.env.DB_HOST || 'localhost',
     port: Number(process.env.DB_PORT || 3306),
     user: process.env.DB_USER || 'root',      // Mặc định XAMPP là 'root'
-    password: process.env.DB_PASSWORD || '',   // Mặc định XAMPP để trống
+    // Ưu tiên DB_PASSWORD; vẫn đọc DB_PASS để ai còn file .env cũ không bị sập
+    password: process.env.DB_PASSWORD || process.env.DB_PASS || '',   // Mặc định XAMPP để trống
     database: process.env.DB_NAME || 'moc_coffee',
     charset: 'utf8mb4',
     waitForConnections: true,

@@ -30,6 +30,22 @@
         location.href = 'login.html' + (reason ? '?' + reason + '=1' : '');
     }
 
+    // Đăng xuất thật: báo server thu hồi token (keepalive để request vẫn được gửi khi trang đang chuyển hướng),
+    // rồi mới xóa token trong trình duyệt.
+    function logout() {
+        var token = getToken();
+        if (token) {
+            try {
+                fetch('/api/auth/logout', {
+                    method: 'POST',
+                    headers: { Authorization: 'Bearer ' + token },
+                    keepalive: true
+                }).catch(function () { /* mất mạng thì vẫn xóa token cục bộ */ });
+            } catch (e) { /* bỏ qua */ }
+        }
+        clearToken();
+    }
+
     var onLoginPage = /login\.html$/.test(location.pathname);
     if (!onLoginPage && !isValid(getToken())) {
         toLogin(getToken() ? 'expired' : 'required');
@@ -223,7 +239,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('a[href="login.html"]').forEach(function (a) {
-            a.addEventListener('click', clearToken);
+            a.addEventListener('click', logout);
         });
         loadSharedAdminData();
         connectRealtime();
@@ -239,7 +255,7 @@
     });
 
     window.AdminAuth = {
-        getToken: getToken, setToken: setToken, clearToken: clearToken,
+        getToken: getToken, setToken: setToken, clearToken: clearToken, logout: logout,
         isValid: isValid, api: api, esc: esc, toast: toast, fresh: fresh
     };
 })();

@@ -274,3 +274,27 @@ test('Token sau khi đăng xuất bị 401 ở /api/admin/me', async () => {
     assert.equal(after.status, 401);
     assert.equal(after.body.message, 'Phiên đăng nhập đã kết thúc');
 });
+
+// ----- S6: token trong cookie HttpOnly song song với header Authorization -----
+test('Cookie mocToken (không có header) vẫn xác thực được /api/admin/me', async () => {
+    const res = await call('/api/admin/me', { headers: { Cookie: 'mocToken=' + tokenWithJti() } });
+    assert.equal(res.status, 200);
+});
+
+test('Header Authorization được ưu tiên hơn cookie', async () => {
+    const res = await call('/api/admin/me', {
+        headers: { Authorization: 'Bearer sai.token.hoan.toan', Cookie: 'mocToken=' + tokenWithJti() },
+    });
+    assert.equal(res.status, 401); // header sai thì không "lùi" sang cookie
+});
+
+test('Đăng xuất xóa cookie mocToken và thu hồi token trong cookie', async () => {
+    const cookie = 'mocToken=' + tokenWithJti();
+    const out = await fetch(base + '/api/auth/logout', { method: 'POST', headers: { Cookie: cookie } });
+    assert.equal(out.status, 200);
+    const setCookie = out.headers.get('set-cookie') || '';
+    assert.match(setCookie, /^mocToken=;/);
+    assert.match(setCookie, /HttpOnly/i);
+    assert.match(setCookie, /SameSite=Lax/i);
+    assert.equal((await call('/api/admin/me', { headers: { Cookie: cookie } })).status, 401);
+});

@@ -68,6 +68,7 @@
   var params = new URLSearchParams(location.search);
   if (params.get('expired')) showAlert('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.', 'warning');
   else if (params.get('required')) showAlert('Vui lòng đăng nhập để tiếp tục.', 'warning');
+  else if (params.get('login')) showAlert('Bạn cần đăng nhập để tiếp tục', 'warning');
 
   /* ---------- Lời chào theo giờ + tên khách ---------- */
   var nameEl = document.getElementById('member-name');
@@ -96,7 +97,7 @@
         var token = localStorage.getItem('mocCoffeeCustomerToken');
         if (token && token !== tokenBefore) {
           clearInterval(timer);
-          setTimeout(function () { location.href = HOME_PAGE; }, 700); // cho khách kịp thấy "Đăng ký thành công"
+          setTimeout(function () { location.href = window.MocAuthGuard.afterLoginUrl(HOME_PAGE); }, 700); // cho khách kịp thấy "Đăng ký thành công"
         } else if (tries > 40) {
           clearInterval(timer);
         }
@@ -144,7 +145,7 @@
         var customer = await post('/api/auth/customer/login', { email: email, password: password });
         if (customer.ok) {
           window.MocCoffeeApi.setCustomerSession(customer.data);
-          location.href = HOME_PAGE;
+          location.href = window.MocAuthGuard.afterLoginUrl(HOME_PAGE);
           return;
         }
         if (customer.status === 429) throw new Error(customer.message || 'Thử quá nhiều lần, vui lòng đợi một lúc.');

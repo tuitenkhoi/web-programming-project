@@ -9,6 +9,8 @@ const {
     SECRET_KEY,
     verifyToken,
     requireCustomer,
+    setAuthCookie,
+    clearAuthCookie,
 } = require('../middleware/auth');
 const { revokeToken, revokeAllForUser } = require('../middleware/revoke');
 const rateLimit = require('../middleware/rateLimit');
@@ -61,11 +63,13 @@ function createToken(user) {
 }
 
 function authResponse(res, user, message = 'Đăng nhập thành công') {
+    const token = createToken(user);
+    setAuthCookie(res, token); // cookie HttpOnly cho trình duyệt; token vẫn trả trong body để client cũ không vỡ
     return res.json({
         success: true,
         message,
         data: {
-            token: createToken(user),
+            token,
             expiresIn: EXPIRES_IN,
             user: {
                 id: user.id,
@@ -343,6 +347,7 @@ router.post('/customer/change-password', verifyToken, requireCustomer, async (re
         const passwordHash = await bcrypt.hash(newPassword, 10);
         await db.execute('UPDATE users SET password_hash = ? WHERE id = ?', [passwordHash, req.user.id]);
         revokeAllForUser(req.user.id); // đăng xuất mọi thiết bị, kể cả phiên đang dùng
+        clearAuthCookie(res);
 
         // Không trả token mới: khách phải đăng nhập lại bằng mật khẩu mới
         return res.json({ success: true, message: 'Đổi mật khẩu thành công, vui lòng đăng nhập lại' });
@@ -555,6 +560,7 @@ router.get('/activate', async (req, res) => {
 // POST /api/auth/logout — dùng chung cho khách và admin: thu hồi token đang dùng
 router.post('/logout', verifyToken, (req, res) => {
     revokeToken(req.tokenPayload.jti, req.tokenPayload.exp);
+    clearAuthCookie(res);
     return res.json({ success: true, message: 'Đã đăng xuất' });
 });
 

@@ -982,3 +982,114 @@ body.inner-page .input-group > .btn.btn-outline-secondary:last-child {
 body.inner-page .success-icon-large {
   margin-bottom: 2.2rem !important;
 }
+
+/* =========================================================
+   19. TỪ KHÓA TÌM KIẾM ĐƯỢC TÔ SÁNG (menu)
+========================================================= */
+
+body.inner-page .product-card mark {
+  padding: 0 0.15em;
+  color: var(--moc-primary-dark);
+  background-color: rgba(198, 139, 89, 0.35);
+  border-radius: 4px;
+}
+
+/* =========================================================
+   20. THỰC ĐƠN DẠNG DANH SÁCH (.menu-grid.is-list)
+========================================================= */
+
+body.inner-page .menu-grid.is-list {
+  --bs-gutter-y: 0.75rem;
+}
+
+body.inner-page .menu-grid.is-list .product-card:hover {
+  transform: translateY(-3px);
+}
+
+body.inner-page .product-list-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
+}
+
+body.inner-page .menu-grid.is-list .product-card img {
+  flex: 0 0 96px;
+  width: 96px;
+  height: 96px;
+  aspect-ratio: 1;
+  border-radius: 14px;
+}
+
+body.inner-page .menu-grid.is-list .product-card:hover img {
+  transform: none;
+}
+
+body.inner-page .product-list-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+body.inner-page .product-list-info .card-text {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+body.inner-page .product-list-badges {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: flex-end;
+  max-width: 220px;
+}
+
+body.inner-page .product-list-badges:empty {
+  display: none;
+}
+
+body.inner-page .product-list-price {
+  flex: 0 0 auto;
+  min-width: 92px;
+  color: var(--moc-primary);
+  text-align: right;
+}
+
+body.inner-page .product-list-actions {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.5rem;
+}
+
+@media (max-width: 767.98px) {
+  body.inner-page .product-list-row {
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+  }
+
+  body.inner-page .menu-grid.is-list .product-card img {
+    flex-basis: 72px;
+    width: 72px;
+    height: 72px;
+  }
+
+  body.inner-page .product-list-info {
+    flex: 1 1 calc(100% - 90px);
+  }
+
+  body.inner-page .product-list-badges,
+  body.inner-page .product-list-price,
+  body.inner-page .product-list-actions {
+    flex: 1 1 100%;
+    max-width: 100%;
+    text-align: left;
+  }
+
+  body.inner-page .product-list-badges {
+    justify-content: flex-start;
+  }
+
+  body.inner-page .product-list-actions .btn:first-child {
+    flex: 1 1 auto;
+  }
+}

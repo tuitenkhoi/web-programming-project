@@ -15,9 +15,74 @@ document.addEventListener("DOMContentLoaded", function () {
     ready: "Sẵn sàng", completed: "Hoàn thành", cancelled: "Đã hủy",
   };
 
+  // Gắn sự kiện an toàn: trang thiếu phần tử nào thì bỏ qua phần đó, không làm hỏng cả script
+  function on(selector, type, handler) {
+    const element = document.querySelector(selector);
+    if (element) element.addEventListener(type, handler);
+  }
+
+  const HOME_PAGE = "../index.html";
+  const ADMIN_DASHBOARD = "../admin/dashboard.html";
+  const ADMIN_AUTH_SCRIPT = "../assets/js/admin-auth.js";
+
+  const loginPanel = document.querySelector("#login-panel");
+  const registerPanel = document.querySelector("#register-panel");
+
   function message(text, type = "danger") {
     alertBox.textContent = text;
     alertBox.className = `alert alert-${type}`;
+  }
+
+  function hideAlert() {
+    alertBox.className = "alert d-none";
+    alertBox.textContent = "";
+  }
+
+  // ----- Chuyển qua lại đăng nhập / đăng ký -----
+  function showPanel(which) {
+    if (!loginPanel || !registerPanel) return;
+    const register = which === "register";
+    loginPanel.classList.toggle("d-none", register);
+    registerPanel.classList.toggle("d-none", !register);
+    hideAlert();
+  }
+
+  document.addEventListener("click", function (event) {
+    const link = event.target.closest?.("#show-register, #show-login");
+    if (!link) return;
+    event.preventDefault();
+    const toRegister = link.id === "show-register";
+    showPanel(toRegister ? "register" : "login");
+    try {
+      history.replaceState(null, "", toRegister ? "#register" : "#login");
+    } catch (e) { /* bỏ qua */ }
+  });
+
+  showPanel(location.hash === "#register" ? "register" : "login");
+
+  // Không còn lối vào "đăng nhập quản trị" riêng: form đăng nhập dùng chung cho cả hai
+  document.querySelectorAll("#login-panel p, #login-panel div, #login-panel small").forEach(function (el) {
+    if (!el.querySelector("form") && el.children.length < 4 && /quản trị viên/i.test(el.textContent) && /đăng nhập/i.test(el.textContent)) {
+      el.remove();
+    }
+  });
+  document.querySelectorAll('a[href$="admin/login.html"]').forEach(function (a) {
+    const holder = a.closest("p, div, small") || a;
+    if (!holder.querySelector("form")) holder.remove();
+  });
+  document.querySelectorAll("#login-panel h1, #login-panel h2, #login-panel h3").forEach(function (h) {
+    if (/đăng nhập khách hàng/i.test(h.textContent)) h.textContent = "Đăng nhập";
+  });
+
+  // Thông báo từ trang quản trị chuyển sang
+  const pageParams = new URLSearchParams(location.search);
+  if (pageParams.get("expired")) message("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.", "warning");
+  else if (pageParams.get("required")) message("Vui lòng đăng nhập để tiếp tục.", "warning");
+
+  // Lời chào theo giờ
+  function greetingText() {
+    const h = new Date().getHours();
+    return h < 11 ? "Chào buổi sáng" : h < 14 ? "Chào buổi trưa" : h < 18 ? "Chào buổi chiều" : "Chào buổi tối";
   }
 
   function orderCard(order) {
@@ -46,18 +111,19 @@ document.addEventListener("DOMContentLoaded", function () {
   let prefsTimer;
 
   function showPrefs(prefs) {
+    if (!prefsForm) return;
     const theme = prefs.theme || "system";
     const radio = prefsForm.querySelector(`input[name="theme"][value="${theme}"]`);
     if (radio) radio.checked = true;
     prefsForm.querySelector("#pref-font").value = String(prefs.font_size || 16);
   }
 
-  prefsForm.addEventListener("change", function () {
+  on("#prefs-form", "change", function () {
     const prefs = {
       theme: prefsForm.querySelector('input[name="theme"]:checked')?.value || "system",
       font_size: Number(prefsForm.querySelector("#pref-font").value),
     };
-    window.MocPrefs.save(prefs); // đổi giao diện tức thì
+    if (window.MocPrefs) window.MocPrefs.save(prefs); // đổi giao diện tức thì
     clearTimeout(prefsTimer);
     prefsTimer = setTimeout(async () => {
       if (!api.getCustomerProfile()) return; // chưa đăng nhập: chỉ lưu trong trình duyệt
@@ -68,32 +134,37 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 300);
   });
 
+  // Khách chưa đăng nhập cũng thấy đúng lựa chọn hiện tại của trình duyệt
+  if (window.MocPrefs) showPrefs(window.MocPrefs.read());
+
   // Đổ thông tin hồ sơ vào phần đầu trang và form chỉnh sửa
   function fillProfile(profile) {
-    document.querySelector("#member-name").textContent = profile.full_name;
+    document.querySelector("#member-name").textContent = `${greetingText()}, ${profile.full_name}!`;
     document.querySelector("#member-contact").textContent = `${profile.email} · ${profile.phone || "Chưa có SĐT"}`;
-    const avatar = api.avatarUrl(profile.avatar);
-    document.querySelector("#member-avatar").src = avatar;
-    document.querySelector("#avatar-preview").src = avatar;
-    document.querySelector("#profile-email").value = profile.email || "";
-    document.querySelector("#profile-name").value = profile.full_name || "";
-    document.querySelector("#profile-phone").value = profile.phone || "";
+    const avatar = api.avatarUrl ? api.avatarUrl(profile.avatar) : "";
+    const setSrc = (selector, value) => { const el = document.querySelector(selector); if (el && value) el.src = value; };
+    const setValue = (selector, value) => { const el = document.querySelector(selector); if (el) el.value = value; };
+    setSrc("#member-avatar", avatar);
+    setSrc("#avatar-preview", avatar);
+    setValue("#profile-email", profile.email || "");
+    setValue("#profile-name", profile.full_name || "");
+    setValue("#profile-phone", profile.phone || "");
   }
 
   async function loadMember() {
     const profile = api.getCustomerProfile();
-    guest.classList.toggle("d-none", Boolean(profile));
-    member.classList.toggle("d-none", !profile);
+    guest?.classList.toggle("d-none", Boolean(profile));
+    member?.classList.toggle("d-none", !profile);
     if (!profile) return;
 
     fillProfile(profile);
     // Lấy hồ sơ mới nhất từ server (avatar, tên, SĐT có thể đã đổi ở thiết bị khác)
-    showPrefs(window.MocPrefs.read());
+    if (window.MocPrefs) showPrefs(window.MocPrefs.read());
     api.getMe().then((fresh) => {
       if (!fresh) return;
       fillProfile(fresh);
       // Tùy chọn trên server là bản chuẩn: đồng bộ về trình duyệt này
-      showPrefs(window.MocPrefs.save({ theme: fresh.theme, font_size: Number(fresh.font_size) }));
+      if (window.MocPrefs) showPrefs(window.MocPrefs.save({ theme: fresh.theme, font_size: Number(fresh.font_size) }));
     }).catch(() => {});
 
     try {
@@ -116,16 +187,63 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  document.querySelector("#customer-login-form").addEventListener("submit", async function (event) {
+  // ----- Đăng nhập chung: thử tài khoản khách hàng trước, không được thì thử quản trị -----
+  async function postLogin(url, body) {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json; charset=utf-8" },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => ({}));
+    const ok = res.ok && data.success !== false && data.data && data.data.token;
+    return { ok: Boolean(ok), status: res.status, data: data.data, message: data.message };
+  }
+
+  function loadAdminAuth() {
+    if (window.AdminAuth) return Promise.resolve(window.AdminAuth);
+    return new Promise(function (resolve, reject) {
+      const script = document.createElement("script");
+      script.src = ADMIN_AUTH_SCRIPT;
+      script.onload = () => (window.AdminAuth ? resolve(window.AdminAuth) : reject(new Error("Thiếu AdminAuth")));
+      script.onerror = () => reject(new Error("Không nạp được admin-auth.js"));
+      document.head.appendChild(script);
+    });
+  }
+
+  on("#customer-login-form", "submit", async function (event) {
     event.preventDefault();
+    const email = document.querySelector("#login-email").value.trim();
+    const password = document.querySelector("#login-password").value;
+    const button = event.currentTarget.querySelector('[type="submit"]');
+    if (button) button.disabled = true;
+    hideAlert();
+
     try {
-      await api.customerLogin(document.querySelector("#login-email").value.trim(), document.querySelector("#login-password").value);
-      message("Đăng nhập thành công.", "success");
-      await loadMember();
-    } catch (error) { message(error.message); }
+      const customer = await postLogin("/api/auth/customer/login", { email, password });
+      if (customer.ok) {
+        api.setCustomerSession(customer.data);
+        location.href = HOME_PAGE;
+        return;
+      }
+      if (customer.status === 429) throw new Error(customer.message || "Thử quá nhiều lần, vui lòng đợi một lúc.");
+
+      const admin = await postLogin("/api/auth/login", { email, password });
+      if (admin.ok) {
+        const auth = await loadAdminAuth();
+        auth.setToken(admin.data.token);
+        message("Đăng nhập quản trị thành công. Đang chuyển hướng...", "success");
+        location.href = ADMIN_DASHBOARD;
+        return;
+      }
+
+      throw new Error(customer.message || "Email hoặc mật khẩu không chính xác.");
+    } catch (error) {
+      message(error.message === "Failed to fetch" ? "Không kết nối được máy chủ." : error.message);
+      if (button) button.disabled = false;
+    }
   });
 
-  document.querySelector("#customer-register-form").addEventListener("submit", async function (event) {
+  on("#customer-register-form", "submit", async function (event) {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.currentTarget));
     // Kiểm tra nhập lại mật khẩu ngay ở trình duyệt (server vẫn kiểm tra lại)
@@ -136,7 +254,8 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
       await api.customerRegister(data);
       message("Đăng ký thành công.", "success");
-      await loadMember();
+      // Cho khách kịp thấy thông báo rồi về trang chủ
+      setTimeout(() => { location.href = HOME_PAGE; }, 700);
     } catch (error) { message(error.message); }
   });
 
@@ -146,32 +265,33 @@ document.addEventListener("DOMContentLoaded", function () {
   const avatarInput = document.querySelector("#avatar-input");
   const avatarError = document.querySelector("#avatar-error");
 
-  avatarInput.addEventListener("change", function () {
+  avatarInput?.addEventListener("change", function () {
     const file = avatarInput.files[0];
-    avatarError.textContent = "";
+    if (avatarError) avatarError.textContent = "";
     if (!file) return;
     if (!AVATAR_TYPES.includes(file.type)) {
-      avatarError.textContent = "Chỉ chấp nhận ảnh JPG, PNG hoặc WEBP.";
+      if (avatarError) avatarError.textContent = "Chỉ chấp nhận ảnh JPG, PNG hoặc WEBP.";
       avatarInput.value = "";
       return;
     }
     if (file.size > AVATAR_MAX_BYTES) {
-      avatarError.textContent = "Ảnh không được vượt quá 2 MB.";
+      if (avatarError) avatarError.textContent = "Ảnh không được vượt quá 2 MB.";
       avatarInput.value = "";
       return;
     }
-    document.querySelector("#avatar-preview").src = URL.createObjectURL(file);
+    const preview = document.querySelector("#avatar-preview");
+    if (preview) preview.src = URL.createObjectURL(file);
   });
 
-  document.querySelector("#profile-form").addEventListener("submit", async function (event) {
+  on("#profile-form", "submit", async function (event) {
     event.preventDefault();
     const formData = new FormData();
     formData.append("full_name", document.querySelector("#profile-name").value.trim());
     formData.append("phone", document.querySelector("#profile-phone").value.trim());
-    if (avatarInput.files[0]) formData.append("avatar", avatarInput.files[0]);
+    if (avatarInput?.files[0]) formData.append("avatar", avatarInput.files[0]);
     try {
       const updated = await api.updateProfile(formData);
-      avatarInput.value = "";
+      if (avatarInput) avatarInput.value = "";
       fillProfile(updated);
       message("Cập nhật hồ sơ thành công.", "success");
     } catch (error) { message(error.message); }
@@ -188,7 +308,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  document.querySelector("#password-form").addEventListener("submit", async function (event) {
+  on("#password-form", "submit", async function (event) {
     event.preventDefault();
     const payload = {
       current_password: document.querySelector("#pw-current").value,
@@ -205,7 +325,7 @@ document.addEventListener("DOMContentLoaded", function () {
     } catch (error) { message(error.message); }
   });
 
-  document.querySelector("#order-lookup-form").addEventListener("submit", async function (event) {
+  on("#order-lookup-form", "submit", async function (event) {
     event.preventDefault();
     const data = Object.fromEntries(new FormData(event.currentTarget));
     const result = document.querySelector("#lookup-result");
@@ -213,7 +333,7 @@ document.addEventListener("DOMContentLoaded", function () {
     catch (error) { result.innerHTML = `<p class="text-danger">${esc(error.message)}</p>`; }
   });
 
-  document.querySelector("#customer-logout").addEventListener("click", async function () {
+  on("#customer-logout", "click", async function () {
     await api.customerLogout();
     loadMember();
   });

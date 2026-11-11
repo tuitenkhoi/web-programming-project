@@ -693,18 +693,25 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       if (removeButton) {
-        const itemIndex = findCartItemIndex(cartKey);
+        window.MocConfirm.show({
+          title: "Xóa món khỏi giỏ hàng",
+          message: `Xóa '${item.name}' khỏi giỏ hàng?`,
+          danger: true,
+          onConfirm: function () {
+            const itemIndex = findCartItemIndex(cartKey);
 
-        if (itemIndex !== -1) {
-          const removedItem = cart[itemIndex];
+            if (itemIndex !== -1) {
+              const removedItem = cart[itemIndex];
 
-          cart.splice(itemIndex, 1);
-          renderCart();
+              cart.splice(itemIndex, 1);
+              renderCart();
 
-          showToast(
-            `Đã xóa ${removedItem.name} khỏi giỏ hàng.`
-          );
-        }
+              showToast(
+                `Đã xóa ${removedItem.name} khỏi giỏ hàng.`
+              );
+            }
+          },
+        });
 
         return;
       }
@@ -979,9 +986,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         return;
       }
-
-      // Thanh toán cần tài khoản: chưa đăng nhập thì chuyển sang trang đăng nhập, xong sẽ quay lại giỏ hàng
-      if (!window.MocAuthGuard.requireLogin()) return;
 
       const useAtTable =
         orderAtTableRadio.checked;

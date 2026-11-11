@@ -188,11 +188,23 @@ document.addEventListener('DOMContentLoaded', function () {
         return load();
       }
       if (btn.dataset.act === 'delete') {
-        if (!confirm('Xóa voucher ' + v.code + '?')) return;
-        btn.disabled = true;
-        await call('/' + id, 'DELETE');
-        toast('Đã xóa voucher.');
-        return load();
+        MocConfirm.show({
+          title: 'Xóa voucher',
+          message: "Xóa voucher '" + v.code + "'? Hành động này không thể hoàn tác.",
+          danger: true,
+          onConfirm: async function () {
+            try {
+              btn.disabled = true;
+              await call('/' + id, 'DELETE');
+              toast('Đã xóa voucher.');
+              load();
+            } catch (e) {
+              toast(e.message, 'danger');
+              btn.disabled = false;
+            }
+          },
+        });
+        return;
       }
     } catch (e) {
       toast(e.message, 'danger');

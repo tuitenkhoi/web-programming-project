@@ -6,8 +6,16 @@ const {
     getProductById,
     createProduct,
     updateProduct,
+    patchProduct,
     deleteProduct,
+    pinProduct,
+    setProductTags,
 } = require("../controllers/product.controller");
+
+const {
+    getProductAttachments,
+    addProductAttachments,
+} = require("../controllers/attachment.controller");
 
 // Dùng middleware chung của server chính (có kiểm tra tài khoản trong DB)
 const {
@@ -18,6 +26,7 @@ const {
 const {
     upload,
     verifyImageContent,
+    attachments,
 } = require("../middleware/upload.middleware");
 
 const router = express.Router();
@@ -57,6 +66,41 @@ router.put(
     updateProduct
 );
 
+// Admin sửa một phần (JSON, không có file) - dùng cho tự lưu
+router.patch(
+    "/:id",
+    authenticateToken,
+    authorizeAdmin,
+    patchProduct
+);
+
+// Admin ghim / bỏ ghim sản phẩm (không có file đính kèm nên không cần multer)
+router.put(
+    "/:id/pin",
+    authenticateToken,
+    authorizeAdmin,
+    pinProduct
+);
+
+// Admin thay toàn bộ nhãn của món (JSON { tag_ids: [...] })
+router.put(
+    "/:id/tags",
+    authenticateToken,
+    authorizeAdmin,
+    setProductTags
+);
+
+// Tệp đính kèm: xem công khai, thêm (tối đa 5 file/lần) chỉ admin
+router.get("/:id/attachments", getProductAttachments);
+router.post(
+    "/:id/attachments",
+    authenticateToken,
+    authorizeAdmin,
+    attachments.array("files"),
+    attachments.verifyContent,
+    addProductAttachments
+);
+
 // Admin xóa sản phẩm
 router.delete(
     "/:id",
@@ -65,4 +109,4 @@ router.delete(
     deleteProduct
 );
 
-module.exports = router;
+module.exports = router;

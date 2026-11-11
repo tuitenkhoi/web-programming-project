@@ -29,7 +29,6 @@
   <link rel="stylesheet" href="../assets/css/theme.css" />
   <link rel="stylesheet" href="../assets/css/pages.css" />
   <link rel="stylesheet" href="../assets/css/mobile-fixes.css" />
-  <script src="../assets/js/prefs.js"></script>
 </head>
 
 <body class="inner-page">
@@ -149,6 +148,7 @@
               Tìm kiếm món
             </label>
 
+            <div class="d-flex gap-2">
             <div class="input-group">
               <span class="input-group-text bg-white">
                 <i class="bi bi-search"></i>
@@ -160,6 +160,19 @@
               <button type="button" id="clear-search" class="btn btn-outline-secondary" title="Xóa nội dung tìm kiếm">
                 <i class="bi bi-x-lg"></i>
               </button>
+            </div>
+
+            <!-- Kiểu hiển thị -->
+            <div id="menu-view-toggle" class="btn-group flex-shrink-0" role="group" aria-label="Kiểu hiển thị thực đơn">
+              <button type="button" id="view-grid" data-view="grid" class="btn btn-coffee" aria-pressed="true"
+                aria-label="Xem dạng lưới" title="Dạng lưới">
+                <i class="bi bi-grid"></i>
+              </button>
+              <button type="button" id="view-list" data-view="list" class="btn btn-outline-coffee" aria-pressed="false"
+                aria-label="Xem dạng danh sách" title="Dạng danh sách">
+                <i class="bi bi-list-ul"></i>
+              </button>
+            </div>
             </div>
           </div>
 
@@ -227,6 +240,9 @@
             Bánh ngọt
           </button>
         </div>
+
+        <!-- Lọc theo nhãn (chọn nhiều nhãn = món phải có đủ các nhãn đó) -->
+        <div id="tag-filter" class="tag-filter d-none mt-3" role="group" aria-label="Lọc theo nhãn"></div>
       </div>
     </section>
 
@@ -251,7 +267,7 @@
         </div>
 
         <!-- Khu vực sản phẩm -->
-        <div class="row g-4" id="product-list">
+        <div class="row g-4 menu-grid" id="product-list">
           <div class="col-12 text-center py-5 text-secondary">Đang tải thực đơn...</div>
 </div>
 
@@ -259,15 +275,21 @@
         <div id="empty-result" class="text-center py-5 d-none">
           <i class="bi bi-search display-3 text-secondary"></i>
 
-          <h3 class="h4 mt-3">Không tìm thấy món phù hợp</h3>
+          <h3 id="empty-title" class="h4 mt-3" aria-live="polite">Không tìm thấy món phù hợp</h3>
 
-          <p class="text-secondary">
+          <p id="empty-hint" class="text-secondary">
             Hãy thử thay đổi từ khóa hoặc chọn danh mục khác.
           </p>
 
-          <button type="button" id="empty-reset-filter" class="btn btn-coffee">
-            Xem tất cả món
-          </button>
+          <div class="d-flex justify-content-center flex-wrap gap-2">
+            <button type="button" id="empty-clear-search" class="btn btn-outline-coffee d-none">
+              <i class="bi bi-x-lg me-1"></i>Xóa từ khóa
+            </button>
+
+            <button type="button" id="empty-reset-filter" class="btn btn-coffee">
+              Xem tất cả món
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -426,8 +448,9 @@
   <!-- JavaScript của dự án -->
   <script src="../assets/js/client-api.js"></script>
   <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/product-badges.js"></script>
   <script src="../assets/js/menu.js"></script>
   <script src="../assets/js/effects.js"></script>
   <script src="../assets/js/customer-greeting.js"></script>
 </body>
-</html>
+</html>

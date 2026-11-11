@@ -15,6 +15,7 @@ const {
 const categoryRoutes = require('./backend/src/routes/category.routes');
 const productRoutes = require('./backend/src/routes/product.routes');
 const orderRoutes = require('./backend/src/routes/order.routes');
+const { attachmentStatic } = require('./backend/src/middleware/attachment-static');
 
 const app = express();
 
@@ -28,8 +29,7 @@ if (process.env.TRUST_PROXY) {
 // Bỏ trống = cho phép mọi domain(giữ hành vi cũ)
 
 const corsOrigins = (process.env.CORS_ORIGIN || '').split(',').map((s) => s.trim()).filter(Boolean);
-// credentials: true để trình duyệt gửi kèm cookie đăng nhập; cors tự phản chiếu đúng origin nằm trong danh sách
-app.use(cors(corsOrigins.length ? { origin: corsOrigins, credentials: true } : undefined));
+app.use(cors(corsOrigins.length ? { origin: corsOrigins } : undefined));
 
 // Thêm các header bảo mật (X-Content-Type-Options, X-Frame-Options...).
 // Tắt CSP vì giao diện đang nạp Bootstrap/icon từ CDN và có script inline; bật lại sau khi đã liệt kê đủ nguồn.
@@ -121,45 +121,50 @@ const UPLOAD_IMAGE_EXTENSIONS = new Set([
     '.webp',
 ]);
 
-// Phục vụ ảnh người dùng tải lên. Dùng chung cho mọi thư mục upload:
-// chỉ cho đuôi ảnh, chặn đường dẫn lạ (file ẩn, dấu \, ký tự rỗng), thêm nosniff, tên file duy nhất nên cache lâu.
-function serveUploads(urlPath, folder) {
-    app.use(
-        urlPath,
-        allowPublicFile,
-        (req, res, next) => {
-            let decodedPath;
+app.use(
+    '/uploads/products',
+    allowPublicFile,
+    (req, res, next) => {
+        let decodedPath;
 
-            try {
-                decodedPath = decodeURIComponent(req.path);
-            } catch {
-                return res.status(400).end();
-            }
+        try {
+            decodedPath = decodeURIComponent(req.path);
+        } catch {
+            return res.status(400).end();
+        }
 
-            const extension = path.extname(decodedPath).toLowerCase();
+        const extension = path.extname(decodedPath).toLowerCase();
 
-            if (!UPLOAD_IMAGE_EXTENSIONS.has(extension)) {
-                return res.status(404).end();
-            }
+        if (!UPLOAD_IMAGE_EXTENSIONS.has(extension)) {
+            return res.status(404).end();
+        }
 
-            res.setHeader('X-Content-Type-Options', 'nosniff');
-            next();
-        },
-        express.static(
-            path.join(__dirname, 'backend/uploads', folder),
-            {
-                index: false,
-                dotfiles: 'deny',
-                redirect: false,
-                immutable: true, // tên file upload là duy nhất (timestamp + random) nên không bao giờ đổi nội dung
-                maxAge: '30d',
-            }
-        )
-    );
-}
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        next();
+    },
+    express.static(
+        path.join(__dirname, 'backend/uploads/products'),
+        {
+            index: false,
+            dotfiles: 'deny',
+            redirect: false,
+            immutable: true, // tên file upload là duy nhất (timestamp + random) nên không bao giờ đổi nội dung
+            maxAge: '30d',
+        }
+    )
+);
 
-serveUploads('/uploads/products', 'products');
-serveUploads('/uploads/avatars', 'avatars');
+// Tệp đính kèm sản phẩm (ảnh + video + PDF): chỉ phục vụ đúng đuôi cho phép, chặn path traversal, khóa nosniff.
+app.use(
+    '/uploads/attachments',
+    ...attachmentStatic(path.join(__dirname, 'backend/uploads/attachments'))
+);
+
+// Ảnh đại diện khách hàng: dùng lại bộ chặn path traversal của attachments nhưng chỉ cho đuôi ảnh.
+app.use(
+    '/uploads/avatars',
+    ...attachmentStatic(path.join(__dirname, 'backend/uploads/avatars'), new Set(['.jpg', '.jpeg', '.png', '.webp']))
+);
 
 // API
 app.get('/api/health', async (req, res) => {
@@ -190,6 +195,8 @@ app.use('/api/reviews', rateLimit({ windowMs: 10 * 60 * 1000, max: 30, methods: 
 // Mỗi router tự lo GET công khai, còn thêm/sửa/xóa thì cần admin
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/tags', require('./routes/tags'));
+app.use('/api/attachments', require('./backend/src/routes/attachment.routes'));
 app.get('/api/admin/me', verifyToken, requireAdmin, (req, res) => {
     res.json({
         success: true,
@@ -230,7 +237,7 @@ app.use((err, req, res, next) => {
         return res.status(400).json({ success: false, message });
     }
     // Sai định dạng ảnh (do upload.middleware.js ném ra)
-    if (err.message === 'Chỉ chấp nhận ảnh JPG, PNG hoặc WEBP') {
+    if (err.message === 'Chỉ chấp nhận ảnh JPG, PNG hoặc WEBP' || (err.message || '').startsWith('Chỉ chấp nhận file ')) {
         return res.status(400).json({ success: false, message: err.message });
     }
 

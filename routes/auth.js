@@ -9,7 +9,6 @@ const {
     SECRET_KEY,
     verifyToken,
     requireCustomer,
-    setAuthCookie,
     clearAuthCookie,
 } = require('../middleware/auth');
 const { revokeToken, revokeAllForUser } = require('../middleware/revoke');
@@ -63,13 +62,11 @@ function createToken(user) {
 }
 
 function authResponse(res, user, message = 'Đăng nhập thành công') {
-    const token = createToken(user);
-    setAuthCookie(res, token); // cookie HttpOnly cho trình duyệt; token vẫn trả trong body để client cũ không vỡ
     return res.json({
         success: true,
         message,
         data: {
-            token,
+            token: createToken(user),
             expiresIn: EXPIRES_IN,
             user: {
                 id: user.id,
@@ -220,7 +217,7 @@ router.post('/customer/login', async (req, res) => {
 router.get('/customer/me', verifyToken, requireCustomer, async (req, res) => {
     try {
         const [rows] = await db.execute(
-            `SELECT id, full_name, email, phone, created_at, email_verified_at, theme, font_size, avatar
+            `SELECT id, full_name, email, phone, created_at, email_verified_at, theme, font_size, avatar, menu_view
              FROM users WHERE id = ? LIMIT 1`,
             [req.user.id]
         );
@@ -302,7 +299,7 @@ router.patch(
             }
 
             const [rows] = await db.execute(
-                `SELECT id, full_name, email, phone, created_at, email_verified_at, theme, font_size, avatar
+                `SELECT id, full_name, email, phone, created_at, email_verified_at, theme, font_size, avatar, menu_view
                  FROM users WHERE id = ? LIMIT 1`,
                 [req.user.id]
             );
@@ -347,7 +344,6 @@ router.post('/customer/change-password', verifyToken, requireCustomer, async (re
         const passwordHash = await bcrypt.hash(newPassword, 10);
         await db.execute('UPDATE users SET password_hash = ? WHERE id = ?', [passwordHash, req.user.id]);
         revokeAllForUser(req.user.id); // đăng xuất mọi thiết bị, kể cả phiên đang dùng
-        clearAuthCookie(res);
 
         // Không trả token mới: khách phải đăng nhập lại bằng mật khẩu mới
         return res.json({ success: true, message: 'Đổi mật khẩu thành công, vui lòng đăng nhập lại' });
@@ -357,17 +353,20 @@ router.post('/customer/change-password', verifyToken, requireCustomer, async (re
     }
 });
 
-// PATCH /api/auth/customer/preferences { theme, font_size } — chỉ nhận giá trị nằm trong danh sách cho phép
+// PATCH /api/auth/customer/preferences { theme, font_size, menu_view } — chỉ nhận giá trị nằm trong danh sách cho phép
 const THEMES = ['light', 'dark', 'system'];
 const FONT_SIZES = [14, 16, 18, 20];
+const MENU_VIEWS = ['grid', 'list'];
 
 router.patch('/customer/preferences', verifyToken, requireCustomer, async (req, res) => {
     const hasTheme = req.body?.theme !== undefined;
     const hasFont = req.body?.font_size !== undefined;
+    const hasMenuView = req.body?.menu_view !== undefined;
     const theme = String(req.body?.theme ?? '');
     const fontSize = Number(req.body?.font_size);
+    const menuView = String(req.body?.menu_view ?? '');
 
-    if (!hasTheme && !hasFont) {
+    if (!hasTheme && !hasFont && !hasMenuView) {
         return res.status(400).json({ success: false, message: 'Không có tùy chọn nào để cập nhật.' });
     }
     if (hasTheme && !THEMES.includes(theme)) {
@@ -376,15 +375,19 @@ router.patch('/customer/preferences', verifyToken, requireCustomer, async (req, 
     if (hasFont && !FONT_SIZES.includes(fontSize)) {
         return res.status(400).json({ success: false, message: 'Cỡ chữ chỉ nhận: 14, 16, 18 hoặc 20.' });
     }
+    if (hasMenuView && !MENU_VIEWS.includes(menuView)) {
+        return res.status(400).json({ success: false, message: 'Kiểu hiển thị thực đơn chỉ nhận: grid hoặc list.' });
+    }
 
     try {
         const sets = [];
         const values = [];
         if (hasTheme) { sets.push('theme = ?'); values.push(theme); }
         if (hasFont) { sets.push('font_size = ?'); values.push(fontSize); }
+        if (hasMenuView) { sets.push('menu_view = ?'); values.push(menuView); }
         await db.execute(`UPDATE users SET ${sets.join(', ')} WHERE id = ?`, [...values, req.user.id]);
 
-        const [rows] = await db.execute('SELECT theme, font_size FROM users WHERE id = ? LIMIT 1', [req.user.id]);
+        const [rows] = await db.execute('SELECT theme, font_size, menu_view FROM users WHERE id = ? LIMIT 1', [req.user.id]);
         return res.json({ success: true, message: 'Đã lưu tùy chọn.', data: rows[0] || null });
     } catch (error) {
         console.error('Lỗi lưu tùy chọn:', error);

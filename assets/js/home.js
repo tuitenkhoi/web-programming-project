@@ -48,8 +48,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                   data-product-image
                   loading="lazy" 
                 />
-                ${index === 0
-                  ? '<span class="badge bg-danger position-absolute top-0 start-0 m-3">Nổi bật</span>'
+                ${Number(rawProduct.is_pinned) === 1
+                  ? '<span class="badge bg-danger position-absolute top-0 start-0 m-3">📌 Nổi bật</span>'
                   : ""}
               </div>
               <div class="card-body d-flex flex-column">

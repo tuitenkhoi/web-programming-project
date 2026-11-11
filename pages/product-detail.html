@@ -29,7 +29,6 @@
   <link rel="stylesheet" href="../assets/css/theme.css" />
   <link rel="stylesheet" href="../assets/css/pages.css" />
   <link rel="stylesheet" href="../assets/css/mobile-fixes.css" />
-  <script src="../assets/js/prefs.js"></script>
 </head>
 
 <body class="inner-page">
@@ -147,6 +146,9 @@
             <div id="product-thumbnails" class="d-flex gap-3 mt-3">
               <span class="text-secondary">Đang tải hình ảnh...</span>
             </div>
+
+            <!-- Video và tài liệu đính kèm (do product-detail.js dựng khi sản phẩm có tệp) -->
+            <div id="product-extra-media" class="mt-4 d-none"></div>
           </div>
 
           <!-- Thông tin và tùy chọn -->
@@ -728,6 +730,7 @@
   <!-- JavaScript của dự án -->
   <script src="../assets/js/client-api.js"></script>
   <script src="../assets/js/main.js"></script>
+  <script src="../assets/js/lightbox.js"></script>
   <script src="../assets/js/product-detail.js"></script>
   <script src="../assets/js/product-reviews.js"></script>
   <script src="../assets/js/effects.js"></script>

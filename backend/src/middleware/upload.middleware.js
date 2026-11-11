@@ -10,6 +10,9 @@ const extensionByMimeType = {
     "image/jpeg": ".jpg",
     "image/png": ".png",
     "image/webp": ".webp",
+    "video/mp4": ".mp4",
+    "video/webm": ".webm",
+    "application/pdf": ".pdf",
 };
 
 // Nhận dạng loại file thật bằng vài byte đầu ("magic bytes"). Trả về mime hoặc null.
@@ -24,13 +27,27 @@ const detectMimeType = (buffer) => {
         buffer.toString("ascii", 0, 4) === "RIFF" &&
         buffer.toString("ascii", 8, 12) === "WEBP";
 
+    const isMp4 = buffer.length >= 12 && buffer.toString("ascii", 4, 8) === "ftyp";
+    const isWebm = buffer.length >= 4 && buffer.subarray(0, 4).equals(Buffer.from([0x1a, 0x45, 0xdf, 0xa3]));
+    const isPdf = buffer.length >= 4 && buffer.toString("ascii", 0, 4) === "%PDF";
+
+    if (isMp4) return "video/mp4";
+    if (isWebm) return "video/webm";
+    if (isPdf) return "application/pdf";
     if (isJpeg) return "image/jpeg";
     if (isPng) return "image/png";
     if (isWebp) return "image/webp";
     return null;
 };
 
-const labelByMimeType = { "image/jpeg": "JPG", "image/png": "PNG", "image/webp": "WEBP" };
+const labelByMimeType = {
+    "image/jpeg": "JPG",
+    "image/png": "PNG",
+    "image/webp": "WEBP",
+    "video/mp4": "MP4",
+    "video/webm": "WEBM",
+    "application/pdf": "PDF",
+};
 
 // Nhà máy tạo bộ upload: mỗi nơi dùng (sản phẩm, avatar...) chỉ khác thư mục, số file, dung lượng và loại cho phép.
 //   destFolder  : thư mục con trong backend/uploads (vd "avatars")
@@ -43,7 +60,10 @@ function createUploader({ destFolder, maxFiles = 1, maxSizeMB = 5, allowedMime =
 
     const allowed = new Set(allowedMime);
     const typeList = allowedMime.map((mime) => labelByMimeType[mime]).join(", ");
-    const typeMessage = `Chỉ chấp nhận ảnh ${typeList}`;
+    const onlyImages = allowedMime.every((mime) => mime.startsWith("image/"));
+    // Giữ nguyên câu báo lỗi cũ cho nơi chỉ nhận ảnh (server.js so khớp đúng câu này)
+    const typeMessage = onlyImages ? `Chỉ chấp nhận ảnh ${typeList}` : `Chỉ chấp nhận file ${typeList}`;
+    const sizeSubject = onlyImages ? "Ảnh" : "File";
 
     const storage = multer.diskStorage({
         destination: (req, file, callback) => callback(null, directory),
@@ -78,10 +98,26 @@ function createUploader({ destFolder, maxFiles = 1, maxSizeMB = 5, allowedMime =
 
             const message =
                 error.name === "MulterError" && error.code === "LIMIT_FILE_SIZE"
-                    ? `Ảnh không được vượt quá ${maxSizeMB} MB`
+                    ? `${sizeSubject} không được vượt quá ${maxSizeMB} MB`
                     : error.name === "MulterError"
                         ? "Lỗi upload: " + error.message
                         : error.message;
+            return res.status(400).json({ success: false, message });
+        });
+    };
+
+    // Bọc upload.array(...) cho nhiều file một lần; báo lỗi tiếng Việt theo giới hạn của từng nơi
+    const array = (fieldName) => (req, res, next) => {
+        upload.array(fieldName, maxFiles)(req, res, (error) => {
+            if (!error) return next();
+
+            let message = error.message;
+            if (error.name === "MulterError") {
+                if (error.code === "LIMIT_FILE_SIZE") message = `Mỗi file không được vượt quá ${maxSizeMB} MB`;
+                else if (error.code === "LIMIT_FILE_COUNT" || error.code === "LIMIT_UNEXPECTED_FILE") {
+                    message = `Mỗi lần chỉ được tải tối đa ${maxFiles} file`;
+                } else message = "Lỗi upload: " + error.message;
+            }
             return res.status(400).json({ success: false, message });
         });
     };
@@ -107,11 +143,15 @@ function createUploader({ destFolder, maxFiles = 1, maxSizeMB = 5, allowedMime =
                 console.error("Lỗi kiểm tra nội dung ảnh:", error.code);
             }
 
+            file.detectedMime = detected; // controller dùng để đối chiếu với mime trình duyệt khai
+
             if (!detected || !allowed.has(detected)) {
                 await Promise.all(files.map((f) => fsPromises.unlink(f.path).catch(() => {})));
                 return res.status(400).json({
                     success: false,
-                    message: `File tải lên không phải ảnh ${typeList} hợp lệ`,
+                    message: onlyImages
+                        ? `File tải lên không phải ảnh ${typeList} hợp lệ`
+                        : `Có file không đúng định dạng ${typeList}`,
                 });
             }
         }
@@ -119,14 +159,24 @@ function createUploader({ destFolder, maxFiles = 1, maxSizeMB = 5, allowedMime =
         next();
     };
 
-    return { upload, single, verifyContent, directory };
+    return { upload, single, array, verifyContent, directory };
 }
 
 // Bộ upload ảnh sản phẩm: giữ nguyên hành vi cũ (1 ảnh, 5 MB, field "image")
 const products = createUploader({ destFolder: "products", maxFiles: 1, maxSizeMB: 5 });
 
+// Bộ upload tệp đính kèm: tối đa 5 file/lần, 10 MB/file, ảnh + video + PDF
+const attachments = createUploader({
+    destFolder: "attachments",
+    maxFiles: 5,
+    maxSizeMB: 10,
+    allowedMime: ["image/jpeg", "image/png", "image/webp", "video/mp4", "video/webm", "application/pdf"],
+});
+
 module.exports = {
     createUploader,
+    attachments,
+    detectMimeType,
     upload: products.upload,
     verifyImageContent: products.verifyContent,
 };

@@ -1,3 +1,45 @@
+/* Nút chuyển kiểu hiển thị bảng/lưới dùng chung cho trang quản trị.
+   window.MocViewToggle.init(container, { onChange, initial })
+     - container: phần tử chứa 2 nút có thuộc tính data-view="list" và data-view="grid"
+     - onChange(mode): được gọi với "list" hoặc "grid" mỗi khi người dùng đổi kiểu
+   Trả về { get(), set(mode) }. */
+(function () {
+  'use strict';
+
+  var ACTIVE = 'btn btn-coffee';
+  var INACTIVE = 'btn btn-outline-coffee';
+
+  window.MocViewToggle = {
+    init: function (container, options) {
+      if (!container) return null;
+      options = options || {};
+      var buttons = Array.prototype.slice.call(container.querySelectorAll('[data-view]'));
+      var mode = options.initial === 'grid' ? 'grid' : 'list';
+
+      function paint() {
+        buttons.forEach(function (button) {
+          var on = button.getAttribute('data-view') === mode;
+          button.className = on ? ACTIVE : INACTIVE;
+          button.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+      }
+
+      function set(next, silent) {
+        mode = next === 'grid' ? 'grid' : 'list';
+        paint();
+        if (!silent && typeof options.onChange === 'function') options.onChange(mode);
+      }
+
+      buttons.forEach(function (button) {
+        button.addEventListener('click', function () { set(button.getAttribute('data-view')); });
+      });
+
+      paint();
+      return { get: function () { return mode; }, set: set };
+    },
+  };
+})();
+
 /* Trang quản lý bàn: hiện sẵn các nút thao tác trên từng bàn
    (ví dụ bàn trống: [Nhận khách] [Bảo trì]) thay vì phải bấm vào dấu 3 chấm.
    Script đọc các mục trong menu 3 chấm của mỗi bàn rồi tạo nút tương ứng; bấm nút

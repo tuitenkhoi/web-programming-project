@@ -1473,3 +1473,187 @@ footer .text-white-50 {
 .border-coffee {
   border-color: var(--coffee-primary) !important;
 }
+/* =========================================================
+   26. CHIP TRẠNG THÁI SẢN PHẨM (assets/js/product-badges.js)
+========================================================= */
+
+.product-badges {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: calc(100% - 20px);
+  pointer-events: none;
+}
+
+.product-badges:empty {
+  display: none;
+}
+
+.moc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  max-width: 100%;
+  padding: 3px 9px;
+  overflow: hidden;
+  color: var(--white);
+  background-color: var(--coffee-primary);
+  border-radius: 999px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: auto;
+}
+
+.moc-badge-pin {
+  background-color: var(--coffee-primary-dark);
+}
+
+.moc-badge-rating {
+  color: var(--coffee-primary-dark);
+  background-color: var(--warning);
+}
+
+.moc-badge-sale {
+  background-color: var(--danger);
+}
+
+.moc-badge-video {
+  background-color: var(--coffee-green);
+}
+
+.moc-badge-file {
+  background-color: var(--text-muted);
+}
+
+.moc-badge-draft {
+  color: var(--text-color);
+  background-color: var(--border-color);
+}
+
+@media (max-width: 575.98px) {
+  .moc-badge {
+    padding: 2px 7px;
+    font-size: 11px;
+  }
+}
+
+/* ==========================================================================
+   27. TỆP ĐÍNH KÈM SẢN PHẨM (admin + trang chi tiết)
+   ========================================================================== */
+.attachment-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 1.25rem 1rem;
+  border: 2px dashed var(--bs-border-color, #dee2e6);
+  border-radius: 0.75rem;
+  color: var(--bs-secondary-color, #6c757d);
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+.attachment-dropzone:hover,
+.attachment-dropzone:focus-visible,
+.attachment-dropzone.is-dragover {
+  border-color: var(--bs-primary, #6f4e37);
+  background: rgba(111, 78, 55, 0.06);
+  outline: none;
+}
+.attachment-list { display: grid; gap: 0.5rem; }
+.attachment-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border: 1px solid var(--bs-border-color, #dee2e6);
+  border-radius: 0.5rem;
+}
+.attachment-thumb {
+  position: relative;
+  flex: 0 0 56px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 0.375rem;
+  background: rgba(0, 0, 0, 0.06);
+}
+.attachment-thumb img,
+.attachment-thumb video { width: 100%; height: 100%; object-fit: cover; }
+.attachment-thumb-icon { position: absolute; color: #fff; font-size: 1.4rem; text-shadow: 0 0 4px rgba(0, 0, 0, 0.6); }
+.attachment-thumb-pdf { font-size: 1.75rem; color: #c0392b; }
+.attachment-info { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.attachment-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Thư viện ở trang chi tiết */
+.product-gallery-thumb {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: 0.5rem;
+  background: rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+}
+.product-gallery-thumb img,
+.product-gallery-thumb video { width: 100%; height: 100%; object-fit: cover; }
+.product-gallery-thumb:focus-visible,
+.product-gallery-thumb.is-active { border-color: var(--bs-primary, #6f4e37); outline: none; }
+.product-gallery-thumb .attachment-thumb-icon { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.product-video { width: 100%; max-height: 420px; border-radius: 0.75rem; background: #000; }
+.product-documents a { text-decoration: none; }
+
+.moc-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.88);
+}
+.moc-lightbox[hidden] { display: none; }
+.moc-lightbox img { max-width: 100%; max-height: 88vh; border-radius: 0.5rem; }
+.moc-lightbox button {
+  position: absolute;
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.moc-lightbox button:hover,
+.moc-lightbox button:focus-visible { background: rgba(255, 255, 255, 0.3); outline: 2px solid #fff; }
+.moc-lightbox-close { top: 1rem; right: 1rem; }
+.moc-lightbox-prev { left: 1rem; top: 50%; }
+.moc-lightbox-next { right: 1rem; top: 50%; }
+
+/* ==========================================================================
+   28. NHÃN SẢN PHẨM (menu + admin)
+   ========================================================================== */
+.tag-filter { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
+.product-tags { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-bottom: 0.5rem; }
+.product-tag {
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  color: var(--bs-secondary-color, #6c757d);
+  background: rgba(111, 78, 55, 0.1);
+}
+.tag-option { display: inline-flex; align-items: center; gap: 0.35rem; }

@@ -362,6 +362,32 @@ document.addEventListener("DOMContentLoaded", function () {
     const productForm = $("#admin-product-form");
     const imageInput = $("#admin-product-image");
     const imagePreview = $("#product-image-preview");
+    const tags = window.MocTags
+      ? window.MocTags.create({
+          managerRoot: $("[data-tag-manager]"),
+          optionsRoot: $("[data-tag-options]"),
+          request: function (endpoint, options) {
+            return apiRequest(endpoint, options);
+          },
+          notify: showToast,
+          onChange: function () {
+            loadProducts().catch(function (error) {
+              showToast(error.message, "danger");
+            });
+          },
+        })
+      : null;
+    const attachments = window.MocAttachments
+      ? window.MocAttachments.create({
+          root: $("#attachment-section"),
+          apiBase: API_BASE_URL,
+          getToken,
+          request: function (endpoint, options) {
+            return apiRequest(endpoint, options);
+          },
+          notify: showToast,
+        })
+      : null;
 
     [
       "#total-product-count",
@@ -433,6 +459,73 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    // ----- Tự lưu (chỉ khi đang SỬA món đã có; không gồm ảnh) -----
+    const AUTOSAVE_FIELDS = ["name", "category_id", "price", "description", "status"];
+
+    function currentFormSnapshot() {
+      if (!$("#admin-product-id").value) return null;     // chế độ thêm mới: dùng nút Lưu
+      if (!productForm.checkValidity()) return null;      // chưa hợp lệ thì chưa lưu
+
+      return {
+        name: $("#admin-product-name").value.trim(),
+        category_id: Number(categoryInput.value),
+        price: Number($("#admin-product-price").value),
+        description: $("#admin-product-description").value.trim(),
+        status: Number(statusInput.value),
+        tag_ids: tags ? tags.getSelected() : [],
+      };
+    }
+
+    const autoSave = window.MocAutoSave
+      ? window.MocAutoSave.create({
+          delay: 800,
+          statusEl: $("#product-autosave-status"),
+          getSnapshot: currentFormSnapshot,
+          save: async function (current, previous) {
+            const productId = $("#admin-product-id").value;
+            const changes = {};
+
+            AUTOSAVE_FIELDS.forEach(function (field) {
+              if (!previous || current[field] !== previous[field]) {
+                changes[field] = current[field];
+              }
+            });
+
+            if (Object.keys(changes).length > 0) {
+              await apiRequest(`/products/${productId}`, {
+                method: "PATCH",
+                body: changes,
+              });
+            }
+
+            if (tags && (!previous || JSON.stringify(current.tag_ids) !== JSON.stringify(previous.tag_ids))) {
+              await tags.saveFor(productId);
+            }
+
+            // Cập nhật dòng đang hiển thị mà không phải tải lại cả danh sách
+            const product = getProductById(productId);
+
+            if (product) {
+              Object.assign(product, changes);
+              if (changes.category_id !== undefined) {
+                product.category_name =
+                  categoryInput.options[categoryInput.selectedIndex]?.textContent ||
+                  product.category_name;
+              }
+              product.tags = (tags ? tags.getSelected() : []).map(function (id) {
+                const known = (product.tags || []).find((tag) => Number(tag.id) === id);
+                return known || { id, name: "", slug: "" };
+              });
+              renderProducts();
+            }
+          },
+        })
+      : null;
+
+    function resetAutoSave() {
+      autoSave?.reset(currentFormSnapshot());
+    }
+
     function getProductById(id) {
       return state.products.find(
         (product) => Number(product.id) === Number(id)
@@ -467,7 +560,16 @@ document.addEventListener("DOMContentLoaded", function () {
           return Number(second.price) - Number(first.price);
         }
 
-        return Number(second.id) - Number(first.id);
+        // Mặc định giống API: ghim lên đầu (ghim mới nhất trước), rồi tới cập nhật mới nhất
+        const pinDiff =
+          Number(second.is_pinned || 0) - Number(first.is_pinned || 0);
+
+        if (pinDiff !== 0) return pinDiff;
+
+        const stamp = (product) =>
+          Date.parse(product.pinned_at || product.updated_at || "") || 0;
+
+        return stamp(second) - stamp(first) || Number(second.id) - Number(first.id);
       });
 
       return products;
@@ -516,6 +618,7 @@ document.addEventListener("DOMContentLoaded", function () {
                   />
                   <div class="ms-3">
                     <strong>${escapeHtml(product.name)}</strong>
+                    ${window.MocBadges ? window.MocBadges.render(product, { only: ["pin"] }) : ""}
                     <small class="d-block text-secondary">
                       ${escapeHtml(product.description || "Chưa có mô tả")}
                     </small>
@@ -532,7 +635,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 </span>
               </td>
               <td class="text-center pe-4">
-                <div class="dropdown">
+                <button
+                  type="button"
+                  class="btn btn-sm ${Number(product.is_pinned) === 1 ? "btn-coffee" : "btn-light"} api-pin-product me-1"
+                  data-id="${product.id}"
+                  aria-pressed="${Number(product.is_pinned) === 1 ? "true" : "false"}"
+                  aria-label="${Number(product.is_pinned) === 1 ? "Bỏ ghim" : "Ghim"} ${escapeHtml(product.name)}"
+                  title="${Number(product.is_pinned) === 1 ? "Bỏ ghim" : "Ghim lên đầu thực đơn"}"
+                >
+                  📌
+                </button>
+                <div class="dropdown d-inline-block">
                   <button
                     class="btn btn-sm btn-light"
                     type="button"
@@ -615,7 +728,9 @@ document.addEventListener("DOMContentLoaded", function () {
                       onerror="this.src='${DEFAULT_PRODUCT_IMAGE}'"
                     />
                     <div class="card-body">
-                      <h3 class="h5">${escapeHtml(product.name)}</h3>
+                      <h3 class="h5">${escapeHtml(product.name)}
+                        ${window.MocBadges ? window.MocBadges.render(product, { only: ["pin"] }) : ""}
+                      </h3>
                       <p class="fw-bold text-danger">
                         ${formatCurrency(product.price)}
                       </p>
@@ -706,6 +821,9 @@ document.addEventListener("DOMContentLoaded", function () {
       imageInput.value = "";
       statusInput.value = "1";
       $("#submit-product-button-label").textContent = "Thêm món";
+      attachments?.reset();
+      tags?.setSelected([]);
+      autoSave?.reset(null);
     }
 
     function openProductDetail(product) {
@@ -758,12 +876,16 @@ document.addEventListener("DOMContentLoaded", function () {
       imagePreview.src = getProductImageUrl(product);
       productForm.classList.remove("was-validated");
       $("#submit-product-button-label").textContent = "Lưu thay đổi";
+      attachments?.setProduct(product.id);
+      tags?.setSelected((product.tags || []).map((tag) => tag.id));
+      resetAutoSave();
 
       showModal("#product-form-modal");
     }
 
     await loadCategories();
     await loadProducts();
+    tags?.load();
 
     searchInput.addEventListener("input", function () {
       window.clearTimeout(state.searchTimer);
@@ -797,21 +919,18 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     );
 
-    $("#product-list-view")?.addEventListener("click", function () {
-      state.gridMode = false;
-      $("#product-table-view").classList.remove("d-none");
-      $("#product-grid-container").classList.add("d-none");
-      this.className = "btn btn-coffee";
-      $("#product-grid-view").className = "btn btn-outline-coffee";
-    });
+    // Nút chuyển bảng/lưới dùng chung (admin-table-actions.js)
+    window.MocViewToggle?.init($("#product-view-toggle"), {
+      onChange(mode) {
+        state.gridMode = mode === "grid";
 
-    $("#product-grid-view")?.addEventListener("click", function () {
-      state.gridMode = true;
-      renderGrid(getVisibleProducts());
-      $("#product-table-view").classList.add("d-none");
-      $("#product-grid-container").classList.remove("d-none");
-      this.className = "btn btn-coffee";
-      $("#product-list-view").className = "btn btn-outline-coffee";
+        if (state.gridMode) {
+          renderGrid(getVisibleProducts());
+        }
+
+        $("#product-table-view").classList.toggle("d-none", state.gridMode);
+        $("#product-grid-container").classList.toggle("d-none", !state.gridMode);
+      },
     });
 
     $("#open-add-product-button")?.addEventListener(
@@ -858,6 +977,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (!product) return;
 
+      if (button.classList.contains("api-pin-product")) {
+        const pin = Number(product.is_pinned) !== 1;
+        button.disabled = true;
+
+        try {
+          const result = await apiRequest(`/products/${product.id}/pin`, {
+            method: "PUT",
+            body: { pinned: pin },
+          });
+
+          // Cập nhật tại chỗ rồi vẽ lại từ state, KHÔNG tải lại cả bảng từ server
+          product.is_pinned = Number(result.data.is_pinned);
+          product.pinned_at = result.data.pinned_at;
+          renderProducts();
+          showToast(result.message || (pin ? "Đã ghim sản phẩm." : "Đã bỏ ghim sản phẩm."));
+        } catch (error) {
+          button.disabled = false;
+          showToast(error.message, "danger");
+        }
+
+        return;
+      }
+
       if (button.classList.contains("api-view-product")) {
         openProductDetail(product);
         return;
@@ -869,9 +1011,20 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       if (button.classList.contains("api-delete-product")) {
-        $("#delete-product-id").value = product.id;
-        $("#delete-product-name").textContent = product.name;
-        showModal("#delete-product-modal");
+        window.MocConfirm.show({
+          title: "Xóa sản phẩm",
+          message: `Xóa sản phẩm '${product.name}'? Hành động này không thể hoàn tác. Nếu món đã có trong đơn hàng, nên chuyển sang "Ngừng bán".`,
+          danger: true,
+          onConfirm: async function () {
+            try {
+              await apiRequest(`/products/${product.id}`, { method: "DELETE" });
+              showToast("Xóa sản phẩm thành công.");
+              await loadProducts();
+            } catch (error) {
+              showToast(error.message, "danger");
+            }
+          },
+        });
         return;
       }
 
@@ -905,6 +1058,26 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     );
 
+    // Mọi thay đổi ở ô nhập/chọn của form (trừ ô chọn ảnh và ô chọn tệp đính kèm) -> hẹn tự lưu
+    ["input", "change"].forEach(function (type) {
+      productForm.addEventListener(type, function (event) {
+        const target = event.target;
+
+        if (
+          target === imageInput ||
+          target.closest("#attachment-section")
+        ) {
+          return;
+        }
+
+        autoSave?.schedule();
+      });
+    });
+
+    $("#product-form-modal")?.addEventListener("hidden.bs.modal", function () {
+      autoSave?.cancel();
+    });
+
     productForm.addEventListener("submit", async function (event) {
       event.preventDefault();
       productForm.classList.add("was-validated");
@@ -929,9 +1102,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const submitButton = $('button[type="submit"]', productForm);
       submitButton.disabled = true;
+      autoSave?.cancel(); // nút Lưu gửi toàn bộ, không để tự lưu chạy chồng
 
       try {
-        await apiRequest(
+        const saved = await apiRequest(
           productId ? `/products/${productId}` : "/products",
           {
             method: productId ? "PUT" : "POST",
@@ -939,12 +1113,45 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         );
 
-        hideModal("#product-form-modal");
-        showToast(
-          productId
-            ? "Cập nhật sản phẩm thành công."
-            : "Thêm sản phẩm thành công."
-        );
+        // Nhãn lưu bằng một lần PUT riêng (thay toàn bộ nhãn của món)
+        const savedId = productId || saved?.data?.id;
+        let tagError = null;
+
+        if (tags && savedId) {
+          try {
+            await tags.saveFor(savedId);
+          } catch (error) {
+            tagError = error;
+          }
+        }
+
+        // Thêm mới: sản phẩm đã có id -> gửi các tệp đính kèm đang xếp hàng
+        if (!productId && attachments?.hasQueue() && saved?.data?.id) {
+          await attachments.flushQueue(saved.data.id);
+        }
+
+        if (productId) {
+          hideModal("#product-form-modal");
+          showToast("Cập nhật sản phẩm thành công.");
+        } else {
+          // Thêm lần đầu bằng nút Lưu xong thì chuyển sang chế độ sửa: từ đây mọi thay đổi được tự lưu
+          showToast("Thêm sản phẩm thành công. Các thay đổi tiếp theo sẽ được tự lưu.");
+
+          if (savedId) {
+            $("#admin-product-id").value = savedId;
+            $("#product-form-title").textContent = `Chỉnh sửa ${$("#admin-product-name").value.trim()}`;
+            $("#submit-product-button-label").textContent = "Lưu thay đổi";
+            imageInput.value = "";
+            attachments?.setProduct(savedId);
+            resetAutoSave();
+          } else {
+            hideModal("#product-form-modal");
+          }
+        }
+
+        if (tagError) {
+          showToast(`Đã lưu món nhưng chưa lưu được nhãn: ${tagError.message}`, "warning");
+        }
 
         await loadProducts();
       } catch (error) {
@@ -953,31 +1160,6 @@ document.addEventListener("DOMContentLoaded", function () {
         submitButton.disabled = false;
       }
     });
-
-    $("#confirm-delete-product")?.addEventListener(
-      "click",
-      async function () {
-        const productId = $("#delete-product-id").value;
-
-        if (!productId) return;
-
-        this.disabled = true;
-
-        try {
-          await apiRequest(`/products/${productId}`, {
-            method: "DELETE",
-          });
-
-          hideModal("#delete-product-modal");
-          showToast("Xóa sản phẩm thành công.");
-          await loadProducts();
-        } catch (error) {
-          showToast(error.message, "danger");
-        } finally {
-          this.disabled = false;
-        }
-      }
-    );
   }
 
   initializeLogoutLinks();

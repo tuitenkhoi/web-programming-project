@@ -27,7 +27,11 @@ document.addEventListener("DOMContentLoaded", function () {
   const productId = new URLSearchParams(window.location.search).get("id");
   const fallbackImage = "../assets/images/products/default-product.jpg";
 
+  const extraMedia = document.querySelector("#product-extra-media");
+
   let currentProduct = null;
+  let currentAttachments = [];
+  let galleryImages = []; // { url, alt } theo thứ tự: ảnh chính rồi ảnh phụ
 
   function escapeHTML(value) {
     return String(value ?? "")
@@ -180,6 +184,8 @@ document.addEventListener("DOMContentLoaded", function () {
       `;
     }
 
+    renderAttachments();
+
     if (noteCount) {
       noteCount.textContent = noteInput?.value.length || 0;
     }
@@ -187,6 +193,101 @@ document.addEventListener("DOMContentLoaded", function () {
     updatePrice();
     detailContent?.classList.remove("d-none");
     notFound?.classList.add("d-none");
+  }
+
+  // Chỉ nhận đường dẫn http(s) hoặc tuyệt đối trong site, tránh javascript: lọt vào href/src
+  function safeUrl(value) {
+    const url = String(value || "");
+    return /^(https?:\/\/|\/(?!\/))/i.test(url) ? url : "";
+  }
+
+  function el(tag, className, text) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  // Ảnh phụ -> thêm vào dải ảnh nhỏ + lightbox; video -> <video controls>; PDF -> mục "Tài liệu"
+  function renderAttachments() {
+    const list = Array.isArray(currentAttachments) ? currentAttachments : [];
+    const images = list.filter((a) => a.kind === "image" && safeUrl(a.url));
+    const videos = list.filter((a) => a.kind === "video" && safeUrl(a.url));
+    const documents = list.filter((a) => a.kind === "file" && safeUrl(a.url));
+
+    galleryImages = [{ url: currentProduct.image, alt: currentProduct.name }].concat(
+      images.map(function (a) {
+        return { url: safeUrl(a.url), alt: a.original_name || currentProduct.name };
+      })
+    );
+
+    if (thumbnails) {
+      images.forEach(function (a) {
+        const button = el("button", "product-thumbnail");
+        button.type = "button";
+        button.dataset.image = safeUrl(a.url);
+        button.setAttribute("aria-label", "Xem ảnh " + (a.original_name || ""));
+        const img = el("img");
+        img.src = safeUrl(a.url);
+        img.alt = a.original_name || currentProduct.name;
+        img.loading = "lazy";
+        button.appendChild(img);
+        thumbnails.appendChild(button);
+      });
+    }
+
+    if (productImage) {
+      productImage.tabIndex = 0;
+      productImage.setAttribute("role", "button");
+      productImage.setAttribute("aria-label", "Phóng to ảnh " + currentProduct.name);
+      productImage.style.cursor = "zoom-in";
+    }
+
+    if (!extraMedia) return;
+    extraMedia.textContent = "";
+
+    videos.forEach(function (a) {
+      const wrap = el("div", "mb-3");
+      const video = el("video", "product-video");
+      video.controls = true;
+      video.preload = "metadata";
+      video.src = safeUrl(a.url);
+      video.setAttribute("aria-label", "Video " + (a.original_name || currentProduct.name));
+      wrap.appendChild(video);
+      extraMedia.appendChild(wrap);
+    });
+
+    if (documents.length) {
+      const section = el("section", "product-documents");
+      section.appendChild(el("h2", "h6 mb-2", "Tài liệu"));
+      const ul = el("ul", "list-unstyled mb-0");
+      documents.forEach(function (a) {
+        const li = el("li", "mb-1");
+        li.appendChild(el("i", "bi bi-file-earmark-pdf text-danger me-2"));
+        const link = el("a", "", a.original_name || "Tài liệu PDF");
+        link.href = safeUrl(a.url);
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        li.appendChild(link);
+        ul.appendChild(li);
+      });
+      section.appendChild(ul);
+      extraMedia.appendChild(section);
+    }
+
+    extraMedia.classList.toggle("d-none", !videos.length && !documents.length);
+  }
+
+  function openLightbox() {
+    if (!window.MocLightbox || !galleryImages.length) return;
+    const current = productImage ? productImage.getAttribute("src") : "";
+    const index = Math.max(
+      0,
+      galleryImages.findIndex(function (item) {
+        return item.url === current;
+      })
+    );
+    window.MocLightbox.open(galleryImages, index);
   }
 
   function renderRelated(rawProducts) {
@@ -353,6 +454,14 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   });
 
+  productImage?.addEventListener("click", openLightbox);
+  productImage?.addEventListener("keydown", function (event) {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      openLightbox();
+    }
+  });
+
   productImage?.addEventListener("error", function () {
     applyFallback(this);
   });
@@ -408,6 +517,7 @@ document.addEventListener("DOMContentLoaded", function () {
         true
       );
 
+      currentAttachments = rawProduct.attachments || [];
       renderProduct();
     } catch (error) {
       showUnavailable(error.message || "Không thể tải sản phẩm.");
@@ -433,4 +543,4 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   initialize();
-});
+});

@@ -28,7 +28,8 @@ if (process.env.TRUST_PROXY) {
 // Bỏ trống = cho phép mọi domain(giữ hành vi cũ)
 
 const corsOrigins = (process.env.CORS_ORIGIN || '').split(',').map((s) => s.trim()).filter(Boolean);
-app.use(cors(corsOrigins.length ? { origin: corsOrigins } : undefined));
+// credentials: true để trình duyệt gửi kèm cookie đăng nhập; cors tự phản chiếu đúng origin nằm trong danh sách
+app.use(cors(corsOrigins.length ? { origin: corsOrigins, credentials: true } : undefined));
 
 // Thêm các header bảo mật (X-Content-Type-Options, X-Frame-Options...).
 // Tắt CSP vì giao diện đang nạp Bootstrap/icon từ CDN và có script inline; bật lại sau khi đã liệt kê đủ nguồn.

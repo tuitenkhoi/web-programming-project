@@ -35,12 +35,48 @@ function setCachedUser(userId, user) {
     userCache.set(userId, { user, expires: Date.now() + AUTH_CACHE_MS });
 }
 
+// ----- Cookie đăng nhập (song song với header Authorization) -----
+// HttpOnly: JavaScript trên trang không đọc được; SameSite=Lax: trình duyệt không gửi kèm khi form/POST từ trang web khác.
+const AUTH_COOKIE = 'mocToken';
+
+function cookieOptions() {
+    return {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        path: '/',
+    };
+}
+
+// Đặt cookie sống đúng bằng thời hạn của token (exp - bây giờ)
+function setAuthCookie(res, token) {
+    const decoded = jwt.decode(token);
+    const maxAge = decoded && decoded.exp ? decoded.exp * 1000 - Date.now() : undefined;
+    res.cookie(AUTH_COOKIE, token, { ...cookieOptions(), maxAge });
+}
+
+function clearAuthCookie(res) {
+    res.clearCookie(AUTH_COOKIE, cookieOptions());
+}
+
+// Lấy token từ header "Authorization: Bearer ..." trước, không có thì mới tìm trong cookie
+function extractToken(req) {
+    const match = /^Bearer\s+(\S+)$/i.exec(req.headers.authorization || '');
+    if (match) return match[1];
+
+    for (const part of String(req.headers.cookie || '').split(';')) {
+        const [name, ...rest] = part.trim().split('=');
+        if (name === AUTH_COOKIE && rest.length) {
+            try { return decodeURIComponent(rest.join('=')); } catch { return null; }
+        }
+    }
+    return null;
+}
+
 async function verifyToken(req, res, next) {
-    const authorization = req.headers.authorization || '';
-    const match = /^Bearer\s+(\S+)$/i.exec(authorization);
+    const rawToken = extractToken(req);
 
-
-    if (!match) {
+    if (!rawToken) {
         return res.status(401).json({
             success: false,
             message: 'Bạn chưa đăng nhập.',
@@ -51,7 +87,7 @@ async function verifyToken(req, res, next) {
     let decoded;
 
     try {
-        decoded = jwt.verify(match[1], SECRET_KEY, {
+        decoded = jwt.verify(rawToken, SECRET_KEY, {
             algorithms: ['HS256'],
         });
     } catch (error) {
@@ -205,5 +241,7 @@ module.exports = {
     optionalToken,
     requireAdmin,
     requireCustomer,
+    setAuthCookie,
+    clearAuthCookie,
     SECRET_KEY,
 };

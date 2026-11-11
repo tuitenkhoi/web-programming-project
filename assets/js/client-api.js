@@ -79,6 +79,57 @@
     return result.data;
   }
 
+
+  // ----- Guard phía khách: trang nào cần đăng nhập thì gọi MocAuthGuard.requireLogin() ở đầu trang -----
+  // Chưa có token: nhớ trang hiện tại, báo "Bạn cần đăng nhập để tiếp tục" rồi chuyển sang trang đăng nhập.
+  // Đăng nhập xong thì account-ui.js gọi afterLoginUrl() để quay lại đúng trang đó.
+  const AFTER_LOGIN_KEY = "mocAfterLogin";
+
+  // Chỉ nhận đường dẫn nội bộ ("/..." hoặc "pages/..."), chặn "//evil.com" và "http://..." (open redirect)
+  function isSafeInternalPath(path) {
+    return typeof path === "string" && path.length > 0 && path.length < 500 &&
+      !/^[a-z][a-z0-9+.-]*:/i.test(path) && !path.startsWith("//") && !path.includes("\\");
+  }
+
+  function showGuardToast(text) {
+    const toast = document.createElement("div");
+    toast.setAttribute("role", "alert");
+    toast.className = "alert alert-warning shadow position-fixed top-0 start-50 translate-middle-x mt-5";
+    toast.style.zIndex = "2000";
+    toast.textContent = text;
+    document.body.appendChild(toast);
+  }
+
+  const MocAuthGuard = {
+    // Trả true nếu đã đăng nhập. Chưa đăng nhập: trả false và đang chuyển trang (code phía sau nên dừng lại).
+    requireLogin(options = {}) {
+      if (localStorage.getItem(CUSTOMER_TOKEN_KEY)) return true;
+
+      const current = window.location.pathname + window.location.search;
+      try { sessionStorage.setItem(AFTER_LOGIN_KEY, current); } catch (error) { /* bỏ qua */ }
+
+      const loginPage = options.redirectTo || "/pages/account.html";
+      const target = `${loginPage}?login=1&next=${encodeURIComponent(current)}`;
+
+      showGuardToast("Bạn cần đăng nhập để tiếp tục");
+      setTimeout(() => { window.location.href = target; }, 1200);
+      return false;
+    },
+
+    // Địa chỉ cần quay lại sau khi đăng nhập (đọc 1 lần rồi xóa); không có thì trả fallback
+    afterLoginUrl(fallback) {
+      let saved = null;
+      try {
+        saved = sessionStorage.getItem(AFTER_LOGIN_KEY);
+        sessionStorage.removeItem(AFTER_LOGIN_KEY);
+      } catch (error) { /* bỏ qua */ }
+
+      const next = new URLSearchParams(window.location.search).get("next");
+      const candidate = saved || next;
+      return isSafeInternalPath(candidate) ? candidate : fallback;
+    },
+  };
+
   function getCustomerProfile() {
     try {
       return JSON.parse(localStorage.getItem(CUSTOMER_PROFILE_KEY) || "null");
@@ -194,6 +245,8 @@
 
     return result.data;
   }
+
+  window.MocAuthGuard = MocAuthGuard;
 
   window.MocCoffeeApi = {
     API_ORIGIN,

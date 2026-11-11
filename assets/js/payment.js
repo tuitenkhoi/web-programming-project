@@ -1,6 +1,9 @@
 "use strict";
 
 document.addEventListener("DOMContentLoaded", function () {
+  // Trang thanh toán chỉ dành cho khách đã đăng nhập (chưa đăng nhập thì được chuyển sang trang đăng nhập)
+  if (!window.MocAuthGuard.requireLogin()) return;
+
   const KEYS = {
     cart: "mocCoffeeCart",
     coupon: "mocCoffeeCouponCode",

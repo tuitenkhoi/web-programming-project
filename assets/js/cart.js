@@ -980,6 +980,9 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
+      // Thanh toán cần tài khoản: chưa đăng nhập thì chuyển sang trang đăng nhập, xong sẽ quay lại giỏ hàng
+      if (!window.MocAuthGuard.requireLogin()) return;
+
       const useAtTable =
         orderAtTableRadio.checked;
 

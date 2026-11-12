@@ -14,6 +14,11 @@ function getTransporter() {
         auth: process.env.SMTP_USER
             ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS || '' }
             : undefined,
+
+        // Mail server chậm/không trả lời thì bỏ cuộc sau 10 giây (mặc định của nodemailer là 30 giây đến 2 phút)
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 15000,
     });
     return transporter;
 }

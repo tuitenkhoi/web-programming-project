@@ -17,6 +17,16 @@ const EXPECTED = {
         theme: "VARCHAR(10) NOT NULL DEFAULT 'light'",
         font_size: 'TINYINT NOT NULL DEFAULT 16',
         menu_view: "VARCHAR(10) NOT NULL DEFAULT 'grid'",
+        // Các cột còn lại của migration 004_user_completeness.sql (xác minh email, quên mật khẩu).
+        // Thiếu chúng thì đăng ký/quên mật khẩu báo lỗi 500, nên phải nằm trong danh sách để check-db báo và --fix thêm đủ.
+        email_verified_at: 'DATETIME NULL',
+        verification_token: 'CHAR(32) NULL',
+        verification_expires_at: 'DATETIME NULL',
+        reset_otp: 'CHAR(6) NULL',
+        reset_otp_expires_at: 'DATETIME NULL',
+        reset_attempts: 'TINYINT NOT NULL DEFAULT 0',
+        reset_ticket: 'CHAR(32) NULL',
+        reset_ticket_expires_at: 'DATETIME NULL',
     },
     categories: {
         id: null,

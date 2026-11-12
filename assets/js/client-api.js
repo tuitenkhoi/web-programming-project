@@ -35,6 +35,18 @@
       throw new Error("Phản hồi từ máy chủ không hợp lệ.");
     }
 
+    // Token đã hết hạn / bị thu hồi (đăng xuất nơi khác, đổi mật khẩu...): xóa phiên cũ để khách không bị kẹt
+    // với token hỏng, rồi đưa sang trang đăng nhập (trang tài khoản tự xử lý nên không chuyển nữa).
+    if (
+      response.status === 401 && token && options.auth !== false &&
+      ["TOKEN_REVOKED", "TOKEN_EXPIRED", "ACCOUNT_UNAVAILABLE"].includes(result.code)
+    ) {
+      clearCustomerSession();
+      if (!/account\.html$/.test(window.location.pathname)) {
+        window.MocAuthGuard.requireLogin();
+      }
+    }
+
     if (!response.ok || result.success === false) {
       throw new Error(
         result.message || "Không thể kết nối đến máy chủ."
@@ -82,7 +94,7 @@
 
   // ----- Guard phía khách: trang nào cần đăng nhập thì gọi MocAuthGuard.requireLogin() ở đầu trang -----
   // Chưa có token: nhớ trang hiện tại, báo "Bạn cần đăng nhập để tiếp tục" rồi chuyển sang trang đăng nhập.
-  // Đăng nhập xong thì account-ui.js gọi afterLoginUrl() để quay lại đúng trang đó.
+  // Đăng nhập xong thì account.js gọi afterLoginUrl() để quay lại đúng trang đó.
   const AFTER_LOGIN_KEY = "mocAfterLogin";
 
   // Chỉ nhận đường dẫn nội bộ ("/..." hoặc "pages/..."), chặn "//evil.com" và "http://..." (open redirect)
@@ -100,10 +112,24 @@
     document.body.appendChild(toast);
   }
 
+  // Token còn dùng được không? Chỉ xem hạn (claim "exp") để khỏi gọi API vô ích; server mới là nơi xác thực thật.
+  function hasUsableToken() {
+    const token = localStorage.getItem(CUSTOMER_TOKEN_KEY);
+    if (!token) return false;
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")));
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        clearCustomerSession(); // token hết hạn thì bỏ luôn
+        return false;
+      }
+    } catch (error) { /* không đọc được thì cứ để server quyết định */ }
+    return true;
+  }
+
   const MocAuthGuard = {
     // Trả true nếu đã đăng nhập. Chưa đăng nhập: trả false và đang chuyển trang (code phía sau nên dừng lại).
     requireLogin(options = {}) {
-      if (localStorage.getItem(CUSTOMER_TOKEN_KEY)) return true;
+      if (hasUsableToken()) return true;
 
       const current = window.location.pathname + window.location.search;
       try { sessionStorage.setItem(AFTER_LOGIN_KEY, current); } catch (error) { /* bỏ qua */ }
@@ -124,8 +150,10 @@
         sessionStorage.removeItem(AFTER_LOGIN_KEY);
       } catch (error) { /* bỏ qua */ }
 
-      const next = new URLSearchParams(window.location.search).get("next");
-      const candidate = saved || next;
+      const params = new URLSearchParams(window.location.search);
+      // Chỉ quay lại khi vừa bị guard chuyển tới (?login=1 hoặc ?next=); vào thẳng trang tài khoản thì về trang chủ
+      const fromGuard = params.get("login") || params.get("next");
+      const candidate = fromGuard ? (saved || params.get("next")) : null;
       return isSafeInternalPath(candidate) ? candidate : fallback;
     },
   };

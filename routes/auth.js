@@ -164,7 +164,8 @@ router.post('/customer/register', async (req, res) => {
         );
         // Gửi mail kích hoạt; gửi lỗi cũng không làm hỏng việc đăng ký (khách vẫn đăng nhập được)
         const appUrl = (process.env.APP_URL || '').replace(/\/+$/, '');
-        await sendMail({
+        // Không chờ gửi xong (mail server chậm không được làm treo việc đăng ký); sendMail tự bắt lỗi nên không ném ra ngoài
+        sendMail({
             to: email,
             subject: 'Kích hoạt tài khoản Mộc Coffee',
             text: `Chào ${fullName},\n\nBấm vào liên kết sau để xác minh email (có hiệu lực 24 giờ):\n${appUrl}/api/auth/activate?token=${verificationToken}\n\nNếu bạn không đăng ký, hãy bỏ qua email này.`,
@@ -431,7 +432,8 @@ router.post('/forgot-password', forgotLimiter, async (req, res) => {
                  WHERE id = ?`,
                 [otp, rows[0].id]
             );
-            await sendMail({
+            // Không chờ gửi mail: nếu chờ thì email có tồn tại sẽ phản hồi chậm hơn email lạ, người ngoài đo được thời gian để dò email
+            sendMail({
                 to: email,
                 subject: 'Mã đặt lại mật khẩu Mộc Coffee',
                 text: `Mã xác nhận của bạn là: ${otp}\nMã có hiệu lực trong 10 phút. Nếu không phải bạn yêu cầu, hãy bỏ qua email này.`,

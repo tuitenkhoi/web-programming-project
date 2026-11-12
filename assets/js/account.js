@@ -78,6 +78,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const pageParams = new URLSearchParams(location.search);
   if (pageParams.get("expired")) message("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.", "warning");
   else if (pageParams.get("required")) message("Vui lòng đăng nhập để tiếp tục.", "warning");
+  else if (pageParams.get("login")) message("Bạn cần đăng nhập để tiếp tục", "warning");
 
   // Lời chào theo giờ
   function greetingText() {
@@ -222,7 +223,8 @@ document.addEventListener("DOMContentLoaded", function () {
       const customer = await postLogin("/api/auth/customer/login", { email, password });
       if (customer.ok) {
         api.setCustomerSession(customer.data);
-        location.href = HOME_PAGE;
+        // Bị guard chuyển tới từ trang khác (giỏ hàng, thanh toán...) thì quay lại đúng trang đó
+        location.href = window.MocAuthGuard.afterLoginUrl(HOME_PAGE);
         return;
       }
       if (customer.status === 429) throw new Error(customer.message || "Thử quá nhiều lần, vui lòng đợi một lúc.");
@@ -255,7 +257,7 @@ document.addEventListener("DOMContentLoaded", function () {
       await api.customerRegister(data);
       message("Đăng ký thành công.", "success");
       // Cho khách kịp thấy thông báo rồi về trang chủ
-      setTimeout(() => { location.href = HOME_PAGE; }, 700);
+      setTimeout(() => { location.href = window.MocAuthGuard.afterLoginUrl(HOME_PAGE); }, 700);
     } catch (error) { message(error.message); }
   });
 

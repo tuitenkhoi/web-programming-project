@@ -16,7 +16,7 @@ SET @users_alter_sql = IF(
     @has_avatar = 0,
     'ALTER TABLE users
         ADD COLUMN avatar VARCHAR(255) NULL,
-        ADD COLUMN theme VARCHAR(10) NOT NULL DEFAULT ''system'',
+        ADD COLUMN theme VARCHAR(10) NOT NULL DEFAULT ''light'',
         ADD COLUMN font_size TINYINT NOT NULL DEFAULT 16,
         ADD COLUMN email_verified_at DATETIME NULL,
         ADD COLUMN verification_token CHAR(32) NULL,

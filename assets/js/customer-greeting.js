@@ -47,17 +47,24 @@
     span.className = 'moc-greeting';
     span.textContent = 'Chào, ' + shortName;
     // Ảnh đại diện nhỏ; chưa có thì dùng ảnh mặc định (trang con ở /pages/ cần lùi một cấp)
+    var defaultAvatar = (location.pathname.indexOf('/pages/') !== -1 ? '../' : '') + 'assets/images/default-avatar.png';
     var avatar = document.createElement('img');
     avatar.alt = '';
     avatar.width = 24;
     avatar.height = 24;
-    avatar.className = 'rounded-circle ms-1';
-    avatar.src = profile.avatar
-      ? profile.avatar
-      : (location.pathname.indexOf('/pages/') !== -1 ? '../' : '') + 'assets/images/default-avatar.png';
+    avatar.className = 'rounded-circle object-fit-cover flex-shrink-0';
+    avatar.src = (profile.avatar && window.MocCoffeeApi && MocCoffeeApi.avatarUrl)
+      ? MocCoffeeApi.avatarUrl(profile.avatar)
+      : defaultAvatar;
+    avatar.onerror = function () { avatar.onerror = null; avatar.src = defaultAvatar; };
+    // Đã đăng nhập: ẩn biểu tượng người, chỉ còn ảnh + lời chào trên MỘT hàng
+    var icon = link.querySelector('.bi-person-circle, .bi-person');
+    if (icon) icon.classList.add('d-none');
     link.appendChild(avatar);
     link.appendChild(span);
+    link.classList.add('d-inline-flex', 'align-items-center', 'text-nowrap');
     link.title = fullName;
+    link.setAttribute('aria-label', 'Tài khoản của ' + fullName);
     link.style.width = 'auto';
     link.style.borderRadius = '999px';
     link.style.paddingRight = '12px';

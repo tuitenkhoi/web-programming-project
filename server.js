@@ -113,6 +113,23 @@ STATIC_DIRS.forEach((dir) => {
 app.get(['/', '/index.html'], (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
+// PWA: sw.js phải nằm ở gốc để scope là '/'. Chỉ phục vụ ĐÚNG 2 file này theo danh sách cố định
+// (không mở rộng thư mục gốc, nên .env, server.js, config/ vẫn không lấy được).
+// no-cache: trình duyệt luôn hỏi lại (ETag) nên bản sw.js mới được nhận ngay.
+const ROOT_PWA_FILES = {
+    '/sw.js': { file: 'sw.js', type: 'application/javascript; charset=utf-8' },
+    '/manifest.webmanifest': { file: 'manifest.webmanifest', type: 'application/manifest+json; charset=utf-8' },
+};
+
+app.get(Object.keys(ROOT_PWA_FILES), (req, res, next) => {
+    const entry = ROOT_PWA_FILES[req.path.toLowerCase()];
+    if (!entry) return next();
+
+    res.set({ 'Content-Type': entry.type, 'Cache-Control': 'no-cache' });
+    res.sendFile(entry.file, { root: __dirname, cacheControl: false }, (error) => {
+        if (error && !res.headersSent) next(error);
+    });
+});
 
 const UPLOAD_IMAGE_EXTENSIONS = new Set([
     '.jpg',

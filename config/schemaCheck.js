@@ -14,7 +14,7 @@ const EXPECTED = {
         role: `ENUM(${E('customer', 'admin')}) NOT NULL DEFAULT 'customer'`,
         status: 'TINYINT(1) NOT NULL DEFAULT 1',
         avatar: 'VARCHAR(255) NULL',
-        theme: "VARCHAR(10) NOT NULL DEFAULT 'system'",
+        theme: "VARCHAR(10) NOT NULL DEFAULT 'light'",
         font_size: 'TINYINT NOT NULL DEFAULT 16',
         menu_view: "VARCHAR(10) NOT NULL DEFAULT 'grid'",
     },

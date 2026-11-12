@@ -14,7 +14,7 @@
   }
 
   function apply(prefs) {
-    var theme = prefs.theme || 'system';
+    var theme = prefs.theme || 'light';
     // 'system' thì theo cài đặt của hệ điều hành (prefers-color-scheme)
     var dark = theme === 'dark' || (theme === 'system' && darkQuery && darkQuery.matches);
     root.setAttribute('data-theme', dark ? 'dark' : 'light');

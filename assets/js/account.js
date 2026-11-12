@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function showPrefs(prefs) {
     if (!prefsForm) return;
-    const theme = prefs.theme || "system";
+    const theme = prefs.theme || "light";
     const radio = prefsForm.querySelector(`input[name="theme"][value="${theme}"]`);
     if (radio) radio.checked = true;
     prefsForm.querySelector("#pref-font").value = String(prefs.font_size || 16);
@@ -120,7 +120,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   on("#prefs-form", "change", function () {
     const prefs = {
-      theme: prefsForm.querySelector('input[name="theme"]:checked')?.value || "system",
+      theme: prefsForm.querySelector('input[name="theme"]:checked')?.value || "light",
       font_size: Number(prefsForm.querySelector("#pref-font").value),
     };
     if (window.MocPrefs) window.MocPrefs.save(prefs); // đổi giao diện tức thì
@@ -310,6 +310,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   on("#password-form", "submit", async function (event) {
     event.preventDefault();
+    const form = event.currentTarget; // currentTarget thành null sau await, nên giữ lại trước khi gọi API
     const payload = {
       current_password: document.querySelector("#pw-current").value,
       new_password: document.querySelector("#pw-new").value,
@@ -319,7 +320,7 @@ document.addEventListener("DOMContentLoaded", function () {
     try {
       const text = await api.changePassword(payload);
       api.clearCustomerSession(); // token cũ đã bị server thu hồi, chỉ cần xóa bản lưu cục bộ
-      event.currentTarget.reset();
+      form.reset();
       message(text, "success");
       await loadMember();
     } catch (error) { message(error.message); }

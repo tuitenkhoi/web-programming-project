@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Đơn hàng - Mộc Coffee</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="../assets/css/staff.css" />
+  <script src="../assets/js/admin-auth.js"></script>
+</head>
+
+<body class="staff-body" data-page="orders.html" data-perm="orders.view">
+  <header id="staff-header"></header>
+
+  <main id="staff-content" class="staff-main">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+      <div>
+        <h1 class="h3 staff-title">Đơn hàng</h1>
+        <p class="text-secondary mb-0">Xem, cập nhật trạng thái, xác nhận thanh toán và in hóa đơn.</p>
+      </div>
+      <a href="new-order.html" id="btn-new-order" class="btn btn-coffee d-none"><i class="bi bi-plus-lg me-1"></i>Tạo đơn mới</a>
+    </div>
+    <div class="staff-card p-3 mb-3">
+      <div class="row g-2 align-items-center">
+        <div class="col-12 col-lg-5">
+          <div class="btn-group flex-wrap" id="order-tabs" role="group" aria-label="Lọc trạng thái">
+            <button type="button" class="btn btn-outline-secondary btn-sm active" data-tab="open">Đang xử lý</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-tab="unpaid">Chờ thanh toán</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-tab="completed">Hoàn thành</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-tab="cancelled">Đã hủy</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-tab="all">Tất cả</button>
+          </div>
+        </div>
+        <div class="col-7 col-lg-4"><input type="search" id="order-search" class="form-control" placeholder="Tìm mã đơn, bàn, tên, SĐT..." /></div>
+        <div class="col-5 col-lg-3"><input type="date" id="order-date" class="form-control" title="Lọc theo ngày (để trống = mọi ngày)" /></div>
+      </div>
+    </div>
+    <div class="staff-card">
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead class="table-light"><tr><th>Mã đơn</th><th>Bàn / Hình thức</th><th>Khách</th><th class="text-end">Tổng tiền</th><th>Thanh toán</th><th>Trạng thái</th><th>Giờ</th></tr></thead>
+          <tbody id="order-body"></tbody>
+        </table>
+      </div>
+      <div class="d-flex justify-content-between align-items-center p-3">
+        <small class="text-secondary" id="order-count"></small>
+        <div class="btn-group"><button type="button" id="prev-page" class="btn btn-outline-secondary btn-sm">&laquo;</button><button type="button" id="next-page" class="btn btn-outline-secondary btn-sm">&raquo;</button></div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="order-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content border-0">
+          <div class="modal-header"><h2 class="modal-title h5" id="order-modal-title">Chi tiết đơn</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button></div>
+          <div class="modal-body" id="order-modal-body"></div>
+          <div class="modal-footer flex-wrap" id="order-modal-actions"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/confirm-modal.js"></script>
+  <script src="../assets/js/staff.js"></script>
+  <script src="../assets/js/staff-orders.js"></script>
+</body>
+
+</html>

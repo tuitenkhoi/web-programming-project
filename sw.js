@@ -133,13 +133,16 @@ function classifyRequest(info, origin) {
 
   if (path === "/sw.js" || path === "/manifest.webmanifest") return null;
   if (path === "/admin" || path.startsWith("/admin/")) return null;
+  if (path === "/staff" || path.startsWith("/staff/")) return null;
   if (path.startsWith("/socket.io")) return null;
 
   if (path.startsWith("/api/")) {
     if (!API_CACHEABLE.test(path) || API_EXCLUDED.test(path)) return null;
     let fromAdminPage = false;
     try {
-      fromAdminPage = info.referrer ? new URL(info.referrer).pathname.startsWith("/admin/") : false;
+      fromAdminPage = info.referrer
+        ? /^\/(admin|staff)\//.test(new URL(info.referrer).pathname)
+        : false;
     } catch {
       fromAdminPage = false;
     }

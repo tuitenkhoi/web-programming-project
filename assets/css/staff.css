@@ -1,0 +1,94 @@
+/* Giao diện trang nhân viên (/staff). Dùng Bootstrap 5 + màu thương hiệu Mộc Coffee. */
+:root {
+  --st-primary: #6f4e37;
+  --st-primary-dark: #3e2723;
+  --st-accent: #c68b59;
+  --st-cream: #f7f1ea;
+  --st-paper: #fbf8f4;
+  --st-ink: #2a1d17;
+  --st-green: #557153;
+  --st-red: #b3402d;
+  --st-amber: #c98a1b;
+  --st-blue: #3a6ea5;
+}
+body.staff-body { background: var(--st-cream); color: var(--st-ink); min-height: 100vh; font-family: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+.btn-coffee { background: var(--st-primary); border-color: var(--st-primary); color: #fff; }
+.btn-coffee:hover, .btn-coffee:focus { background: var(--st-primary-dark); border-color: var(--st-primary-dark); color: #fff; }
+.btn-coffee:disabled { background: var(--st-primary); border-color: var(--st-primary); opacity: .55; }
+
+.staff-header { background: var(--st-primary-dark); color: #fff; position: sticky; top: 0; z-index: 1030; }
+.staff-header .navbar-brand { color: #fff; font-weight: 700; }
+.staff-header .nav-link { color: rgba(255,255,255,.78); border-radius: .5rem; padding: .5rem .85rem; font-weight: 500; }
+.staff-header .nav-link:hover { color: #fff; background: rgba(255,255,255,.08); }
+.staff-header .nav-link.active { color: #fff; background: var(--st-primary); }
+.staff-user { color: rgba(255,255,255,.85); font-size: .9rem; line-height: 1.2; text-align: right; }
+.staff-user small { display: block; color: var(--st-accent); }
+
+.staff-main { padding: 1.25rem; max-width: 1600px; margin: 0 auto; }
+.staff-title { font-weight: 700; margin-bottom: .15rem; }
+.staff-card { background: #fff; border: 0; border-radius: .9rem; box-shadow: 0 6px 18px rgba(62,39,35,.08); }
+
+/* Sơ đồ bàn */
+.area-title { font-weight: 700; color: var(--st-primary-dark); margin: 1.25rem 0 .6rem; display: flex; align-items: center; gap: .5rem; }
+.table-tile { background: #fff; border-radius: .9rem; border: 2px solid transparent; box-shadow: 0 6px 18px rgba(62,39,35,.08); padding: .9rem; height: 100%; display: flex; flex-direction: column; gap: .5rem; }
+.table-tile.available { border-color: rgba(85,113,83,.45); }
+.table-tile.occupied { border-color: var(--st-red); background: #fff6f3; }
+.table-tile.maintenance { border-color: #9aa0a6; background: #f1f1f1; opacity: .85; }
+.table-tile .tile-head { display: flex; justify-content: space-between; align-items: center; }
+.table-tile .tile-name { font-weight: 700; font-size: 1.1rem; }
+.status-pill { font-size: .72rem; font-weight: 600; padding: .2rem .55rem; border-radius: 999px; color: #fff; }
+.status-pill.available { background: var(--st-green); }
+.status-pill.occupied { background: var(--st-red); }
+.status-pill.maintenance { background: #7b8085; }
+.tile-meta { font-size: .85rem; color: #6b5a50; }
+.tile-actions { margin-top: auto; display: flex; flex-wrap: wrap; gap: .4rem; }
+.booking-chip { font-size: .75rem; background: #fff3d6; color: #7a5300; border-radius: .5rem; padding: .15rem .5rem; display: inline-block; }
+
+/* Đơn hàng */
+.order-row { cursor: pointer; }
+.order-row:hover { background: #fbf4ec; }
+.badge-status { font-weight: 600; }
+.badge-status.pending { background: var(--st-red) !important; }
+.badge-status.confirmed { background: var(--st-blue) !important; }
+.badge-status.preparing { background: var(--st-amber) !important; }
+.badge-status.ready { background: #1f8a8a !important; }
+.badge-status.completed { background: var(--st-green) !important; }
+.badge-status.cancelled { background: #7b8085 !important; }
+
+/* Tạo đơn (POS) */
+.pos-layout { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 1rem; align-items: start; }
+@media (max-width: 991.98px) { .pos-layout { grid-template-columns: 1fr; } }
+.pos-menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: .75rem; }
+.product-tile { background: #fff; border-radius: .8rem; box-shadow: 0 4px 12px rgba(62,39,35,.08); overflow: hidden; cursor: pointer; border: 2px solid transparent; text-align: left; padding: 0; }
+.product-tile:hover { border-color: var(--st-accent); }
+.product-tile img { width: 100%; height: 100px; object-fit: cover; background: var(--st-cream); display: block; }
+.product-tile .tile-body { padding: .55rem .65rem; }
+.product-tile .p-name { font-weight: 600; font-size: .9rem; line-height: 1.25; min-height: 2.25em; }
+.product-tile .p-price { color: var(--st-primary); font-weight: 700; font-size: .9rem; }
+.pos-cart { position: sticky; top: 76px; max-height: calc(100vh - 96px); display: flex; flex-direction: column; }
+.pos-cart .cart-lines { overflow-y: auto; flex: 1; min-height: 80px; }
+.cart-line { border-bottom: 1px dashed #e4d6c8; padding: .55rem 0; }
+.cart-line:last-child { border-bottom: 0; }
+.qty-box { display: inline-flex; align-items: center; gap: .35rem; }
+.qty-box button { width: 28px; height: 28px; padding: 0; line-height: 1; }
+.cat-tabs { display: flex; gap: .4rem; overflow-x: auto; padding-bottom: .35rem; }
+.cat-tabs .btn { white-space: nowrap; }
+
+/* Màn hình bếp */
+.kitchen-board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; align-items: start; }
+@media (max-width: 991.98px) { .kitchen-board { grid-template-columns: 1fr; } }
+.kitchen-col h2 { font-size: 1rem; font-weight: 700; display: flex; justify-content: space-between; align-items: center; }
+.kitchen-card { background: #fff; border-radius: .9rem; box-shadow: 0 6px 18px rgba(62,39,35,.1); padding: .9rem; margin-bottom: .8rem; border-left: 6px solid var(--st-blue); }
+.kitchen-card.pending { border-left-color: var(--st-red); }
+.kitchen-card.preparing { border-left-color: var(--st-amber); }
+.kitchen-card.ready { border-left-color: var(--st-green); }
+.kitchen-card.late { box-shadow: 0 0 0 2px var(--st-red), 0 6px 18px rgba(62,39,35,.1); }
+.kitchen-card .k-head { display: flex; justify-content: space-between; align-items: baseline; gap: .5rem; }
+.kitchen-card .k-where { font-size: 1.15rem; font-weight: 800; }
+.kitchen-card .k-time { font-size: .85rem; color: #6b5a50; white-space: nowrap; }
+.kitchen-card.late .k-time { color: var(--st-red); font-weight: 700; }
+.k-item { padding: .35rem 0; border-top: 1px dashed #e4d6c8; }
+.k-item .k-qty { font-weight: 800; margin-right: .35rem; }
+.k-item small { display: block; color: #6b5a50; }
+.k-note { background: #fff3d6; border-radius: .5rem; padding: .3rem .55rem; font-size: .85rem; margin-top: .4rem; }
+.kitchen-empty { color: #8c7b70; text-align: center; padding: 1.5rem 0; }

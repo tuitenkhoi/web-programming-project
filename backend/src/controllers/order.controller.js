@@ -500,4 +500,10 @@ const createOrder = async (req, res) => {
 
 module.exports = {
     createOrder,
+    // Dùng chung với routes/staff.js để đơn nhân viên tạo tính tiền giống hệt đơn khách đặt
+    SIZE_PRICES,
+    TOPPING_PRICES,
+    LEVELS,
+    cleanText,
+    createOrderCode,
 };

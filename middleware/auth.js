@@ -29,6 +29,11 @@ function getCachedUser(userId) {
     return hit.user;
 }
 
+// Xóa cache của một tài khoản (dùng khi admin khóa/đổi vị trí nhân viên để có hiệu lực ngay)
+function invalidateUserCache(userId) {
+    userCache.delete(Number(userId));
+}
+
 function setCachedUser(userId, user) {
     if (AUTH_CACHE_MS <= 0) return;
     if (userCache.size > 500) userCache.clear(); // chặn phình bộ nhớ
@@ -71,6 +76,30 @@ function extractToken(req) {
         }
     }
     return null;
+}
+
+// Tra tài khoản. Nếu database chưa chạy migration 007 (thiếu cột staff_position) thì tra lại không có cột đó,
+// để khách và admin vẫn dùng được bình thường trong lúc chưa nâng cấp database.
+async function selectUser(userId) {
+    try {
+        return await db.execute(
+            `SELECT id, full_name, email, role, status, staff_position
+             FROM users
+             WHERE id = ?
+             LIMIT 1`,
+            [userId]
+        );
+    } catch (error) {
+        if (error.code !== 'ER_BAD_FIELD_ERROR') throw error;
+        console.warn('Database chưa có cột users.staff_position: hãy chạy database/migrations/007_staff_accounts.sql');
+        return db.execute(
+            `SELECT id, full_name, email, role, status
+             FROM users
+             WHERE id = ?
+             LIMIT 1`,
+            [userId]
+        );
+    }
 }
 
 async function verifyToken(req, res, next) {
@@ -146,13 +175,7 @@ async function verifyToken(req, res, next) {
 
     if (!user) {
         try {
-            const [rows] = await db.execute(
-                `SELECT id, full_name, email, role, status
-                 FROM users
-                 WHERE id = ?
-                 LIMIT 1`,
-                [userId]
-            );
+            const [rows] = await selectUser(userId);
 
             user = rows[0];
             if (user && Number(user.status) === 1) setCachedUser(userId, user);
@@ -180,6 +203,7 @@ async function verifyToken(req, res, next) {
         full_name: user.full_name,
         email: user.email,
         role: user.role,
+        staff_position: user.staff_position || null,
     };
 
     next();
@@ -243,5 +267,6 @@ module.exports = {
     requireCustomer,
     setAuthCookie,
     clearAuthCookie,
+    invalidateUserCache,
     SECRET_KEY,
 };

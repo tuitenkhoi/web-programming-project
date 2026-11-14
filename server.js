@@ -12,6 +12,7 @@ const {
     verifyToken,
     requireAdmin,
 } = require('./middleware/auth');
+const { requireStaff } = require('./middleware/permissions');
 const categoryRoutes = require('./backend/src/routes/category.routes');
 const productRoutes = require('./backend/src/routes/product.routes');
 const orderRoutes = require('./backend/src/routes/order.routes');
@@ -39,7 +40,7 @@ app.use(express.json({ limit: '100kb' }));
 
 // Chỉ phục vụ các thư mục giao diện, KHÔNG phục vụ cả thư mục dự án (tránh lộ .env, server.js, config/).
 // Sửa danh sách này cho khớp cấu trúc thư mục của bạn.
-const STATIC_DIRS = ['admin', 'assets', 'pages'];
+const STATIC_DIRS = ['admin', 'assets', 'pages', 'staff'];
 
 const PUBLIC_EXTENSIONS = new Set([
     '.html',
@@ -226,6 +227,8 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/customer', require('./routes/customer'));
 app.use('/api/vouchers', require('./routes/vouchers'));
 app.use('/api/admin/vouchers', verifyToken, requireAdmin, require('./routes/admin-vouchers'));
+app.use('/api/admin/staff', verifyToken, requireAdmin, require('./routes/admin-staff')); // admin quản lý tài khoản nhân viên
+app.use('/api/staff', verifyToken, requireStaff, require('./routes/staff')); // API cho trang nhân viên (admin cũng dùng được)
 app.use('/api/reviews', require('./routes/reviews'));
 app.use(
     '/api/dashboard',

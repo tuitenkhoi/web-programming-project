@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Đặt bàn - Mộc Coffee</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="../assets/css/staff.css" />
+  <script src="../assets/js/admin-auth.js"></script>
+</head>
+
+<body class="staff-body" data-page="bookings.html" data-perm="bookings.view">
+  <header id="staff-header"></header>
+
+  <main id="staff-content" class="staff-main">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+      <div>
+        <h1 class="h3 staff-title">Đặt bàn</h1>
+        <p class="text-secondary mb-0" id="booking-hint">Duyệt yêu cầu, xếp khách vào bàn và hoàn tất.</p>
+      </div>
+      <button type="button" id="refresh" class="btn btn-light border" title="Làm mới"><i class="bi bi-arrow-clockwise"></i></button>
+    </div>
+    <div class="staff-card p-3 mb-3">
+      <div class="row g-2 align-items-center">
+        <div class="col-12 col-lg-6">
+          <div class="btn-group flex-wrap" id="booking-tabs" role="group" aria-label="Lọc trạng thái">
+            <button type="button" class="btn btn-outline-secondary btn-sm active" data-tab="active">Cần xử lý</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-tab="pending">Chờ duyệt</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-tab="confirmed">Đã duyệt</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-tab="seated">Đang phục vụ</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-tab="done">Hoàn tất / Hủy</button>
+          </div>
+        </div>
+        <div class="col-7 col-lg-4"><input type="search" id="booking-search" class="form-control" placeholder="Tìm tên, SĐT, bàn, mã..." /></div>
+        <div class="col-5 col-lg-2"><input type="date" id="booking-date" class="form-control" title="Lọc theo ngày" /></div>
+      </div>
+    </div>
+    <div class="staff-card">
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead class="table-light"><tr><th>Mã</th><th>Khách</th><th>Bàn</th><th>Ngày giờ</th><th>Số khách</th><th>Ghi chú</th><th>Trạng thái</th><th class="text-end">Thao tác</th></tr></thead>
+          <tbody id="booking-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/confirm-modal.js"></script>
+  <script src="../assets/js/staff.js"></script>
+  <script src="../assets/js/staff-bookings.js"></script>
+</body>
+
+</html>

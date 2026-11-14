@@ -13,6 +13,7 @@ const SOURCE_DIRS = [
     'middleware',
     'pages',
     'routes',
+    'staff',
     'scripts',
     'tests',
 ];

@@ -12,18 +12,27 @@ const {
 const {
     verifyToken,
     optionalToken,
-    requireAdmin,
 } = require("../../../middleware/auth");
+const {
+    requirePermission,
+    requireOrderStatusPermission,
+} = require("../../../middleware/permissions");
 
 const router = express.Router();
 
 // Khách hàng không cần đăng nhập vẫn có thể gọi món.
 router.post("/", optionalToken, createOrder);
 
-// Các API dưới đây chỉ dành cho admin.
-router.get("/", verifyToken, requireAdmin, getOrders);
-router.get("/:id", verifyToken, requireAdmin, getOrderById);
-router.patch("/:id/status", verifyToken, requireAdmin, updateOrderStatus);
-router.patch("/:id/payment", verifyToken, requireAdmin, confirmOrderPayment);
+// Các API dưới đây dành cho admin và nhân viên (admin luôn đủ quyền; nhân viên theo vị trí, xem middleware/permissions.js).
+router.get("/", verifyToken, requirePermission("orders.view"), getOrders);
+router.get("/:id", verifyToken, requirePermission("orders.view"), getOrderById);
+router.patch(
+    "/:id/status",
+    verifyToken,
+    requirePermission("orders.view"),
+    requireOrderStatusPermission,
+    updateOrderStatus
+);
+router.patch("/:id/payment", verifyToken, requirePermission("orders.payment"), confirmOrderPayment);
 
 module.exports = router;

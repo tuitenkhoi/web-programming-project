@@ -19,7 +19,9 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(150) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     phone VARCHAR(20),
-    role ENUM('customer', 'admin') NOT NULL DEFAULT 'customer',
+    role ENUM('customer', 'admin', 'staff') NOT NULL DEFAULT 'customer',
+    staff_position ENUM('waiter', 'cashier', 'kitchen') NULL,
+    created_by INT UNSIGNED NULL,
     status TINYINT(1) NOT NULL DEFAULT 1,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -74,7 +76,7 @@ CREATE TABLE IF NOT EXISTS orders (
     order_code VARCHAR(30) NOT NULL UNIQUE,
     user_id INT UNSIGNED NULL,
     customer_name VARCHAR(100) NOT NULL,
-    customer_phone VARCHAR(20) NOT NULL,
+    customer_phone VARCHAR(20) NULL,
     customer_email VARCHAR(150) NULL,
     order_type ENUM('at_table', 'takeaway') NOT NULL DEFAULT 'at_table',
     table_code VARCHAR(20) NULL,
@@ -84,6 +86,8 @@ CREATE TABLE IF NOT EXISTS orders (
     discount_amount DECIMAL(12, 2) NOT NULL DEFAULT 0,
     service_fee DECIMAL(12, 2) NOT NULL DEFAULT 0,
     total_amount DECIMAL(12, 2) NOT NULL DEFAULT 0,
+    created_by INT UNSIGNED NULL,
+    source ENUM('online', 'staff') NOT NULL DEFAULT 'online',
     payment_method ENUM('cash', 'bank_transfer') NOT NULL DEFAULT 'cash',
     payment_status ENUM('pending', 'pending_verification', 'paid', 'failed', 'refunded') NOT NULL DEFAULT 'pending',
     status ENUM('pending', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled') NOT NULL DEFAULT 'pending',
@@ -298,6 +302,21 @@ CREATE TABLE IF NOT EXISTS bookings (
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci;
+
+-- Nhật ký thao tác của nhân viên/admin - migration 007
+CREATE TABLE IF NOT EXISTS staff_activity_logs (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED NULL,
+    user_name VARCHAR(100) NULL,
+    action VARCHAR(50) NOT NULL,
+    entity VARCHAR(30) NOT NULL,
+    entity_id BIGINT UNSIGNED NULL,
+    detail VARCHAR(500) NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_activity_created (created_at),
+    INDEX idx_activity_user (user_id, created_at),
+    INDEX idx_activity_entity (entity, entity_id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 INSERT INTO coffee_tables (
     table_code,

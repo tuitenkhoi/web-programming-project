@@ -23,6 +23,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const HOME_PAGE = "../index.html";
   const ADMIN_DASHBOARD = "../admin/dashboard.html";
+  const STAFF_HOME = "../staff/index.html";
   const ADMIN_AUTH_SCRIPT = "../assets/js/admin-auth.js";
 
   const loginPanel = document.querySelector("#login-panel");
@@ -233,8 +234,9 @@ document.addEventListener("DOMContentLoaded", function () {
       if (admin.ok) {
         const auth = await loadAdminAuth();
         auth.setToken(admin.data.token);
-        message("Đăng nhập quản trị thành công. Đang chuyển hướng...", "success");
-        location.href = ADMIN_DASHBOARD;
+        const isStaff = admin.data.user && admin.data.user.role === "staff";
+        message(isStaff ? "Đăng nhập thành công. Đang chuyển hướng..." : "Đăng nhập quản trị thành công. Đang chuyển hướng...", "success");
+        location.href = isStaff ? STAFF_HOME : ADMIN_DASHBOARD;
         return;
       }
 

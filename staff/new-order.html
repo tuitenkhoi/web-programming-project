@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>Tạo đơn - Mộc Coffee</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <link rel="stylesheet" href="../assets/css/staff.css" />
+  <script src="../assets/js/admin-auth.js"></script>
+</head>
+
+<body class="staff-body" data-page="new-order.html" data-perm="orders.create">
+  <header id="staff-header"></header>
+
+  <main id="staff-content" class="staff-main">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+      <div>
+        <h1 class="h3 staff-title" id="pos-title">Tạo đơn mới</h1>
+        <p class="text-secondary mb-0" id="pos-subtitle">Chọn món bên trái, kiểm tra giỏ bên phải rồi bấm tạo đơn.</p>
+      </div>
+    </div>
+    <div class="pos-layout">
+      <section>
+        <div class="row g-2 mb-2">
+          <div class="col-12 col-md-6"><input type="search" id="menu-search" class="form-control" placeholder="Tìm món..." /></div>
+        </div>
+        <div class="cat-tabs mb-3" id="cat-tabs"></div>
+        <div id="menu-grid" class="pos-menu-grid"><div class="text-secondary py-4">Đang tải thực đơn...</div></div>
+      </section>
+
+      <aside class="staff-card pos-cart p-3">
+        <div id="pos-alert" class="alert alert-danger d-none py-2"></div>
+        <div id="pos-success" class="alert alert-success d-none py-2"></div>
+        <div id="pos-form-top">
+          <div class="btn-group w-100 mb-2" role="group" aria-label="Hình thức">
+            <input type="radio" class="btn-check" name="order-type" id="type-table" value="at_table" checked />
+            <label class="btn btn-outline-secondary" for="type-table"><i class="bi bi-cup-straw me-1"></i>Tại bàn</label>
+            <input type="radio" class="btn-check" name="order-type" id="type-takeaway" value="takeaway" />
+            <label class="btn btn-outline-secondary" for="type-takeaway"><i class="bi bi-bag me-1"></i>Mang đi</label>
+          </div>
+          <select id="pos-table" class="form-select mb-2" aria-label="Chọn bàn"></select>
+          <div class="row g-2 mb-2">
+            <div class="col-6"><input id="pos-name" class="form-control" maxlength="100" placeholder="Tên khách (tùy chọn)" /></div>
+            <div class="col-6"><input id="pos-phone" class="form-control" maxlength="10" inputmode="numeric" placeholder="SĐT (tùy chọn)" /></div>
+          </div>
+        </div>
+        <h2 class="h6 fw-bold mb-1">Giỏ hàng <span class="badge text-bg-secondary" id="cart-count">0</span></h2>
+        <div class="cart-lines" id="cart-lines"></div>
+        <input id="pos-note" class="form-control form-control-sm my-2" maxlength="300" placeholder="Ghi chú cho cả đơn..." />
+        <div id="pos-payment-group" class="mb-2">
+          <select id="pos-payment" class="form-select form-select-sm" aria-label="Thanh toán">
+            <option value="cash">Thanh toán tiền mặt</option>
+            <option value="bank_transfer">Chuyển khoản (chờ xác nhận)</option>
+          </select>
+        </div>
+        <div class="d-flex justify-content-between small"><span>Tạm tính</span><span id="sum-subtotal">0đ</span></div>
+        <div class="d-flex justify-content-between small"><span>Phí phục vụ (5%, tại bàn)</span><span id="sum-fee">0đ</span></div>
+        <div class="d-flex justify-content-between fw-bold fs-5 mb-2"><span>Tổng</span><span id="sum-total">0đ</span></div>
+        <div class="d-flex gap-2">
+          <button type="button" id="btn-clear" class="btn btn-outline-secondary">Xóa giỏ</button>
+          <button type="button" id="btn-submit" class="btn btn-coffee flex-grow-1"><i class="bi bi-check2-circle me-1"></i><span id="btn-submit-text">Tạo đơn</span></button>
+        </div>
+      </aside>
+    </div>
+
+    <div class="modal fade" id="option-modal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0">
+          <div class="modal-header"><h2 class="modal-title h5" id="option-title">Tùy chọn món</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button></div>
+          <div class="modal-body">
+            <div class="mb-3"><label class="form-label fw-semibold">Kích thước</label><div id="opt-size" class="btn-group w-100"></div></div>
+            <div class="row g-2 mb-3">
+              <div class="col-6"><label class="form-label fw-semibold" for="opt-sugar">Đường</label><select id="opt-sugar" class="form-select"></select></div>
+              <div class="col-6"><label class="form-label fw-semibold" for="opt-ice">Đá</label><select id="opt-ice" class="form-select"></select></div>
+            </div>
+            <div class="mb-3"><label class="form-label fw-semibold">Topping</label><div id="opt-toppings"></div></div>
+            <div class="mb-3"><label class="form-label fw-semibold" for="opt-qty">Số lượng</label><input id="opt-qty" type="number" class="form-control" min="1" max="99" value="1" /></div>
+            <div><label class="form-label fw-semibold" for="opt-note">Ghi chú món</label><input id="opt-note" class="form-control" maxlength="200" placeholder="Ít cay, không hành..." /></div>
+          </div>
+          <div class="modal-footer"><span class="me-auto fw-bold" id="opt-price"></span><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button><button type="button" id="opt-save" class="btn btn-coffee">Thêm vào giỏ</button></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/confirm-modal.js"></script>
+  <script src="../assets/js/staff.js"></script>
+  <script src="../assets/js/staff-pos.js"></script>
+</body>
+
+</html>

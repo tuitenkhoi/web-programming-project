@@ -49,7 +49,7 @@ mysql --default-character-set=utf8mb4 -u root < database/schema.sql
 
 **3. Chạy migrations theo đúng thứ tự** (DB vừa tạo xong vẫn cần chạy để có cột mới):
 ```bash
-for f in database/migrations/001_*.sql database/migrations/002_*.sql database/migrations/003_*.sql database/migrations/004_*.sql database/migrations/005_*.sql database/migrations/006_*.sql; do mysql --default-character-set=utf8mb4 -u root moc_coffee < "$f"; done
+for f in database/migrations/001_*.sql database/migrations/002_*.sql database/migrations/003_*.sql database/migrations/004_*.sql database/migrations/005_*.sql database/migrations/006_*.sql database/migrations/007_*.sql; do mysql --default-character-set=utf8mb4 -u root moc_coffee < "$f"; done
 ```
 > ⚠️ **Hai thông báo sau là bình thường, bỏ qua được** (migration lịch sử, không phải lỗi dự án):
 > * `001_...sql`: `ERROR 1146 ... Table 'moc_coffee.tables' doesn't exist` — tham chiếu bảng của bản cũ, nay đã gộp vào `coffee_tables`.
@@ -99,6 +99,33 @@ Mở http://localhost:5000 (khách) và http://localhost:5000/admin/login.html (
 **Phía khách** — menu ở dạng lưới hoặc danh sách (chuyển đổi được, lưu theo tài khoản qua `menu_view`), tìm kiếm live 300 ms trên cả tên lẫn mô tả (không phân biệt dấu, tô sáng từ khóa), lọc theo danh mục và theo nhiều nhãn (kết hợp AND), chi tiết món với thư viện ảnh / video / tài liệu + đánh giá, giỏ hàng, voucher, đặt bàn, thanh toán + mã QR ngân hàng (sinh ngay trên trình duyệt, không gọi site ngoài), tra đơn bằng mã đơn + SĐT. Tài khoản: đăng ký (email + tên + mật khẩu ×2, SĐT tùy chọn), auto-login, kích hoạt email (vẫn dùng được mọi tính năng trước khi kích hoạt, chỉ có banner nhắc), đổi mật khẩu, quên mật khẩu bằng OTP 6 số, sửa hồ sơ + avatar, tùy chọn giao diện (Sáng/Tối/Theo thiết bị, cỡ chữ). Trang thanh toán và hồ sơ yêu cầu đăng nhập; sau khi đăng nhập quay lại đúng trang đang dở.
 
 **Phía admin** — dashboard số liệu động + biểu đồ doanh thu, đơn hàng (lọc, tìm, phân trang, đổi trạng thái, xác nhận thanh toán, in hóa đơn), bàn (sơ đồ và trạng thái), đặt bàn (duyệt / xếp khách / hoàn tất), sản phẩm (thêm/sửa có **tự lưu**, ghim lên đầu, gán nhãn, đính kèm), danh mục, voucher, đánh giá. Thông báo đơn/booking/trạng thái bàn đẩy bằng Socket.IO; polling dự phòng 20 s (màn đặt bàn) và 60 s (badge header).
+
+## Trang nhân viên (`/staff`)
+
+Admin tạo tài khoản nhân viên tại `admin/staff.html` (email dạng `tennhanvien@moccoffee.local`, mật khẩu tạm do admin đặt; nhân viên có thể tự đổi, không bắt buộc). Nhân viên đăng nhập ở trang đăng nhập chung và được chuyển tới `/staff/index.html`.
+
+| Chức năng | Phục vụ | Thu ngân | Bếp | Admin |
+|---|---|---|---|---|
+| Xem sơ đồ bàn | ✔ | ✔ | ✔ | ✔ |
+| Đổi trạng thái bàn | ✔ | | | ✔ |
+| Xem đặt bàn | ✔ | ✔ | | ✔ |
+| Duyệt / xếp khách / hủy đặt bàn | ✔ | | | ✔ |
+| Xem đơn hàng | ✔ | ✔ | ✔ | ✔ |
+| Tạo và sửa đơn tại quầy | ✔ | ✔ | ✔ | ✔ |
+| Xác nhận thanh toán | | ✔ | | ✔ |
+| Hủy đơn | | ✔ | | ✔ |
+| Màn hình bếp (đổi sang đang làm / xong) | | | ✔ | ✔ |
+
+Bảng quyền nằm trong `middleware/permissions.js` (sửa ở đó nếu muốn đổi). Mọi thao tác quan trọng được ghi vào bảng `staff_activity_logs` (admin xem ở nút "Nhật ký thao tác"). Khóa tài khoản có hiệu lực ngay và đăng xuất mọi thiết bị.
+
+**Migration `007_staff_accounts.sql`:** thêm role `staff`, cột `users.staff_position`, `users.created_by`, `orders.created_by`, `orders.source`, cho phép `orders.customer_phone` rỗng và tạo bảng `staff_activity_logs`. Chạy sau migration 006.
+
+| Phương thức & đường dẫn | Quyền | Mô tả |
+|---|---|---|
+| `GET/POST /api/admin/staff` · `PATCH /:id` · `PATCH /:id/status` · `POST /:id/reset-password` · `GET /logs` | 🔒 admin | Quản lý nhân viên và nhật ký |
+| `GET /api/staff/me` · `POST /api/staff/change-password` | nhân viên | Thông tin, quyền, tự đổi mật khẩu |
+| `GET /api/staff/order-options` · `POST /api/staff/orders` · `PUT /api/staff/orders/:id` | theo vị trí | Tạo / sửa đơn tại quầy (giá do server tính) |
+| `GET /api/staff/kitchen` | theo vị trí | Danh sách đơn cho màn hình bếp |
 
 ## Offline / PWA
 

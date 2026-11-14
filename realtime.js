@@ -17,7 +17,7 @@ function initialize(server) {
         },
     });
 
-    // Kênh realtime chỉ dành cho admin đã xác thực. Không tin role trong token;
+    // Kênh realtime dành cho admin và nhân viên đã xác thực. Không tin role trong token;
     // luôn đối chiếu lại role và trạng thái tài khoản trong database.
     io.use(async (socket, next) => {
         try {
@@ -28,8 +28,8 @@ function initialize(server) {
                 return next(new Error('UNAUTHORIZED'));
             }
             const [rows] = await db.execute(
-                'SELECT id FROM users WHERE id = ? AND role = ? AND status = 1 LIMIT 1',
-                [userId, 'admin']
+                "SELECT id FROM users WHERE id = ? AND role IN ('admin', 'staff') AND status = 1 LIMIT 1",
+                [userId]
             );
             if (!rows.length) return next(new Error('FORBIDDEN'));
             socket.data.userId = userId;
@@ -40,6 +40,7 @@ function initialize(server) {
     });
 
     io.on('connection', (socket) => {
+        // Tên phòng giữ là 'admins' cho tương thích; nay gồm cả nhân viên
         socket.join('admins');
     });
     return io;

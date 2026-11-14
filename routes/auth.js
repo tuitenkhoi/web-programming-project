@@ -75,6 +75,7 @@ function authResponse(res, user, message = 'Đăng nhập thành công') {
                 phone: user.phone || '',
                 avatar: user.avatar || '',
                 role: user.role,
+                staff_position: user.staff_position || null,
             },
         },
     });
@@ -96,17 +97,28 @@ router.post('/login', async (req, res) => {
     }
 
     try {
-        const [rows] = await db.query(
-            'SELECT id, email, full_name, password_hash, role, status FROM users WHERE email = ? LIMIT 1',
-            [email]
-        );
+        let rows;
+        try {
+            [rows] = await db.query(
+                'SELECT id, email, full_name, password_hash, role, status, staff_position FROM users WHERE email = ? LIMIT 1',
+                [email]
+            );
+        } catch (error) {
+            // Database chưa chạy migration 007: vẫn cho admin đăng nhập như cũ
+            if (error.code !== 'ER_BAD_FIELD_ERROR') throw error;
+            [rows] = await db.query(
+                'SELECT id, email, full_name, password_hash, role, status FROM users WHERE email = ? LIMIT 1',
+                [email]
+            );
+        }
         const user = rows[0];
 
         // Hash tạo bởi PHP có tiền tố $2y$, bcryptjs đọc được khi đổi thành $2a$
         const hash = user ? String(user.password_hash).replace(/^\$2y\$/, '$2a$') : DUMMY_HASH;
         const passwordOk = await bcrypt.compare(password, hash);
 
-        if (!user || !passwordOk || user.role !== 'admin' || Number(user.status) !== 1) {
+        // Cổng đăng nhập quản trị: admin và nhân viên (khách dùng /customer/login)
+        if (!user || !passwordOk || !['admin', 'staff'].includes(user.role) || Number(user.status) !== 1) {
             recordFail(ip);
             return res.status(401).json({ message: 'Email hoặc mật khẩu không chính xác!' });
         }

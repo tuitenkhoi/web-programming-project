@@ -27,7 +27,8 @@
     }
     function toLogin(reason) {
         clearToken();
-        location.href = 'login.html' + (reason ? '?' + reason + '=1' : '');
+        // Đường dẫn tuyệt đối để dùng được cả ở trang /admin/ lẫn /staff/ (login.html tự chuyển sang trang tài khoản)
+        location.href = '/admin/login.html' + (reason ? '?' + reason + '=1' : '');
     }
 
     // Đăng xuất thật: báo server thu hồi token (keepalive để request vẫn được gửi khi trang đang chuyển hướng),
@@ -49,6 +50,16 @@
     var onLoginPage = /login\.html$/.test(location.pathname);
     if (!onLoginPage && !isValid(getToken())) {
         toLogin(getToken() ? 'expired' : 'required');
+    }
+
+    // Vai trò đọc từ token chỉ để điều hướng cho tiện; server mới là nơi kiểm tra quyền thật sự.
+    function getRole() {
+        var p = decode(getToken());
+        return p && p.role ? p.role : null;
+    }
+    // Nhân viên (staff) không dùng trang /admin/: đưa về trang nhân viên
+    if (!onLoginPage && getRole() === 'staff' && /^\/admin\//.test(location.pathname)) {
+        location.replace('/staff/index.html');
     }
 
     function esc(v) {
@@ -183,7 +194,7 @@
             ['order:created', 'order:updated', 'booking:created', 'booking:updated', 'table:updated']
                 .forEach(function (eventName) {
                     socket.on(eventName, function (detail) {
-                        loadSharedAdminData({ silent: true });
+                        if (getRole() !== 'staff') loadSharedAdminData({ silent: true });
                         window.dispatchEvent(new CustomEvent('mocCoffeeRealtime', {
                             detail: { event: eventName, data: detail }
                         }));
@@ -200,7 +211,8 @@
     }
 
     async function loadSharedAdminData(options) {
-        if (onLoginPage || loadingSharedAdminData) return;
+        // Thông báo/badge dùng API dashboard chỉ dành cho admin
+        if (onLoginPage || loadingSharedAdminData || getRole() === 'staff') return;
         loadingSharedAdminData = true;
         var silent = Boolean(options && options.silent);
 
@@ -255,7 +267,7 @@
     });
 
     window.AdminAuth = {
-        getToken: getToken, setToken: setToken, clearToken: clearToken, logout: logout,
+        getToken: getToken, getRole: getRole, setToken: setToken, clearToken: clearToken, logout: logout,
         isValid: isValid, api: api, esc: esc, toast: toast, fresh: fresh
     };
 })();

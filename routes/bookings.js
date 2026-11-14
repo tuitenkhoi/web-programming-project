@@ -2,10 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { randomBytes } = require('node:crypto');
 const db = require('../config/db'); // kết nối CSDL
-const {
-    verifyToken,
-    requireAdmin,
-} = require('../middleware/auth');
+const { verifyToken } = require('../middleware/auth');
+const { requirePermission } = require('../middleware/permissions');
+const { logActivity } = require('../services/audit');
 const { dbErrorMessage } = require('../middleware/dbError');
 
 const VALID_STATUS = ['pending', 'confirmed', 'cancelled'];
@@ -326,7 +325,7 @@ router.post('/', async (req, res) => {
 });
 
 // ===== Danh sách đơn đặt bàn (admin) =====
-router.get('/', verifyToken, requireAdmin, async (req, res) => {
+router.get('/', verifyToken, requirePermission('bookings.view'), async (req, res) => {
     const status = req.query.status;
 
     if (
@@ -398,7 +397,7 @@ router.get('/', verifyToken, requireAdmin, async (req, res) => {
 
 
 // ===== Duyệt / hủy đơn đặt bàn (admin) =====
-router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
+router.patch('/:id/status', verifyToken, requirePermission('bookings.manage'), async (req, res) => {
     const id = Number(req.params.id);
     const status = req.body?.status;
 
@@ -676,6 +675,10 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
 
         await connection.commit();
         inTransaction = false;
+
+        if (!unchanged) {
+            logActivity(req.user, 'booking.status', 'booking', id, table.table_code + ': ' + booking.status + ' -> ' + status);
+        }
 
         require('../realtime').emit('booking:updated', {
             id,

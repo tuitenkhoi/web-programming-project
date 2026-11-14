@@ -5,6 +5,7 @@
 // (API khách đặt món nằm ở order.controller.js)
 const pool = require("../../../config/db");
 const { dbErrorMessage } = require("../../../middleware/dbError");
+const { logActivity } = require("../../../services/audit");
 
 // ===== Hằng số =====
 const ORDER_STATUSES = ["pending", "confirmed", "preparing", "ready", "completed", "cancelled"];
@@ -222,6 +223,11 @@ const getOrders = async (req, res) => {
             ),
         ]);
 
+        // Doanh thu chỉ hiện cho admin và thu ngân
+        if (req.user && req.user.role === "staff" && req.user.staff_position !== "cashier") {
+            delete summary.today_revenue;
+        }
+
         return res.json({
             success: true,
             count: rows.length,
@@ -365,6 +371,8 @@ const updateOrderStatus = async (req, res) => {
         }
         await connection.commit();
 
+        logActivity(req.user, "order.status", "order", id, `${order.status} -> ${newStatus}`);
+
         require("../../../realtime").emit("order:updated", {
             id,
             status: newStatus,
@@ -413,6 +421,8 @@ const confirmOrderPayment = async (req, res) => {
         }
 
         const [rows] = await pool.execute("SELECT * FROM orders WHERE id = ?", [id]);
+
+        logActivity(req.user, "order.payment", "order", id, `Xác nhận thanh toán ${rows[0].order_code} (${Number(rows[0].total_amount)}đ)`);
 
         require("../../../realtime").emit("order:updated", {
             id,

@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta name="description" content="Tạo và quản lý tài khoản nhân viên Mộc Coffee." />
+
+  <title>Quản lý nhân viên - Mộc Coffee</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <link rel="stylesheet" href="../assets/css/admin.css" />
+  <link rel="stylesheet" href="../assets/css/responsive.css" />
+  <script src="../assets/js/admin-auth.js"></script>
+  <link rel="stylesheet" href="../assets/css/mobile-fixes.css" />
+</head>
+
+<body class="admin-body">
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+  <!-- ==================== SIDEBAR ==================== -->
+  <aside id="admin-sidebar" class="admin-sidebar">
+    <div class="admin-sidebar-header">
+      <a href="dashboard.html" class="admin-logo">
+        <i class="bi bi-cup-hot-fill"></i>
+        <span>Mộc Coffee</span>
+      </a>
+
+      <button type="button" id="close-sidebar-button" class="btn d-lg-none text-white" aria-label="Đóng menu">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="admin-user-box">
+      <div class="admin-avatar">QL</div>
+
+      <div>
+        <strong>Quản lý</strong>
+        <small>admin@moccoffee.vn</small>
+      </div>
+    </div>
+
+    <nav class="admin-navigation">
+      <p class="admin-menu-title">Tổng quan</p>
+
+      <ul class="admin-menu">
+        <li>
+          <a href="dashboard.html">
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+      </ul>
+
+      <p class="admin-menu-title">Quản lý hệ thống</p>
+
+      <ul class="admin-menu">
+        <li>
+          <a href="tables.html">
+            <i class="bi bi-grid-3x3-gap"></i>
+            <span>Quản lý bàn</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="products.html">
+            <i class="bi bi-cup-straw"></i>
+            <span>Quản lý món</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="bookings.html">
+            <i class="bi bi-calendar2-check"></i>
+            <span>Quản lý đặt bàn</span>
+
+            <span class="badge rounded-pill bg-danger ms-auto d-none">
+              0
+            </span>
+          </a>
+        </li>
+
+        <li>
+          <a href="orders.html">
+            <i class="bi bi-receipt"></i>
+            <span>Quản lý đơn hàng</span>
+
+            <span class="badge rounded-pill bg-warning text-dark ms-auto d-none">
+              0
+            </span>
+          </a>
+        </li>
+
+        <li>
+          <a href="invoices.html">
+            <i class="bi bi-file-earmark-text"></i>
+            <span>Quản lý hóa đơn</span>
+          </a>
+        </li>
+        <li>
+          <a href="vouchers.html">
+            <i class="bi bi-ticket-perforated"></i>
+            <span>Quản lý voucher</span>
+          </a>
+        </li>
+        <li>
+          <a href="staff.html" class="active">
+            <i class="bi bi-people"></i>
+            <span>Quản lý nhân viên</span>
+          </a>
+        </li>
+      </ul>
+
+      <p class="admin-menu-title">Khác</p>
+
+      <ul class="admin-menu">
+        <li>
+          <a href="../index.html">
+            <i class="bi bi-globe"></i>
+            <span>Xem trang khách hàng</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="login.html">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Đăng xuất</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- ==================== NỘI DUNG CHÍNH ==================== -->
+  <div class="admin-main">
+    <!-- Topbar -->
+    <header class="admin-topbar">
+      <div class="d-flex align-items-center">
+        <button type="button" id="open-sidebar-button" class="btn btn-light d-lg-none me-2" aria-label="Mở menu">
+          <i class="bi bi-list fs-4"></i>
+        </button>
+
+        <div>
+          <h1 class="h5 mb-0">Quản lý nhân viên</h1>
+
+          <small class="text-secondary">
+            Tạo tài khoản, phân vị trí, khóa/mở khóa
+          </small>
+        </div>
+      </div>
+
+      <div class="d-flex align-items-center gap-2">
+        <button type="button" id="refresh-staff" class="btn btn-light" title="Làm mới trạng thái">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+
+        <div class="dropdown">
+          <button class="btn btn-light position-relative" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+            aria-label="Thông báo">
+            <i class="bi bi-bell"></i>
+
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+              0
+            </span>
+          </button>
+
+          <ul class="dropdown-menu dropdown-menu-end admin-notifications d-none">
+            <li><span class="dropdown-item-text text-secondary">Đang tải thông báo...</span></li>
+          </ul>
+        </div>
+
+        <div class="dropdown">
+          <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-circle me-1"></i>
+            <span class="d-none d-md-inline">Quản lý</span>
+          </button>
+
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li>
+              <a class="dropdown-item" href="#">
+                <i class="bi bi-person me-2"></i>
+                Hồ sơ cá nhân
+              </a>
+            </li>
+
+            <li>
+              <a class="dropdown-item" href="#">
+                <i class="bi bi-gear me-2"></i>
+                Cài đặt
+              </a>
+            </li>
+
+            <li>
+              <hr class="dropdown-divider" />
+            </li>
+
+            <li>
+              <a class="dropdown-item text-danger" href="login.html">
+                <i class="bi bi-box-arrow-right me-2"></i>
+                Đăng xuất
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <!-- Nội dung -->
+    <main class="admin-content">
+      <section class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+          <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-1">
+              <li class="breadcrumb-item"><a href="dashboard.html">Dashboard</a></li>
+              <li class="breadcrumb-item active" aria-current="page">Nhân viên</li>
+            </ol>
+          </nav>
+          <h2 class="h3 fw-bold mb-0">Tài khoản nhân viên</h2>
+        </div>
+        <div class="d-flex gap-2">
+          <button type="button" id="open-logs" class="btn btn-outline-secondary">
+            <i class="bi bi-clock-history me-1"></i> Nhật ký thao tác
+          </button>
+          <button type="button" id="open-add-staff" class="btn btn-coffee">
+            <i class="bi bi-person-plus me-1"></i> Thêm nhân viên
+          </button>
+        </div>
+      </section>
+
+      <section class="row g-3 mb-4">
+        <div class="col-12 col-sm-4"><div class="card border-0 shadow-sm"><div class="card-body"><p class="text-secondary mb-1">Tổng nhân viên</p><h3 id="staff-total" class="fw-bold mb-0">—</h3></div></div></div>
+        <div class="col-12 col-sm-4"><div class="card border-0 shadow-sm"><div class="card-body"><p class="text-secondary mb-1">Đang hoạt động</p><h3 id="staff-active" class="fw-bold mb-0">—</h3></div></div></div>
+        <div class="col-12 col-sm-4"><div class="card border-0 shadow-sm"><div class="card-body"><p class="text-secondary mb-1">Đã khóa</p><h3 id="staff-locked" class="fw-bold mb-0">—</h3></div></div></div>
+      </section>
+
+      <section class="card border-0 shadow-sm">
+        <div class="card-body">
+          <div class="row g-2 mb-3">
+            <div class="col-12 col-md-5">
+              <input type="search" id="staff-search" class="form-control" placeholder="Tìm theo tên, email hoặc số điện thoại..." />
+            </div>
+            <div class="col-6 col-md-3">
+              <select id="staff-position-filter" class="form-select">
+                <option value="all">Mọi vị trí</option>
+                <option value="waiter">Phục vụ</option>
+                <option value="cashier">Thu ngân</option>
+                <option value="kitchen">Bếp</option>
+              </select>
+            </div>
+            <div class="col-6 col-md-4">
+              <select id="staff-status-filter" class="form-select">
+                <option value="all">Mọi trạng thái</option>
+                <option value="1">Đang hoạt động</option>
+                <option value="0">Đã khóa</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="table align-middle mb-0">
+              <thead class="table-light">
+                <tr><th>Nhân viên</th><th>Email đăng nhập</th><th>Số điện thoại</th><th>Vị trí</th><th>Trạng thái</th><th class="text-end">Thao tác</th></tr>
+              </thead>
+              <tbody id="staff-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Thêm / sửa nhân viên -->
+  <div class="modal fade" id="staff-form-modal" tabindex="-1" aria-labelledby="staff-form-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <form id="staff-form" class="modal-content border-0" novalidate autocomplete="off">
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="staff-form-title">Thêm nhân viên</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <div id="staff-form-alert" class="alert alert-danger d-none" role="alert"></div>
+          <div class="row g-3">
+            <div class="col-12">
+              <label for="sf-name" class="form-label fw-semibold">Họ tên <span class="text-danger">*</span></label>
+              <input id="sf-name" class="form-control" maxlength="100" required />
+            </div>
+            <div class="col-12" id="sf-email-group">
+              <label for="sf-username" class="form-label fw-semibold">Tên đăng nhập <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <input id="sf-username" class="form-control" maxlength="60" placeholder="vd: nguyenvana" autocapitalize="none" required />
+                <span class="input-group-text">@moccoffee.local</span>
+              </div>
+              <div class="form-text">Chữ thường, số, dấu chấm, gạch ngang hoặc gạch dưới. Nhân viên dùng email này để đăng nhập.</div>
+            </div>
+            <div class="col-12 col-md-6">
+              <label for="sf-phone" class="form-label fw-semibold">Số điện thoại</label>
+              <input id="sf-phone" class="form-control" maxlength="10" inputmode="numeric" placeholder="0xxxxxxxxx" />
+            </div>
+            <div class="col-12 col-md-6">
+              <label for="sf-position" class="form-label fw-semibold">Vị trí <span class="text-danger">*</span></label>
+              <select id="sf-position" class="form-select">
+                <option value="waiter">Phục vụ</option>
+                <option value="cashier">Thu ngân</option>
+                <option value="kitchen">Bếp</option>
+              </select>
+            </div>
+            <div class="col-12" id="sf-password-group">
+              <label for="sf-password" class="form-label fw-semibold">Mật khẩu tạm <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <input id="sf-password" type="text" class="form-control" minlength="8" maxlength="72" autocomplete="new-password" required />
+                <button type="button" id="sf-generate" class="btn btn-outline-secondary">Tạo ngẫu nhiên</button>
+              </div>
+              <div class="form-text">Ít nhất 8 ký tự. Hãy gửi cho nhân viên; nhân viên có thể tự đổi sau, không bắt buộc.</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-coffee"><i class="bi bi-check-lg me-1"></i> Lưu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Đặt lại mật khẩu -->
+  <div class="modal fade" id="staff-reset-modal" tabindex="-1" aria-labelledby="staff-reset-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <form id="staff-reset-form" class="modal-content border-0" novalidate autocomplete="off">
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="staff-reset-title">Đặt lại mật khẩu</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body">
+          <div id="staff-reset-alert" class="alert alert-danger d-none" role="alert"></div>
+          <p class="mb-2">Nhân viên: <strong id="reset-staff-name"></strong></p>
+          <label for="reset-password" class="form-label fw-semibold">Mật khẩu tạm mới</label>
+          <div class="input-group">
+            <input id="reset-password" type="text" class="form-control" minlength="8" maxlength="72" autocomplete="new-password" required />
+            <button type="button" id="reset-generate" class="btn btn-outline-secondary">Tạo ngẫu nhiên</button>
+          </div>
+          <div class="form-text">Nhân viên đang đăng nhập sẽ bị đăng xuất ngay.</div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-coffee">Đặt lại mật khẩu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Nhật ký thao tác -->
+  <div class="modal fade" id="staff-logs-modal" tabindex="-1" aria-labelledby="staff-logs-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+      <div class="modal-content border-0">
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="staff-logs-title">Nhật ký thao tác gần đây</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+        <div class="modal-body p-0">
+          <div class="table-responsive">
+            <table class="table table-sm align-middle mb-0">
+              <thead class="table-light"><tr><th>Thời gian</th><th>Người thực hiện</th><th>Thao tác</th><th>Chi tiết</th></tr></thead>
+              <tbody id="staff-logs-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="admin-toast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="toast-header">
+        <i id="admin-toast-icon" class="bi bi-check-circle-fill text-success me-2"></i>
+        <strong class="me-auto">Mộc Coffee</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Đóng"></button>
+      </div>
+      <div id="admin-toast-message" class="toast-body"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../assets/js/confirm-modal.js"></script>
+  <script src="../assets/js/admin.js"></script>
+  <script src="../assets/js/admin-staff.js"></script>
+</body>
+
+</html>

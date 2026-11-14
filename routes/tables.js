@@ -1,10 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-const {
-    verifyToken,
-    requireAdmin,
-} = require('../middleware/auth');
+const { verifyToken } = require('../middleware/auth');
+const { requirePermission } = require('../middleware/permissions');
+const { logActivity } = require('../services/audit');
 const { dbErrorMessage } = require('../middleware/dbError');
 
 router.get('/', async (req, res) => {
@@ -32,7 +31,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
+router.patch('/:id/status', verifyToken, requirePermission('tables.update'), async (req, res) => {
     const id = Number(req.params.id);
     const status = req.body?.status;
     const allowed = ['available', 'occupied', 'maintenance'];
@@ -194,6 +193,10 @@ router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
 
         await connection.commit();
         inTransaction = false;
+
+        if (!unchanged) {
+            logActivity(req.user, 'table.status', 'table', id, table.table_code + ': ' + table.status + ' -> ' + status);
+        }
 
         require('../realtime').emit('table:updated', {
             id,

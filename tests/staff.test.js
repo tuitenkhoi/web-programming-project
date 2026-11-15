@@ -35,6 +35,8 @@ function answer(sql) {
     if (/COUNT\(\*\) AS total FROM orders/.test(sql)) return [[{ total: 1 }]];
     if (/AS all_orders/.test(sql)) return [[{ all_orders: 1, today_orders: 1, today_revenue: 0 }]];
     if (/FROM products AS p/.test(sql)) return [[{ id: 1, name: 'Cà phê sữa đá', price: '29000.00', image: '/uploads/products/a.jpg' }]];
+    // Topping đang bán (bảng toppings do admin quản lý): chỉ có Trân châu 10.000đ
+    if (/FROM toppings/.test(sql)) return [[{ name: 'Trân châu', price: '10000' }]];
     if (/FROM coffee_tables[\s\S]*WHERE table_code/.test(sql)) return [[{ id: 1, status: tableStatus }]];
     if (/FROM coffee_tables[\s\S]*WHERE id = \?/.test(sql)) return [[{ id: 1, table_code: 'T01', status: tableStatus }]];
     if (/SELECT id, status, payment_status, order_type, table_code FROM orders/.test(sql)) return [[orderRow]];
@@ -253,6 +255,23 @@ test('sửa đơn: bếp bị chặn; thu ngân sửa được món của đơn 
     // (29.000 + 10.000 size L + 10.000 trân châu) x 3 = 147.000, mang đi
     assert.equal(res.body.data.total_amount, 147000);
     assert.equal((await call('PUT', '/api/staff/orders/abc', as('staff', 'cashier'), { items: [] })).status, 400);
+});
+
+test('tùy chọn tạo đơn: danh sách topping lấy từ bảng toppings (đang bán)', async () => {
+    const res = await call('GET', '/api/staff/order-options', as('staff', 'waiter'));
+    assert.equal(res.status, 200);
+    assert.deepEqual(res.body.data.toppings, [{ name: 'Trân châu', price: 10000 }]);
+    assert.deepEqual(res.body.data.sizes.map((size) => size.code), ['S', 'M', 'L']);
+    assert.equal((await call('GET', '/api/staff/order-options', as('customer'))).status, 403);
+});
+
+test('tạo đơn tại quầy: topping đã tắt/không còn bán bị từ chối kèm thông báo rõ', async () => {
+    const res = await call('POST', '/api/staff/orders', as('staff', 'waiter'), {
+        ...ORDER_BODY,
+        items: [{ product_id: 1, quantity: 1, toppings: ['Kem cheese'] }], // DB giả chỉ bán Trân châu
+    });
+    assert.equal(res.status, 400);
+    assert.match(res.body.message, /Topping "Kem cheese" không còn được bán/);
 });
 
 // ---------- Màn hình bếp ----------

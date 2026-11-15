@@ -6,6 +6,8 @@
 const pool = require("../../../config/db");
 const { dbErrorMessage } = require("../../../middleware/dbError");
 const { logActivity } = require("../../../services/audit");
+const { buildXlsx } = require("../../../services/xlsx");
+const { buildCsv } = require("../../../services/csv");
 
 // ===== Hằng số =====
 const ORDER_STATUSES = ["pending", "confirmed", "preparing", "ready", "completed", "cancelled"];
@@ -101,11 +103,12 @@ const parseToppings = (value) => {
 const sendError = (res, httpStatus, message) =>
     res.status(httpStatus).json({ success: false, message });
 
-// ===== GET /api/orders : danh sách đơn =====
-// Lọc: ?status= &payment_status= &order_type= &date=YYYY-MM-DD &q=từ khóa
-// Sắp xếp: ?sort=newest|oldest|amount_desc|amount_asc   Phân trang: ?page= &limit=
-const getOrders = async (req, res) => {
-    const { status, payment_status, order_type, date, q, sort } = req.query;
+// Đọc bộ lọc từ query string (dùng chung cho danh sách và xuất file).
+// Trả { where, params, orderBy } hoặc { error } nếu có bộ lọc không hợp lệ.
+// Lọc: ?status= &payment_status= &order_type= &date=YYYY-MM-DD &date_from= &date_to= &invoice_status= &payment_method= &q=từ khóa
+// Sắp xếp: ?sort=newest|oldest|amount_desc|amount_asc
+const buildOrderFilter = (query) => {
+    const { status, payment_status, order_type, date, q, sort } = query;
     const conditions = [];
     const params = [];
 
@@ -113,45 +116,45 @@ const getOrders = async (req, res) => {
         // Cho phép nhiều trạng thái cách nhau bằng dấu phẩy, ví dụ ?status=confirmed,preparing
         const list = String(status).split(",").map((item) => item.trim()).filter(Boolean);
         if (!list.length || list.some((item) => !ORDER_STATUSES.includes(item))) {
-            return sendError(res, 400, "Trạng thái đơn không hợp lệ");
+            return { error: "Trạng thái đơn không hợp lệ" };
         }
         conditions.push(`o.status IN (${list.map(() => "?").join(", ")})`);
         params.push(...list);
     }
 
     // ?awaiting_payment=1 : đơn chưa thanh toán và chưa hủy (tab "Chờ thanh toán")
-    if (req.query.awaiting_payment === "1") {
+    if (query.awaiting_payment === "1") {
         conditions.push("o.payment_status IN ('pending', 'pending_verification') AND o.status <> 'cancelled'");
     }
 
     // ?payment_method=cash|bank_transfer
-    if (req.query.payment_method) {
-        if (!PAYMENT_METHODS.includes(req.query.payment_method)) return sendError(res, 400, "Phương thức thanh toán không hợp lệ");
+    if (query.payment_method) {
+        if (!PAYMENT_METHODS.includes(query.payment_method)) return { error: "Phương thức thanh toán không hợp lệ" };
         conditions.push("o.payment_method = ?");
-        params.push(req.query.payment_method);
+        params.push(query.payment_method);
     }
 
     // ?invoice_status=pending|paid|cancelled|failed|refunded : trạng thái hóa đơn suy ra từ đơn
-    if (req.query.invoice_status) {
-        const clause = INVOICE_STATUS_SQL[req.query.invoice_status];
-        if (!clause) return sendError(res, 400, "Trạng thái hóa đơn không hợp lệ");
+    if (query.invoice_status) {
+        const clause = INVOICE_STATUS_SQL[query.invoice_status];
+        if (!clause) return { error: "Trạng thái hóa đơn không hợp lệ" };
         conditions.push(clause);
     }
 
     if (payment_status) {
-        if (!PAYMENT_STATUSES.includes(payment_status)) return sendError(res, 400, "Trạng thái thanh toán không hợp lệ");
+        if (!PAYMENT_STATUSES.includes(payment_status)) return { error: "Trạng thái thanh toán không hợp lệ" };
         conditions.push("o.payment_status = ?");
         params.push(payment_status);
     }
 
     if (order_type) {
-        if (!ORDER_TYPES.includes(order_type)) return sendError(res, 400, "Loại đơn không hợp lệ");
+        if (!ORDER_TYPES.includes(order_type)) return { error: "Loại đơn không hợp lệ" };
         conditions.push("o.order_type = ?");
         params.push(order_type);
     }
 
     if (date) {
-        if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return sendError(res, 400, "Ngày phải có dạng YYYY-MM-DD");
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return { error: "Ngày phải có dạng YYYY-MM-DD" };
         // Dùng khoảng thời gian thay vì DATE(cột) để MySQL dùng được index idx_orders_created_at
         conditions.push("o.created_at >= ? AND o.created_at < ? + INTERVAL 1 DAY");
         params.push(date, date);
@@ -159,15 +162,15 @@ const getOrders = async (req, res) => {
 
     // Khoảng ngày cho trang hóa đơn: ?date_from=YYYY-MM-DD&date_to=YYYY-MM-DD
     const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
-    if (req.query.date_from) {
-        if (!DATE_RE.test(req.query.date_from)) return sendError(res, 400, "Ngày phải có dạng YYYY-MM-DD");
+    if (query.date_from) {
+        if (!DATE_RE.test(query.date_from)) return { error: "Ngày phải có dạng YYYY-MM-DD" };
         conditions.push("o.created_at >= ?");
-        params.push(req.query.date_from);
+        params.push(query.date_from);
     }
-    if (req.query.date_to) {
-        if (!DATE_RE.test(req.query.date_to)) return sendError(res, 400, "Ngày phải có dạng YYYY-MM-DD");
+    if (query.date_to) {
+        if (!DATE_RE.test(query.date_to)) return { error: "Ngày phải có dạng YYYY-MM-DD" };
         conditions.push("o.created_at < ? + INTERVAL 1 DAY");
-        params.push(req.query.date_to);
+        params.push(query.date_to);
     }
 
     if (q) {
@@ -178,10 +181,19 @@ const getOrders = async (req, res) => {
         if (invoiceMatch) params.push(Number(invoiceMatch[1]));
     }
 
-    const orderBy = SORTS[sort] || SORTS.newest;
+    const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+
+    return { where, params, orderBy: SORTS[sort] || SORTS.newest };
+};
+
+// ===== GET /api/orders : danh sách đơn =====
+// Bộ lọc: xem buildOrderFilter.   Phân trang: ?page= &limit=
+const getOrders = async (req, res) => {
+    const filter = buildOrderFilter(req.query);
+    if (filter.error) return sendError(res, 400, filter.error);
+    const { where, params, orderBy } = filter;
     const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 20, 1), 200);
     const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
-    const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
     try {
         // 3 truy vấn độc lập -> chạy song song thay vì chờ lần lượt.
@@ -441,7 +453,237 @@ const confirmOrderPayment = async (req, res) => {
     }
 };
 
+// ===== GET /api/orders/export : xuất danh sách hóa đơn ra file =====
+// ?format=xlsx|csv|json   (mặc định xlsx; json dùng cho nút "PDF / In" ở trang hóa đơn)
+// ?include_items=1        kèm chi tiết từng món
+// Ngoài ra nhận đúng các bộ lọc của GET /api/orders (status, invoice_status, date_from, q...), xuất TẤT CẢ trang.
+const MAX_EXPORT_ROWS = 5000;
+const EXPORT_FORMATS = ["xlsx", "csv", "json"];
+const EXPORT_TIMEZONE = process.env.EXPORT_TIMEZONE || "Asia/Ho_Chi_Minh";
+
+const invoiceCode = (id) => `HD${String(id).padStart(4, "0")}`;
+
+// Trạng thái hóa đơn suy ra từ đơn (giống cách trang hóa đơn hiển thị)
+const invoiceStatusText = (row) => {
+    if (row.status === "cancelled") return "Đã hủy";
+    if (row.payment_status === "paid") return "Đã thanh toán";
+    if (row.payment_status === "failed") return "Thất bại";
+    if (row.payment_status === "refunded") return "Đã hoàn tiền";
+    return "Chờ thanh toán";
+};
+
+// Ngày giờ dạng 14/11/2026 20:30 theo giờ Việt Nam
+const formatDateTime = (value) => {
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+
+    const parts = Object.fromEntries(
+        new Intl.DateTimeFormat("en-GB", {
+            timeZone: EXPORT_TIMEZONE,
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            hourCycle: "h23",
+        })
+            .formatToParts(date)
+            .map((part) => [part.type, part.value])
+    );
+
+    return `${parts.day}/${parts.month}/${parts.year} ${parts.hour}:${parts.minute}`;
+};
+
+const toppingText = (value) =>
+    parseToppings(value)
+        .map((item) => (typeof item === "string" ? item : item?.name))
+        .filter(Boolean)
+        .join(", ");
+
+const INVOICE_COLUMNS = [
+    { header: "Mã hóa đơn", width: 13 },
+    { header: "Mã đơn", width: 24 },
+    { header: "Ngày giờ", width: 18 },
+    { header: "Khách hàng", width: 24 },
+    { header: "Số điện thoại", width: 15 },
+    { header: "Hình thức", width: 14 },
+    { header: "Bàn", width: 9 },
+    { header: "Thanh toán", width: 14 },
+    { header: "Trạng thái", width: 17 },
+    { header: "Mã giảm giá", width: 14 },
+    { header: "Tạm tính", width: 14, type: "money" },
+    { header: "Giảm giá", width: 14, type: "money" },
+    { header: "Phí phục vụ", width: 14, type: "money" },
+    { header: "Tổng tiền", width: 15, type: "money" },
+    { header: "Ghi chú", width: 30 },
+];
+
+const ITEM_COLUMNS = [
+    { header: "Mã hóa đơn", width: 13 },
+    { header: "Mã đơn", width: 24 },
+    { header: "Món", width: 28 },
+    { header: "Size", width: 7 },
+    { header: "Đường", width: 9 },
+    { header: "Đá", width: 9 },
+    { header: "Topping", width: 28 },
+    { header: "Số lượng", width: 10 },
+    { header: "Đơn giá", width: 13, type: "money" },
+    { header: "Thành tiền", width: 14, type: "money" },
+    { header: "Ghi chú món", width: 26 },
+];
+
+const invoiceRow = (order) => [
+    invoiceCode(order.id),
+    order.order_code,
+    formatDateTime(order.created_at),
+    order.customer_name,
+    order.customer_phone,
+    order.order_type === "at_table" ? "Dùng tại bàn" : "Mang đi",
+    order.table_code || "",
+    order.payment_method === "cash" ? "Tiền mặt" : "Chuyển khoản",
+    invoiceStatusText(order),
+    order.coupon_code || "",
+    Number(order.subtotal),
+    Number(order.discount_amount),
+    Number(order.service_fee),
+    Number(order.total_amount),
+    order.note || "",
+];
+
+const itemRow = (order, item) => [
+    invoiceCode(order.id),
+    order.order_code,
+    item.product_name,
+    item.size,
+    item.sugar_level,
+    item.ice_level,
+    toppingText(item.toppings),
+    Number(item.quantity),
+    Number(item.unit_price),
+    Number(item.line_total),
+    item.note || "",
+];
+
+const exportOrders = async (req, res) => {
+    const format = String(req.query.format || "xlsx").toLowerCase();
+    if (!EXPORT_FORMATS.includes(format)) return sendError(res, 400, "Định dạng xuất không hợp lệ (chọn xlsx, csv hoặc json)");
+
+    const filter = buildOrderFilter(req.query);
+    if (filter.error) return sendError(res, 400, filter.error);
+    const { where, params, orderBy } = filter;
+
+    // JSON (dùng để in / lưu PDF) luôn kèm món; xlsx và csv chỉ kèm khi người dùng chọn
+    const includeItems = format === "json" || req.query.include_items === "1";
+
+    try {
+        // Lấy dư 1 dòng để biết có vượt giới hạn hay không
+        const [orders] = await pool.query(
+            `SELECT o.* FROM orders o ${where} ORDER BY ${orderBy} LIMIT ?`,
+            [...params, MAX_EXPORT_ROWS + 1]
+        );
+
+        if (orders.length > MAX_EXPORT_ROWS) {
+            return sendError(res, 400, `Có hơn ${MAX_EXPORT_ROWS} hóa đơn phù hợp. Hãy thu hẹp bộ lọc (ví dụ chọn khoảng ngày) rồi xuất lại.`);
+        }
+
+        // Gom các món theo mã đơn
+        const itemsByOrder = new Map();
+        if (includeItems && orders.length) {
+            const [items] = await pool.query(
+                `SELECT order_id, product_name, size, sugar_level, ice_level, toppings, quantity, unit_price, line_total, note
+                   FROM order_items
+                  WHERE order_id IN (?)
+                  ORDER BY order_id ASC, id ASC`,
+                [orders.map((order) => order.id)]
+            );
+            items.forEach((item) => {
+                if (!itemsByOrder.has(item.order_id)) itemsByOrder.set(item.order_id, []);
+                itemsByOrder.get(item.order_id).push(item);
+            });
+        }
+
+        res.setHeader("Cache-Control", "no-store");
+
+        if (format === "json") {
+            return res.json({
+                success: true,
+                count: orders.length,
+                data: orders.map((order) => ({
+                    ...formatOrder(order),
+                    invoice_code: invoiceCode(order.id),
+                    invoice_status_text: invoiceStatusText(order),
+                    created_text: formatDateTime(order.created_at),
+                    items: (itemsByOrder.get(order.id) || []).map((item) => ({
+                        product_name: item.product_name,
+                        size: item.size,
+                        sugar_level: item.sugar_level,
+                        ice_level: item.ice_level,
+                        toppings: toppingText(item.toppings),
+                        quantity: Number(item.quantity),
+                        unit_price: Number(item.unit_price),
+                        line_total: Number(item.line_total),
+                        note: item.note || "",
+                    })),
+                })),
+            });
+        }
+
+        // Tên file dạng hoa-don-20261114-2030.xlsx (ngày-giờ lúc xuất)
+        const [datePart, timePart] = formatDateTime(new Date()).split(" ");
+        const stamp = `${datePart.split("/").reverse().join("")}-${timePart.replace(":", "")}`;
+        const fileName = `hoa-don-${stamp}.${format}`;
+        res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+
+        if (format === "csv") {
+            let rows;
+
+            if (includeItems) {
+                // CSV không có nhiều bảng tính, nên mỗi MÓN là một dòng (kèm thông tin hóa đơn)
+                const header = [...INVOICE_COLUMNS, ...ITEM_COLUMNS.slice(2)].map((column) => column.header);
+                rows = [header];
+                orders.forEach((order) => {
+                    const items = itemsByOrder.get(order.id) || [];
+                    const emptyItem = new Array(ITEM_COLUMNS.length - 2).fill("");
+                    if (!items.length) rows.push([...invoiceRow(order), ...emptyItem]);
+                    items.forEach((item) => rows.push([...invoiceRow(order), ...itemRow(order, item).slice(2)]));
+                });
+            } else {
+                rows = [INVOICE_COLUMNS.map((column) => column.header), ...orders.map(invoiceRow)];
+            }
+
+            res.type("text/csv; charset=utf-8");
+            return res.send(buildCsv(rows));
+        }
+
+        // xlsx: bảng "Hóa đơn" (+ bảng "Chi tiết món" nếu được chọn)
+        // Dòng tổng không tính hóa đơn đã hủy
+        const counted = orders.filter((order) => order.status !== "cancelled");
+        const sum = (key) => counted.reduce((total, order) => total + Number(order[key]), 0);
+        const totalRow = new Array(INVOICE_COLUMNS.length).fill("");
+        totalRow[0] = "Tổng cộng (không tính hóa đơn đã hủy)";
+        totalRow[10] = sum("subtotal");
+        totalRow[11] = sum("discount_amount");
+        totalRow[12] = sum("service_fee");
+        totalRow[13] = sum("total_amount");
+
+        const sheets = [{ name: "Hóa đơn", columns: INVOICE_COLUMNS, rows: orders.map(invoiceRow), totalRow }];
+
+        if (includeItems) {
+            const itemRows = [];
+            orders.forEach((order) => (itemsByOrder.get(order.id) || []).forEach((item) => itemRows.push(itemRow(order, item))));
+            sheets.push({ name: "Chi tiết món", columns: ITEM_COLUMNS, rows: itemRows });
+        }
+
+        res.type("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        return res.send(buildXlsx(sheets));
+    } catch (error) {
+        console.error("Lỗi xuất hóa đơn:", error);
+        return sendError(res, 500, dbErrorMessage(error, "Lỗi máy chủ khi xuất hóa đơn"));
+    }
+};
+
 module.exports = {
+    exportOrders,
     getOrders,
     getOrderById,
     updateOrderStatus,

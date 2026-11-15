@@ -213,6 +213,11 @@ document.addEventListener("DOMContentLoaded", function () {
         0
       ),
 
+      // Giá gốc của món (chưa cộng size/topping): để trang giỏ hàng tính lại khi khách đổi size, topping
+      basePrice: Number.isFinite(Number(product.basePrice))
+        ? Number(product.basePrice)
+        : undefined,
+
       quantity: Math.max(
         1,
         Number(product.quantity || 1)

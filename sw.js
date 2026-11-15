@@ -16,7 +16,7 @@
 ========================================================= */
 
 // Đổi số này khi thay đổi danh sách precache để cache cũ bị xóa.
-const CACHE_VERSION = "v1";
+const CACHE_VERSION = "v2"; // đổi v1 -> v2: xóa bản cũ của cart.js, product-detail.js... đang nằm trong máy khách
 
 const CACHE_NAMES = {
   pages: `moc-pages-${CACHE_VERSION}`,
@@ -60,6 +60,7 @@ const PRECACHE_STATIC = [
   "/assets/js/product-detail.js",
   "/assets/js/product-reviews.js",
   "/assets/js/lightbox.js",
+  "/assets/js/cart-options.js",
   "/assets/js/cart.js",
   "/assets/js/confirm-modal.js",
   "/assets/js/booking.js",

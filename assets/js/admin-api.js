@@ -377,6 +377,16 @@ document.addEventListener("DOMContentLoaded", function () {
           },
         })
       : null;
+    // Quản lý topping (hộp thoại riêng): tải lại danh sách mỗi lần mở để luôn thấy dữ liệu mới nhất
+    const toppings = window.MocToppings
+      ? window.MocToppings.create({
+          managerRoot: $("[data-topping-manager]"),
+          request: function (endpoint, options) {
+            return apiRequest(endpoint, options);
+          },
+          notify: showToast,
+        })
+      : null;
     const attachments = window.MocAttachments
       ? window.MocAttachments.create({
           root: $("#attachment-section"),
@@ -886,6 +896,9 @@ document.addEventListener("DOMContentLoaded", function () {
     await loadCategories();
     await loadProducts();
     tags?.load();
+    $("#topping-manager-modal")?.addEventListener("show.bs.modal", function () {
+      toppings?.load();
+    });
 
     searchInput.addEventListener("input", function () {
       window.clearTimeout(state.searchTimer);

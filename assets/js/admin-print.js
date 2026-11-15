@@ -150,10 +150,12 @@
   }
 
   /* ---------- In bằng khung ẩn ---------- */
-  function printHtml(html) {
+  // options.width: chiều rộng khung in (mặc định 80mm cho bill; danh sách hóa đơn dùng khổ A4 ngang)
+  function printHtml(html, options) {
+    var width = (options && options.width) || '80mm';
     var iframe = document.createElement('iframe');
     iframe.setAttribute('aria-hidden', 'true');
-    iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:80mm;height:1200px;border:0;visibility:hidden;pointer-events:none';
+    iframe.style.cssText = 'position:fixed;right:0;bottom:0;width:' + width + ';height:1200px;border:0;visibility:hidden;pointer-events:none';
     document.body.appendChild(iframe);
 
     var doc = iframe.contentWindow.document;
@@ -204,6 +206,72 @@
       });
       setTimeout(go, 3000);
     }
+  }
+
+  /* ---------- In / lưu PDF danh sách hóa đơn (nút "Xuất dữ liệu" > PDF) ---------- */
+  var LIST_CSS =
+    '<style>' +
+    '*{-webkit-print-color-adjust:exact;print-color-adjust:exact}' +
+    '@page{size:A4 landscape;margin:12mm}' +
+    'html,body{background:#fff;margin:0;padding:0;color:#000}' +
+    'body{font-family:Arial,"Segoe UI",sans-serif;font-size:12px;line-height:1.4}' +
+    'h1{font-size:18px;margin:0 0 4px}' +
+    '.sub{color:#444;margin:0 0 10px}' +
+    'table{width:100%;border-collapse:collapse}' +
+    'th,td{border:1px solid #999;padding:4px 6px;text-align:left;vertical-align:top}' +
+    'th{background:#eadbc8}' +
+    '.n{text-align:right;white-space:nowrap}' +
+    'tr{page-break-inside:avoid}' +
+    'thead{display:table-header-group}' +
+    '.items td{border-top:0;color:#333;font-size:11px}' +
+    'tfoot td{font-weight:700}' +
+    '</style>';
+
+  var moneyFormat = new Intl.NumberFormat('vi-VN');
+
+  function money(value) {
+    return moneyFormat.format(Number(value) || 0) + ' ₫';
+  }
+
+  // report: { title, subtitle, orders (dữ liệu từ GET /api/orders/export?format=json), showItems }
+  function buildListReport(report) {
+    var orders = report.orders || [];
+    var total = 0;
+
+    var rows = orders.map(function (order) {
+      if (order.status !== 'cancelled') total += Number(order.total_amount) || 0;
+
+      var html =
+        '<tr><td>' + esc(order.invoice_code) + '</td>' +
+        '<td>' + esc(order.created_text) + '</td>' +
+        '<td>' + esc(order.customer_name) + '<br>' + esc(order.customer_phone) + '</td>' +
+        '<td>' + esc(order.payment_method_text) + '</td>' +
+        '<td>' + esc(order.invoice_status_text) + '</td>' +
+        '<td class="n">' + money(order.total_amount) + '</td></tr>';
+
+      if (report.showItems && order.items && order.items.length) {
+        var text = order.items.map(function (item) {
+          var detail = [item.size, item.toppings].filter(Boolean).join(', ');
+          return item.quantity + ' × ' + item.product_name + (detail ? ' (' + detail + ')' : '');
+        }).join(' · ');
+        html += '<tr class="items"><td></td><td colspan="5">' + esc(text) + '</td></tr>';
+      }
+
+      return html;
+    }).join('');
+
+    return '<!doctype html><html lang="vi"><head><meta charset="utf-8">' +
+      '<title>' + esc(report.title) + '</title>' + LIST_CSS + '</head><body>' +
+      '<h1>' + esc(report.title) + '</h1>' +
+      '<p class="sub">' + esc(report.subtitle) + '</p>' +
+      '<table><thead><tr><th>Mã HĐ</th><th>Ngày giờ</th><th>Khách hàng</th><th>Thanh toán</th><th>Trạng thái</th><th class="n">Tổng tiền</th></tr></thead>' +
+      '<tbody>' + (rows || '<tr><td colspan="6">Không có hóa đơn nào.</td></tr>') + '</tbody>' +
+      '<tfoot><tr><td colspan="5">Tổng cộng (không tính hóa đơn đã hủy)</td><td class="n">' + money(total) + '</td></tr></tfoot>' +
+      '</table></body></html>';
+  }
+
+  function printList(report) {
+    printHtml(buildListReport(report), { width: '297mm' });
   }
 
   /* ---------- In cửa sổ chi tiết bất kỳ (đơn hàng...) ---------- */
@@ -377,5 +445,5 @@
     openInvoiceFromQuery();
   }
 
-  window.MocPrint = { buildReceipt: buildReceipt, readInvoice: readInvoice };
+  window.MocPrint = { buildReceipt: buildReceipt, readInvoice: readInvoice, buildListReport: buildListReport, printList: printList };
 })();

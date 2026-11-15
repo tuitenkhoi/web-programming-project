@@ -299,6 +299,7 @@
     getMe: async () => (await request("/auth/customer/me")).data,
     getCustomerOrders: async () => (await request("/customer/orders")).data || [],
     lookupOrder: async (payload) => (await request("/customer/orders/lookup", { method: "POST", body: payload, auth: false })).data,
+    getToppings: async () => (await request("/toppings", { auth: false })).data || [],
     getVouchers: async () => (await request("/vouchers", { auth: false })).data || [],
     validateVoucher: async (code, subtotal) => (await request("/vouchers/validate", { method: "POST", body: { code, subtotal }, auth: false })).data,
     getProductReviews: async (productId) => request(`/reviews/product/${encodeURIComponent(productId)}`, { auth: false }),

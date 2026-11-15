@@ -47,7 +47,7 @@ globalThis.self = {
 let network; // (url, request) => Response | throw
 globalThis.fetch = async (input) => network(typeof input === 'string' ? new URL(input, ORIGIN).href : input.url, input);
 
-require('../sw.js');
+const { CACHE_NAMES } = require('../sw.js'); // tên cache lấy từ sw.js nên đổi CACHE_VERSION không làm hỏng test
 
 const html = (text, status = 200) => new Response(text, { status, headers: { 'Content-Type': 'text/html' } });
 const offline = () => { network = () => { throw new TypeError('Failed to fetch'); }; };
@@ -153,21 +153,21 @@ test('Cài đặt: thiếu file hoặc CDN lỗi vẫn cài được; chỉ lưu
     handlers.install({ waitUntil: (p) => waits.push(p) });
     await assert.doesNotReject(Promise.all(waits));
 
-    const pages = await caches.open('moc-pages-v1');
+    const pages = await caches.open(CACHE_NAMES.pages);
     assert.ok(await pages.match(ORIGIN + '/pages/menu.html'), 'trang 200 phải được precache');
     assert.equal(await pages.match(ORIGIN + '/pages/cart.html'), undefined, 'trang 404 không được lưu');
 });
 
 test('Kích hoạt: xóa cache phiên bản cũ, giữ cache hiện tại và cache của ứng dụng khác', async () => {
     await caches.open('moc-pages-v0');
-    await caches.open('moc-pages-v1');
+    await caches.open(CACHE_NAMES.pages);
     await caches.open('app-khac');
     const waits = [];
     handlers.activate({ waitUntil: (p) => waits.push(p) });
     await Promise.all(waits);
     const names = await caches.keys();
     assert.ok(!names.includes('moc-pages-v0'));
-    assert.ok(names.includes('moc-pages-v1'));
+    assert.ok(names.includes(CACHE_NAMES.pages));
     assert.ok(names.includes('app-khac'));
 });
 

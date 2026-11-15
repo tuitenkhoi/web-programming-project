@@ -2,6 +2,11 @@ const crypto = require("crypto");
 // Dùng chung kết nối DB của server chính
 const pool = require("../../../config/db");
 const { dbErrorMessage } = require("../../../middleware/dbError");
+const {
+    loadActiveToppingPrices,
+    findUnavailableTopping,
+    unavailableToppingMessage,
+} = require("../services/toppings");
 
 const SIZE_PRICES = {
     S: -5000,
@@ -9,12 +14,8 @@ const SIZE_PRICES = {
     L: 10000,
 };
 
-const TOPPING_PRICES = {
-    "Trân châu": 10000,
-    "Thạch cà phê": 10000,
-    "Kem sữa": 12000,
-    "Thêm shot cà phê": 15000,
-};
+// Giá topping KHÔNG viết cứng ở đây nữa: lấy từ bảng toppings (admin sửa ở trang Quản lý món).
+// Giá size vẫn cố định (S / M / L).
 
 const LEVELS = new Set(["0%", "30%", "50%", "70%", "100%"]);
 const ORDER_TYPES = new Set(["at_table", "takeaway"]);
@@ -137,8 +138,9 @@ const validateRequest = (body) => {
             return { error: "Mức đường hoặc mức đá không hợp lệ" };
         }
 
-        if (toppings.some((name) => !(name in TOPPING_PRICES))) {
-            return { error: "Topping không hợp lệ" };
+        // Tên topping có hợp lệ (còn bán) hay không sẽ kiểm tra với bảng toppings ở createOrder
+        if (toppings.length > 20) {
+            return { error: "Mỗi món chỉ được chọn tối đa 20 topping" };
         }
 
         items.push({
@@ -220,10 +222,22 @@ const createOrder = async (req, res) => {
             });
         }
 
+        // Giá topping lấy từ DB: chỉ topping đang bán (is_active = 1) mới đặt được
+        const toppingNames = [...new Set(order.items.flatMap((item) => item.toppings))];
+        const toppingPrices = await loadActiveToppingPrices(toppingNames);
+        const unavailableTopping = findUnavailableTopping(toppingNames, toppingPrices);
+
+        if (unavailableTopping) {
+            return res.status(400).json({
+                success: false,
+                message: unavailableToppingMessage(unavailableTopping),
+            });
+        }
+
         const calculatedItems = order.items.map((item) => {
             const product = productMap.get(item.productId);
             const toppingPrice = item.toppings.reduce(
-                (total, name) => total + TOPPING_PRICES[name],
+                (total, name) => total + toppingPrices.get(name),
                 0
             );
             const unitPrice = Math.max(
@@ -502,7 +516,6 @@ module.exports = {
     createOrder,
     // Dùng chung với routes/staff.js để đơn nhân viên tạo tính tiền giống hệt đơn khách đặt
     SIZE_PRICES,
-    TOPPING_PRICES,
     LEVELS,
     cleanText,
     createOrderCode,

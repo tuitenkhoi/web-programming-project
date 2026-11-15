@@ -25,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var page = 1;
     var loadSeq = 0; // chống kết quả cũ về sau ghi đè kết quả mới
     var searchTimer = null;
+    var lastTotal = 0; // tổng số hóa đơn theo bộ lọc hiện tại (hiện trong hộp thoại xuất)
 
     // Xóa các hàng dữ liệu mẫu trong HTML để không hiện số liệu giả khi chưa tải được dữ liệu thật
     function showMessage(text, cls) {
@@ -120,6 +121,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function render(list, total) {
+        lastTotal = total;
         tbody.innerHTML = list.map(row).join('');
         setText('visible-invoice-count', total);
         if (emptyBox) emptyBox.classList.toggle('d-none', list.length > 0);
@@ -153,6 +155,138 @@ document.addEventListener('DOMContentLoaded', function () {
             showMessage('Không tải được hóa đơn. Vui lòng thử lại.', 'text-danger');
             A.toast(err.message, 'error');
         }
+    }
+
+
+    // ===== Xuất dữ liệu: chọn kiểu file (Excel / CSV / PDF-in) =====
+    // Xuất TẤT CẢ hóa đơn khớp bộ lọc đang chọn (không chỉ trang đang xem). Kiểu đã chọn được nhớ cho lần sau.
+    var exportModal = document.getElementById('export-invoice-modal');
+    var exportForm = document.getElementById('export-invoice-form');
+    var exportSummary = document.getElementById('export-summary');
+    var exportError = document.getElementById('export-error');
+    var exportSubmit = document.getElementById('export-submit');
+    var exportItems = document.getElementById('export-include-items');
+    var exportItemsHint = document.getElementById('export-items-hint');
+    var EXPORT_PREF_KEY = 'mocInvoiceExport';
+
+    var ITEMS_HINT = {
+        xlsx: 'Thêm một bảng tính "Chi tiết món" trong cùng file.',
+        csv: 'Mỗi món là một dòng (thông tin hóa đơn lặp lại ở từng dòng).',
+        pdf: 'Liệt kê món ngay dưới từng hóa đơn.'
+    };
+
+    function selectedFormat() {
+        var checked = exportForm.querySelector('input[name="exportFormat"]:checked');
+        return checked ? checked.value : 'xlsx';
+    }
+
+    function showExportError(message) {
+        exportError.textContent = message || '';
+        exportError.classList.toggle('d-none', !message);
+    }
+
+    function updateExportHint() {
+        exportItemsHint.textContent = ITEMS_HINT[selectedFormat()] || '';
+    }
+
+    function loadExportPreference() {
+        try {
+            var saved = JSON.parse(localStorage.getItem(EXPORT_PREF_KEY) || '{}');
+            var radio = exportForm.querySelector('input[name="exportFormat"][value="' + saved.format + '"]');
+            if (radio) radio.checked = true;
+            exportItems.checked = saved.includeItems === true;
+        } catch (e) { /* không đọc được thì dùng mặc định */ }
+        updateExportHint();
+    }
+
+    function saveExportPreference() {
+        try {
+            localStorage.setItem(EXPORT_PREF_KEY, JSON.stringify({ format: selectedFormat(), includeItems: exportItems.checked }));
+        } catch (e) { /* trình duyệt chặn lưu thì bỏ qua */ }
+    }
+
+    // Giống bộ lọc đang hiển thị nhưng bỏ phân trang
+    function exportQuery(format) {
+        var q = new URLSearchParams(buildQuery());
+        q.delete('page');
+        q.delete('limit');
+        q.set('format', format === 'pdf' ? 'json' : format);
+        if (exportItems.checked && format !== 'pdf') q.set('include_items', '1');
+        return q;
+    }
+
+    // Tải file về: dùng fetch kèm token (liên kết thường không gửi được token), rồi cho trình duyệt lưu
+    async function downloadExport(query) {
+        var token = A.getToken();
+        var res = await fetch('/api/orders/export?' + query.toString(), {
+            headers: token ? { Authorization: 'Bearer ' + token } : {}
+        });
+        if (!res.ok) {
+            var data = null;
+            try { data = await res.json(); } catch (e) { /* không có JSON */ }
+            if (res.status === 401) throw new Error('Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.');
+            throw new Error((data && data.message) || 'Không xuất được file (' + res.status + ').');
+        }
+        var match = /filename="([^"]+)"/.exec(res.headers.get('Content-Disposition') || '');
+        var fileName = match ? match[1] : 'hoa-don.' + query.get('format');
+        var url = URL.createObjectURL(await res.blob());
+        var link = document.createElement('a');
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+        return fileName;
+    }
+
+    function exportSubtitle() {
+        var parts = ['Xuất lúc ' + new Date().toLocaleString('vi-VN')];
+        if (dateFrom && dateFrom.value) parts.push('từ ' + dateFrom.value);
+        if (dateTo && dateTo.value) parts.push('đến ' + dateTo.value);
+        if (statusFilter && statusFilter.value !== 'all') parts.push('trạng thái: ' + statusFilter.options[statusFilter.selectedIndex].text);
+        if (search && search.value.trim()) parts.push('từ khóa: ' + search.value.trim());
+        return parts.join(' · ');
+    }
+
+    if (exportModal && exportForm) {
+        exportModal.addEventListener('show.bs.modal', function () {
+            loadExportPreference();
+            showExportError('');
+            exportSummary.textContent = 'Sẽ xuất ' + lastTotal + ' hóa đơn theo bộ lọc hiện tại (tất cả các trang).';
+        });
+
+        exportForm.addEventListener('change', updateExportHint);
+
+        exportForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            var format = selectedFormat();
+            showExportError('');
+            exportSubmit.disabled = true;
+
+            try {
+                if (format === 'pdf') {
+                    var result = await A.api('/api/orders/export?' + exportQuery(format).toString());
+                    window.MocPrint.printList({
+                        title: 'Danh sách hóa đơn',
+                        subtitle: exportSubtitle(),
+                        orders: result.data || [],
+                        showItems: exportItems.checked
+                    });
+                } else {
+                    var name = await downloadExport(exportQuery(format));
+                    A.toast('Đã xuất file ' + name, 'success');
+                }
+
+                saveExportPreference();
+                var instance = window.bootstrap && window.bootstrap.Modal.getInstance(exportModal);
+                if (instance) instance.hide();
+            } catch (error) {
+                showExportError(error.message);
+            } finally {
+                exportSubmit.disabled = false;
+            }
+        });
     }
 
     // Đổi bộ lọc thì về trang 1 và hỏi lại server

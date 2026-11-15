@@ -1,12 +1,17 @@
 // Kiểm tra và tính tiền các món trong đơn do NHÂN VIÊN tạo/sửa.
-// Giá size/topping lấy từ order.controller.js (cùng nguồn với đơn khách đặt) nên không bao giờ lệch giá.
+// Giá size lấy từ order.controller.js, giá topping lấy từ bảng toppings (services/toppings.js):
+// cùng nguồn với đơn khách đặt nên không bao giờ lệch giá.
 const pool = require("../../../config/db");
 const {
     SIZE_PRICES,
-    TOPPING_PRICES,
     LEVELS,
     cleanText,
 } = require("../controllers/order.controller");
+const {
+    loadActiveToppingPrices,
+    findUnavailableTopping,
+    unavailableToppingMessage,
+} = require("./toppings");
 
 // Trả { items } hoặc { error }
 function parseItems(rawItems) {
@@ -34,7 +39,8 @@ function parseItems(rawItems) {
         if (!Number.isInteger(quantity) || quantity < 1 || quantity > 99) return { error: "Số lượng sản phẩm phải từ 1 đến 99" };
         if (!(size in SIZE_PRICES)) return { error: "Kích thước sản phẩm không hợp lệ" };
         if (!LEVELS.has(sugarLevel) || !LEVELS.has(iceLevel)) return { error: "Mức đường hoặc mức đá không hợp lệ" };
-        if (toppings.some((name) => !(name in TOPPING_PRICES))) return { error: "Topping không hợp lệ" };
+        // Topping có còn bán hay không sẽ kiểm tra với bảng toppings ở priceItems
+        if (toppings.length > 20) return { error: "Mỗi món chỉ được chọn tối đa 20 topping" };
 
         items.push({ productId, quantity, size, sugarLevel, iceLevel, toppings, note: note || null });
     }
@@ -62,9 +68,20 @@ async function priceItems(items) {
         throw error;
     }
 
+    // Giá topping lấy từ DB (cùng nguồn với đơn khách đặt); topping đã tắt / bị xóa thì từ chối
+    const toppingNames = [...new Set(items.flatMap((item) => item.toppings))];
+    const toppingPrices = await loadActiveToppingPrices(toppingNames);
+    const unavailableTopping = findUnavailableTopping(toppingNames, toppingPrices);
+
+    if (unavailableTopping) {
+        const error = new Error(unavailableToppingMessage(unavailableTopping));
+        error.httpStatus = 400;
+        throw error;
+    }
+
     const priced = items.map((item) => {
         const product = map.get(item.productId);
-        const toppingPrice = item.toppings.reduce((total, name) => total + TOPPING_PRICES[name], 0);
+        const toppingPrice = item.toppings.reduce((total, name) => total + toppingPrices.get(name), 0);
         const unitPrice = Math.max(0, Number(product.price) + SIZE_PRICES[item.size] + toppingPrice);
         return {
             ...item,
@@ -111,6 +128,5 @@ module.exports = {
     itemRowsFor,
     INSERT_ITEMS_SQL,
     SIZE_PRICES,
-    TOPPING_PRICES,
     LEVELS,
 };

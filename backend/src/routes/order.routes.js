@@ -4,6 +4,7 @@ const {
 } = require("../controllers/order.controller");
 const {
     getOrders,
+    exportOrders,
     getOrderById,
     updateOrderStatus,
     confirmOrderPayment,
@@ -25,6 +26,8 @@ router.post("/", optionalToken, createOrder);
 
 // Các API dưới đây dành cho admin và nhân viên (admin luôn đủ quyền; nhân viên theo vị trí, xem middleware/permissions.js).
 router.get("/", verifyToken, requirePermission("orders.view"), getOrders);
+// Xuất file hàng loạt (chứa tên, SĐT khách) chỉ dành cho admin. Phải đặt trước "/:id", nếu không "export" bị hiểu là một mã đơn
+router.get("/export", verifyToken, requirePermission("orders.export"), exportOrders);
 router.get("/:id", verifyToken, requirePermission("orders.view"), getOrderById);
 router.patch(
     "/:id/status",

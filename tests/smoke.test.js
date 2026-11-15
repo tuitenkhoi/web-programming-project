@@ -19,6 +19,7 @@ function answer(sql) {
     if (/FROM orders[\s\S]*id <>/.test(sql)) return [[]];
     if (/FROM bookings b[\s\S]*status = 'seated'/.test(sql)) return [[]];
     if (/FROM products AS p/.test(sql)) return [[{ id: 1, name: 'Cà phê sữa đá', price: '29000.00', image: '/uploads/products/a.jpg' }]];
+    if (/FROM toppings/.test(sql)) return [[{ name: 'Trân châu', price: '10000' }]];
     if (/INSERT INTO orders/.test(sql)) return [{ insertId: 7 }];
     if (/INSERT INTO order_items/.test(sql)) return [{ affectedRows: 2 }];
     if (/AS item_count/.test(sql)) return [[{ id: 1, order_code: 'MC1', total_amount: '1', subtotal: '1', discount_amount: '0', service_fee: '0', order_type: 'takeaway', payment_method: 'cash', payment_status: 'pending', status: 'pending', item_count: '2' }]];

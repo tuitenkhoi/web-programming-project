@@ -286,59 +286,15 @@
                 </div>
               </div>
 
-              <!-- Topping -->
+              <!-- Topping: danh sách lấy từ máy chủ (admin quản lý ở trang Quản lý món > Quản lý topping) -->
               <div class="mb-4">
-                <label class="form-label fw-bold">
+                <label class="form-label fw-bold" id="topping-label">
                   Topping thêm
                 </label>
 
-                <div class="row g-2">
-                  <div class="col-12 col-sm-6">
-                    <div class="form-check topping-option">
-                      <input type="checkbox" class="form-check-input topping-checkbox" id="topping-pearl"
-                        value="Trân châu" data-price="10000" />
-
-                      <label class="form-check-label d-flex justify-content-between w-100" for="topping-pearl">
-                        <span>Trân châu</span>
-                        <strong>+10.000đ</strong>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div class="col-12 col-sm-6">
-                    <div class="form-check topping-option">
-                      <input type="checkbox" class="form-check-input topping-checkbox" id="topping-jelly"
-                        value="Thạch cà phê" data-price="10000" />
-
-                      <label class="form-check-label d-flex justify-content-between w-100" for="topping-jelly">
-                        <span>Thạch cà phê</span>
-                        <strong>+10.000đ</strong>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div class="col-12 col-sm-6">
-                    <div class="form-check topping-option">
-                      <input type="checkbox" class="form-check-input topping-checkbox" id="topping-cream"
-                        value="Kem sữa" data-price="12000" />
-
-                      <label class="form-check-label d-flex justify-content-between w-100" for="topping-cream">
-                        <span>Kem sữa</span>
-                        <strong>+12.000đ</strong>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div class="col-12 col-sm-6">
-                    <div class="form-check topping-option">
-                      <input type="checkbox" class="form-check-input topping-checkbox" id="topping-shot"
-                        value="Thêm shot cà phê" data-price="15000" />
-
-                      <label class="form-check-label d-flex justify-content-between w-100" for="topping-shot">
-                        <span>Thêm shot cà phê</span>
-                        <strong>+15.000đ</strong>
-                      </label>
-                    </div>
+                <div class="row g-2" id="topping-options" role="group" aria-labelledby="topping-label">
+                  <div class="col-12">
+                    <p class="text-secondary small mb-0" id="topping-status">Đang tải topping...</p>
                   </div>
                 </div>
               </div>

@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const noteCount = document.querySelector("#product-note-count");
   const relatedList = document.querySelector("#related-product-list");
   const cartToast = document.querySelector("#cart-toast");
+  const toppingOptions = document.querySelector("#topping-options");
 
   if (!form || !window.MocCoffeeApi) return;
 
@@ -81,6 +82,74 @@ document.addEventListener("DOMContentLoaded", function () {
         price: Number(topping.dataset.price || 0),
       };
     });
+  }
+
+  function showToppingMessage(text) {
+    if (!toppingOptions) return;
+    toppingOptions.textContent = "";
+
+    const column = document.createElement("div");
+    column.className = "col-12";
+
+    const message = document.createElement("p");
+    message.className = "text-secondary small mb-0";
+    message.textContent = text;
+
+    column.appendChild(message);
+    toppingOptions.appendChild(column);
+  }
+
+  // Vẽ danh sách topping lấy từ máy chủ (tên và giá đi qua textContent nên an toàn với ký tự lạ)
+  function renderToppings(toppings) {
+    if (!toppingOptions) return;
+
+    if (!toppings.length) {
+      showToppingMessage("Hiện chưa có topping nào.");
+      return;
+    }
+
+    toppingOptions.textContent = "";
+
+    toppings.forEach(function (topping) {
+      const id = "topping-" + topping.id;
+      const column = document.createElement("div");
+      column.className = "col-12 col-sm-6";
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "form-check topping-option";
+
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.className = "form-check-input topping-checkbox";
+      input.id = id;
+      input.value = topping.name;
+      input.dataset.price = String(topping.price);
+
+      const label = document.createElement("label");
+      label.className = "form-check-label d-flex justify-content-between w-100";
+      label.htmlFor = id;
+
+      const name = document.createElement("span");
+      name.textContent = topping.name;
+
+      const price = document.createElement("strong");
+      price.textContent = "+" + formatCurrency(topping.price);
+
+      label.append(name, price);
+      wrapper.append(input, label);
+      column.appendChild(wrapper);
+      toppingOptions.appendChild(column);
+    });
+  }
+
+  async function loadToppings() {
+    try {
+      renderToppings(await window.MocCoffeeApi.getToppings());
+    } catch (error) {
+      console.error("Không thể tải topping:", error);
+
+      showToppingMessage("Không tải được topping. Bạn vẫn có thể đặt món không kèm topping.");
+    }
   }
 
   function calculateUnitPrice() {
@@ -388,6 +457,7 @@ document.addEventListener("DOMContentLoaded", function () {
       name: currentProduct.name,
       image: currentProduct.image,
       price: calculateUnitPrice(),
+      basePrice: currentProduct.price, // giá gốc, để giỏ hàng tính lại khi đổi size/topping
       quantity: getQuantity(),
       size: getSelectedSize().name,
       sugar: form.querySelector("#sugar-level")?.value || "70%",
@@ -428,10 +498,15 @@ document.addEventListener("DOMContentLoaded", function () {
   quantityInput?.addEventListener("change", updatePrice);
 
   form
-    .querySelectorAll('input[name="productSize"], .topping-checkbox')
+    .querySelectorAll('input[name="productSize"]')
     .forEach(function (input) {
       input.addEventListener("change", updatePrice);
     });
+
+  // Ô topping được vẽ sau khi tải từ máy chủ nên lắng nghe ở thẻ cha
+  toppingOptions?.addEventListener("change", function (event) {
+    if (event.target.matches(".topping-checkbox")) updatePrice();
+  });
 
   noteInput?.addEventListener("input", function () {
     if (noteCount) {
@@ -542,5 +617,6 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
+  loadToppings();
   initialize();
 });

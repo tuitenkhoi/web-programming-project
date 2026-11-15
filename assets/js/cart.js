@@ -180,6 +180,29 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       tableCodeSelect.disabled = false;
+
+      // Khách quét mã QR trên bàn: tự chọn đúng bàn đó (kể cả khi bàn đã "có khách")
+      const scanned = window.MocTable?.get?.();
+      const scannedTable = scanned
+        ? data.find((table) => table.table_code === scanned.code && table.status !== "maintenance")
+        : null;
+
+      if (scannedTable && orderAtTableRadio) {
+        let option = Array.from(tableCodeSelect.options).find(
+          (item) => item.value === scannedTable.table_code
+        );
+
+        if (!option) {
+          option = document.createElement("option");
+          option.value = scannedTable.table_code;
+          option.textContent = scannedTable.table_name || `Bàn ${scannedTable.table_code}`;
+          tableCodeSelect.appendChild(option);
+        }
+
+        tableCodeSelect.value = scannedTable.table_code;
+        orderAtTableRadio.checked = true;
+        updateOrderType();
+      }
     } catch (error) {
       tableCodeSelect.innerHTML =
         '<option value="">Không tải được danh sách bàn</option>';

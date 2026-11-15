@@ -11,7 +11,8 @@
         { href: 'new-order.html', icon: 'bi-plus-circle', text: 'Tạo đơn', perm: 'orders.create' },
         { href: 'orders.html', icon: 'bi-receipt', text: 'Đơn hàng', perm: 'orders.view' },
         { href: 'kitchen.html', icon: 'bi-fire', text: 'Màn hình bếp', perm: 'kitchen.view' },
-        { href: 'bookings.html', icon: 'bi-calendar2-check', text: 'Đặt bàn', perm: 'bookings.view' }
+        { href: 'bookings.html', icon: 'bi-calendar2-check', text: 'Đặt bàn', perm: 'bookings.view' },
+        { href: 'revenue.html', icon: 'bi-graph-up-arrow', text: 'Doanh thu', perm: 'revenue.view' }
     ];
     var STATUS_TEXT = {
         pending: 'Chờ xác nhận', confirmed: 'Đã xác nhận', preparing: 'Đang chế biến',

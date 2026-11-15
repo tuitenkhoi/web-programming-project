@@ -234,11 +234,17 @@
           <h2 class="h3 fw-bold mb-0">Sơ đồ bàn</h2>
         </div>
 
+        <div class="d-flex flex-wrap gap-2">
+        <button type="button" id="print-table-qr-button" class="btn btn-outline-secondary" title="In mã QR để dán lên từng bàn">
+          <i class="bi bi-qr-code me-1"></i>
+          In mã QR các bàn
+        </button>
         <button type="button" id="open-add-table-button" class="btn btn-coffee" data-bs-toggle="modal"
           data-bs-target="#table-form-modal">
           <i class="bi bi-plus-lg me-1"></i>
           Thêm bàn mới
         </button>
+        </div>
       </section>
 
       <!-- ==================== THỐNG KÊ ==================== -->
@@ -758,6 +764,8 @@
   <script src="../assets/js/admin.js"></script>
   <script src="../assets/js/admin-tables.js"></script>
   <script src="../assets/js/admin-print.js"></script>
+  <script src="../assets/js/vendor/qrcode.js"></script>
+  <script src="../assets/js/admin-table-qr.js"></script>
 </body>
 
 </html>

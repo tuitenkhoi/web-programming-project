@@ -42,15 +42,19 @@
       ["TOKEN_REVOKED", "TOKEN_EXPIRED", "ACCOUNT_UNAVAILABLE"].includes(result.code)
     ) {
       clearCustomerSession();
-      if (!/account\.html$/.test(window.location.pathname)) {
+      // Trang thanh toán/hoàn tất không bắt buộc đăng nhập: không đẩy khách sang trang đăng nhập
+      if (!/(account|payment|success|cart)\.html$/.test(window.location.pathname)) {
         window.MocAuthGuard.requireLogin();
       }
     }
 
     if (!response.ok || result.success === false) {
-      throw new Error(
+      const error = new Error(
         result.message || "Không thể kết nối đến máy chủ."
       );
+      error.status = response.status;
+      error.code = result.code;
+      throw error;
     }
 
     return result;
@@ -127,6 +131,11 @@
   }
 
   const MocAuthGuard = {
+    // Đã đăng nhập (token còn hạn) hay chưa; không chuyển trang. Dùng cho trang không bắt buộc đăng nhập.
+    isLoggedIn() {
+      return hasUsableToken();
+    },
+
     // Trả true nếu đã đăng nhập. Chưa đăng nhập: trả false và đang chuyển trang (code phía sau nên dừng lại).
     requireLogin(options = {}) {
       if (hasUsableToken()) return true;
@@ -256,12 +265,17 @@
   }
 
   async function createOrder(order) {
-    const result = await request("/orders", {
-      method: "POST",
-      body: order,
-    });
-
-    return result.data;
+    try {
+      const result = await request("/orders", { method: "POST", body: order });
+      return result.data;
+    } catch (error) {
+      // Phiên đăng nhập cũ bị từ chối (hết hạn/thu hồi): đặt đơn tiếp như khách vãng lai
+      if (error.status === 401 && ["TOKEN_REVOKED", "TOKEN_EXPIRED", "ACCOUNT_UNAVAILABLE"].includes(error.code)) {
+        const result = await request("/orders", { method: "POST", body: order, auth: false });
+        return result.data;
+      }
+      throw error;
+    }
   }
 
   // Gửi yêu cầu đặt bàn lên server

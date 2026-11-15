@@ -1,8 +1,9 @@
 "use strict";
 
 document.addEventListener("DOMContentLoaded", function () {
-  // Trang thanh toán chỉ dành cho khách đã đăng nhập (chưa đăng nhập thì được chuyển sang trang đăng nhập)
-  if (!window.MocAuthGuard.requireLogin()) return;
+  // Không bắt buộc đăng nhập: khách vãng lai vẫn đặt và thanh toán được (đăng nhập chỉ để lưu lịch sử đơn).
+  // Token cũ đã hết hạn thì bỏ đi để không làm hỏng yêu cầu đặt đơn.
+  window.MocAuthGuard.isLoggedIn();
 
   const KEYS = {
     cart: "mocCoffeeCart",

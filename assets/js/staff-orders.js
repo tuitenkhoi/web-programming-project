@@ -128,32 +128,11 @@
         } catch (err) { S.toast(err.message, 'error'); }
     }
 
-    function print(o) {
-        var w = window.open('', '_blank', 'width=380,height=640');
-        if (!w) { S.toast('Trình duyệt đang chặn cửa sổ in. Hãy cho phép cửa sổ bật lên.', 'error'); return; }
-        var rows = o.items.map(function (it) {
-            return '<tr><td>' + S.esc(it.product_name) + '<br><small>' + S.esc(itemText(it)) + '</small></td><td style="text-align:center">' + it.quantity + '</td><td style="text-align:right">' + S.money(it.line_total) + '</td></tr>';
-        }).join('');
-        w.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>Hóa đơn ' + S.esc(o.order_code) + '</title>' +
-            '<style>body{font-family:Arial,sans-serif;font-size:13px;margin:12px;width:300px}h1{font-size:18px;text-align:center;margin:0}p{margin:2px 0;text-align:center}table{width:100%;border-collapse:collapse;margin:8px 0}td,th{padding:3px 0;vertical-align:top;border-bottom:1px dashed #999}small{color:#555}.r{display:flex;justify-content:space-between}</style></head><body>' +
-            '<h1>MỘC COFFEE</h1><p>Hóa đơn ' + S.esc(o.order_code) + '</p><p>' + S.esc(S.dateTimeText(o.created_at)) + '</p>' +
-            '<p>' + (o.order_type === 'at_table' ? 'Bàn ' + S.esc(o.table_code) : 'Mang đi') + ' · ' + S.esc(o.customer_name) + '</p>' +
-            '<table><thead><tr><th style="text-align:left">Món</th><th>SL</th><th style="text-align:right">Tiền</th></tr></thead><tbody>' + rows + '</tbody></table>' +
-            '<div class="r"><span>Tạm tính</span><span>' + S.money(o.subtotal) + '</span></div>' +
-            (o.discount_amount ? '<div class="r"><span>Giảm giá</span><span>-' + S.money(o.discount_amount) + '</span></div>' : '') +
-            (o.service_fee ? '<div class="r"><span>Phí phục vụ</span><span>' + S.money(o.service_fee) + '</span></div>' : '') +
-            '<div class="r"><strong>Tổng cộng</strong><strong>' + S.money(o.total_amount) + '</strong></div>' +
-            '<p style="margin-top:8px">' + S.esc(o.payment_status_text) + '</p><p>Cảm ơn quý khách!</p></body></html>');
-        w.document.close();
-        w.focus();
-        setTimeout(function () { w.print(); }, 250);
-    }
-
     document.getElementById('order-modal-actions').addEventListener('click', function (event) {
         var btn = event.target.closest('button[data-act]');
         if (!btn || !detail) return;
         var act = btn.dataset.act;
-        if (act === 'print') return print(detail);
+        if (act === 'print') return S.printInvoice(detail);
         if (act === 'next') return setStatus(NEXT[detail.status].to);
         if (act === 'cancel') {
             return window.MocConfirm.show({

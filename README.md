@@ -107,11 +107,14 @@ Admin tạo tài khoản nhân viên tại `admin/staff.html` (email dạng `ten
 | Chức năng | Phục vụ | Thu ngân | Bếp | Admin |
 |---|---|---|---|---|
 | Xem sơ đồ bàn | ✔ | ✔ | ✔ | ✔ |
-| Đổi trạng thái bàn | ✔ | | | ✔ |
+| Nhận khách (bàn trống → có khách) rồi gọi món tại bàn đó | ✔ | | | ✔ |
+| Đặt bàn sang / ra khỏi bảo trì | ✔ | ✔ | | ✔ |
+| Xác nhận đơn và xuất hóa đơn ngay trên sơ đồ bàn | | ✔ | | ✔ |
 | Xem đặt bàn | ✔ | ✔ | | ✔ |
 | Duyệt / xếp khách / hủy đặt bàn | ✔ | | | ✔ |
 | Xem đơn hàng | ✔ | ✔ | ✔ | ✔ |
-| Tạo và sửa đơn tại quầy | ✔ | ✔ | ✔ | ✔ |
+| Tạo đơn mang đi (phục vụ chỉ tạo được đơn mang đi, hoặc đơn tại bàn đã nhận khách) | ✔ | ✔ | | ✔ |
+| Sửa đơn | ✔ | ✔ | | ✔ |
 | Xác nhận thanh toán | | ✔ | | ✔ |
 | Hủy đơn | | ✔ | | ✔ |
 | Màn hình bếp (đổi sang đang làm / xong) | | | ✔ | ✔ |

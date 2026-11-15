@@ -16,7 +16,7 @@
         var total = orders.reduce(function (sum, o) { return sum + Number(o.total_amount || 0); }, 0);
         var meta = S.esc(t.capacity) + ' chỗ';
         var info = '';
-        if (orders.length) {
+        if (orders.length && S.can('tables.update')) {
             info += '<div class="tile-meta"><i class="bi bi-receipt me-1"></i>' + orders.length + ' đơn · ' + S.money(total) + '</div>';
         }
         var booking = bookingByTable[t.table_code];
@@ -25,22 +25,34 @@
         }
 
         var actions = '';
-        if (t.status !== 'maintenance' && S.can('orders.create')) {
-            actions += '<a class="btn btn-sm btn-coffee" href="new-order.html?table=' + encodeURIComponent(t.table_code) + '"><i class="bi bi-plus-lg me-1"></i>Gọi món</a>';
-        }
-        if (orders.length && S.can('orders.view')) {
-            actions += '<a class="btn btn-sm btn-outline-secondary" href="orders.html?q=' + encodeURIComponent(t.table_code) + '"><i class="bi bi-receipt me-1"></i>Xem đơn</a>';
-        }
-        if (S.can('tables.update')) {
-            if (t.status === 'available') {
-                actions += '<button type="button" class="btn btn-sm btn-outline-secondary" data-act="occupied" data-id="' + t.id + '">Nhận khách</button>';
-                actions += '<button type="button" class="btn btn-sm btn-outline-secondary" data-act="maintenance" data-id="' + t.id + '"><i class="bi bi-tools"></i></button>';
-            } else if (t.status === 'occupied') {
-                actions += '<button type="button" class="btn btn-sm btn-outline-success" data-act="available" data-id="' + t.id + '">Trả bàn</button>';
-            } else {
-                actions += '<button type="button" class="btn btn-sm btn-outline-success" data-act="available" data-id="' + t.id + '">Hết bảo trì</button>';
+        var canManage = S.can('tables.update');
+        var btn = function (act, cls, label, extra) {
+            return '<button type="button" class="btn btn-sm ' + cls + '" data-act="' + act + '" data-id="' + t.id + '"' + (extra || '') + '>' + label + '</button>';
+        };
+        if (t.status === 'available') {
+            if (S.canTable('available', 'occupied')) actions += btn('occupied', 'btn-coffee', '<i class="bi bi-person-check me-1"></i>Nhận khách', ' data-code="' + S.esc(t.table_code) + '"');
+            if (S.canTable('available', 'maintenance')) actions += btn('maintenance', 'btn-outline-secondary', '<i class="bi bi-tools me-1"></i>Bảo trì');
+        } else if (t.status === 'maintenance') {
+            if (S.canTable('maintenance', 'available')) actions += btn('available', 'btn-outline-success', 'Hết bảo trì');
+        } else if (t.status === 'occupied') {
+            // Phục vụ: gọi thêm món cho bàn đang có khách
+            if (S.can('tables.order')) {
+                actions += '<a class="btn btn-sm btn-coffee" href="new-order.html?table=' + encodeURIComponent(t.table_code) + '"><i class="bi bi-plus-lg me-1"></i>Gọi món</a>';
+            }
+            // Admin: được trả bàn thủ công
+            if (S.canTable('occupied', 'available')) actions += btn('available', 'btn-outline-success', 'Trả bàn');
+            // Thu ngân: xác nhận đơn + xuất hóa đơn từng đơn của bàn
+            if (S.can('tables.bill')) {
+                orders.forEach(function (o) {
+                    actions += '<div class="w-100 d-flex flex-wrap align-items-center gap-1 border-top pt-1 mt-1">' +
+                        '<span class="small fw-semibold me-auto">' + S.esc(o.order_code) + ' · ' + S.money(o.total_amount) + '</span>' +
+                        (o.status === 'pending' && S.canSetStatus('confirmed')
+                            ? '<button type="button" class="btn btn-sm btn-outline-success" data-order-act="confirm" data-oid="' + o.id + '">Xác nhận đơn</button>' : '') +
+                        '<button type="button" class="btn btn-sm btn-coffee" data-order-act="invoice" data-oid="' + o.id + '"><i class="bi bi-printer me-1"></i>Xuất hóa đơn</button></div>';
+                });
             }
         }
+        if (!canManage && !actions) actions = '';
 
         return '<div class="col-6 col-md-4 col-xl-3 col-xxl-2"><article class="table-tile ' + S.esc(t.status) + '">' +
             '<div class="tile-head"><span class="tile-name">' + S.esc(t.table_name || t.table_code) + '</span>' +
@@ -106,6 +118,26 @@
     }
 
     box.addEventListener('click', async function (event) {
+        var ob = event.target.closest('button[data-order-act]');
+        if (ob) {
+            if (ob.disabled) return;
+            ob.disabled = true;
+            try {
+                if (ob.dataset.orderAct === 'confirm') {
+                    var r = await S.api('/api/orders/' + encodeURIComponent(ob.dataset.oid) + '/status', { method: 'PATCH', body: JSON.stringify({ status: 'confirmed' }) });
+                    S.toast(r.message || 'Đã xác nhận đơn.');
+                    await load();
+                } else {
+                    var d = await S.api('/api/orders/' + encodeURIComponent(ob.dataset.oid));
+                    S.printInvoice(d.data);
+                }
+            } catch (err) {
+                S.toast(err.message, 'error');
+            } finally {
+                ob.disabled = false;
+            }
+            return;
+        }
         var btn = event.target.closest('button[data-act]');
         if (!btn || btn.disabled) return;
         btn.disabled = true;
@@ -114,6 +146,11 @@
                 method: 'PATCH',
                 body: JSON.stringify({ status: btn.dataset.act })
             });
+            // Nhận khách xong -> sang trang tạo đơn, bàn đã chọn sẵn
+            if (btn.dataset.act === 'occupied' && S.can('tables.order')) {
+                location.href = 'new-order.html?table=' + encodeURIComponent(btn.dataset.code);
+                return;
+            }
             S.toast(res.message);
             await load();
         } catch (err) {

@@ -93,6 +93,38 @@
         $('sum-subtotal').textContent = S.money(subtotal);
         $('sum-fee').textContent = S.money(fee);
         $('sum-total').textContent = S.money(subtotal + fee);
+        if (cart.length) qrFixed = null;
+        renderQr(subtotal + fee);
+    }
+
+    // ----- QR chuyển khoản: có sẵn số tiền + nội dung (dùng chung bộ tạo VietQR với trang thanh toán của khách) -----
+    var qrFixed = null; // sau khi tạo đơn: giữ mã của đơn vừa tạo (số tiền + mã đơn) để khách quét
+    function renderQr(total) {
+        var box = $('pos-qr');
+        var show = $('pos-payment').value === 'bank_transfer' && !editId;
+        var amount = qrFixed ? qrFixed.amount : total;
+        var content = qrFixed ? qrFixed.content : 'MOC ' + (orderType() === 'at_table' && lockedTable() ? lockedTable() : 'MANG DI');
+        if (!show || amount <= 0 || typeof qrcode !== 'function' || !window.MocPaymentQr) {
+            box.classList.add('d-none');
+            box.innerHTML = '';
+            return;
+        }
+        try {
+            var qr = qrcode(0, 'M');
+            qr.addData(window.MocPaymentQr.buildPayload(amount, content), 'Byte');
+            qr.make();
+            var n = qr.getModuleCount(), q = 2, path = '';
+            for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (qr.isDark(r, c)) path += 'M' + (c + q) + ' ' + (r + q) + 'h1v1h-1z';
+            box.innerHTML = '<div class="d-inline-block border rounded p-2 bg-white" style="width:210px">' +
+                '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + (n + q * 2) + ' ' + (n + q * 2) + '" shape-rendering="crispEdges" role="img" aria-label="Mã QR chuyển khoản" style="display:block;width:100%;height:auto">' +
+                '<rect width="100%" height="100%" fill="#fff"/><path d="' + path + '" fill="#000"/></svg></div>' +
+                '<div class="small fw-semibold text-success mt-1">Mã đã kèm sẵn ' + S.money(amount) + '</div>' +
+                '<div class="small text-secondary">Nội dung: ' + S.esc(window.MocPaymentQr.cleanContent(content)) + '</div>';
+            box.classList.remove('d-none');
+        } catch (error) {
+            console.error('Không tạo được mã QR:', error);
+            box.classList.add('d-none');
+        }
     }
 
     // ----- Hộp thoại tùy chọn món -----
@@ -166,7 +198,30 @@
                 S.esc(t.table_name || t.table_code) + ' · ' + S.esc(t.area || '') + ' (' + STATUS[t.status] + ')</option>';
         }).join('');
     }
+    // Phục vụ (không có quyền "orders.any_table"): ?table=MÃ -> bàn khóa sẵn (đã nhận khách); không có -> chỉ khách mang đi.
+    // Thu ngân/admin: chọn tự do.
+    function restricted() { return !editId && !S.can('orders.any_table'); }
+    function lockedTable() { return (params.get('table') || '').toUpperCase(); }
     function applyType() {
+        if (restricted()) {
+            var code = lockedTable();
+            document.getElementById(code ? 'type-table' : 'type-takeaway').checked = true;
+            $('pos-type-group').classList.add('d-none');
+            if (code) {
+                var t = tables.filter(function (x) { return x.table_code === code; })[0];
+                $('pos-table').value = code;
+                $('pos-table').disabled = true;
+                $('pos-title').textContent = 'Gọi món · ' + (t ? (t.table_name || t.table_code) : code);
+                $('pos-subtitle').textContent = 'Đơn sẽ gắn với bàn này.';
+                if (!t || t.status !== 'occupied') {
+                    showAlert('Bàn này chưa nhận khách. Hãy quay lại sơ đồ bàn và bấm "Nhận khách" trước.');
+                    $('btn-submit').disabled = true;
+                }
+            } else {
+                $('pos-title').textContent = 'Tạo đơn mang đi';
+                $('pos-subtitle').textContent = 'Dành cho khách mua mang đi. Khách ăn tại bàn: nhận khách ở sơ đồ bàn trước.';
+            }
+        }
         var atTable = orderType() === 'at_table';
         $('pos-table').classList.toggle('d-none', !atTable);
         renderCart();
@@ -209,13 +264,15 @@
             $('pos-name').value = '';
             $('pos-phone').value = '';
             renderCart();
+            if ($('pos-payment').value === 'bank_transfer') { qrFixed = { amount: Number(res.data.total_amount), content: res.data.order_code }; renderQr(0); }
             var ok = $('pos-success');
             ok.innerHTML = 'Đã tạo đơn <strong>' + S.esc(res.data.order_code) + '</strong> · ' + S.money(res.data.total_amount) + '. <a href="orders.html">Xem đơn</a>';
             ok.classList.remove('d-none');
             setTimeout(function () { ok.classList.add('d-none'); }, 8000);
             // Bàn vừa chuyển sang "có khách": tải lại danh sách bàn để hiển thị đúng
             tables = await S.api('/api/tables');
-            renderTables('');
+            renderTables(restricted() ? lockedTable() : '');
+            if (restricted() && lockedTable()) $('pos-table').disabled = true;
         } catch (err) {
             showAlert(err.message);
         } finally {
@@ -302,5 +359,6 @@
     $('opt-save').addEventListener('click', saveOptions);
     document.querySelectorAll('input[name="order-type"]').forEach(function (r) { r.addEventListener('change', applyType); });
     $('btn-submit').addEventListener('click', submit);
+    $('pos-payment').addEventListener('change', function () { qrFixed = null; renderCart(); });
     $('btn-clear').addEventListener('click', function () { cart = []; renderCart(); });
 })();

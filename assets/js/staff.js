@@ -40,6 +40,11 @@
         return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
     }
     function can(permission) { return Boolean(me && me.permissions.indexOf(permission) !== -1); }
+    // Được chuyển bàn từ trạng thái `from` sang `to` không (server vẫn kiểm tra lại)
+    function canTable(from, to) {
+        var rules = (me && me.table_transitions) || {};
+        return (rules[from] || []).indexOf(to) !== -1;
+    }
     function canSetStatus(status) { return Boolean(me && me.order_statuses.indexOf(status) !== -1); }
     function debounce(fn, ms) {
         var timer = null;
@@ -165,6 +170,7 @@
         me: function () { return me; },
         can: can,
         canSetStatus: canSetStatus,
+        canTable: canTable,
         api: A.api,
         toast: A.toast,
         esc: esc,

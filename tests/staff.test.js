@@ -25,6 +25,8 @@ function answer(sql) {
     }
     if (/FROM users[\s\S]*WHERE id = \?/.test(sql) && !/password_hash/.test(sql)) return [[current]];
     if (/SELECT password_hash FROM users/.test(sql)) return [[{ password_hash: PASSWORD_HASH }]];
+    if (/SELECT id, full_name, role FROM users WHERE email/.test(sql)) return [dupEmail ? [{ id: 3, full_name: 'Dương Đình Đức', role: 'staff' }] : []];
+    if (/SELECT id, full_name, role FROM users WHERE phone/.test(sql)) return [dupPhone ? [{ id: 4, full_name: 'Trần Thị B', role: 'customer' }] : []];
     if (/SELECT id FROM users WHERE email/.test(sql)) return [[]];
     if (/FROM users WHERE email = \?/.test(sql) && /password_hash/.test(sql)) return [loginRow ? [loginRow] : []];
     if (/FROM users WHERE role = 'staff'|WHERE role = 'staff'/.test(sql)) return [[]];
@@ -33,8 +35,8 @@ function answer(sql) {
     if (/COUNT\(\*\) AS total FROM orders/.test(sql)) return [[{ total: 1 }]];
     if (/AS all_orders/.test(sql)) return [[{ all_orders: 1, today_orders: 1, today_revenue: 0 }]];
     if (/FROM products AS p/.test(sql)) return [[{ id: 1, name: 'Cà phê sữa đá', price: '29000.00', image: '/uploads/products/a.jpg' }]];
-    if (/FROM coffee_tables[\s\S]*WHERE table_code/.test(sql)) return [[{ id: 1, status: 'available' }]];
-    if (/FROM coffee_tables[\s\S]*WHERE id = \?/.test(sql)) return [[{ id: 1, table_code: 'T01', status: 'available' }]];
+    if (/FROM coffee_tables[\s\S]*WHERE table_code/.test(sql)) return [[{ id: 1, status: tableStatus }]];
+    if (/FROM coffee_tables[\s\S]*WHERE id = \?/.test(sql)) return [[{ id: 1, table_code: 'T01', status: tableStatus }]];
     if (/SELECT id, status, payment_status, order_type, table_code FROM orders/.test(sql)) return [[orderRow]];
     if (/FROM orders WHERE id = \? FOR UPDATE/.test(sql)) {
         return [[{ id: 1, order_code: 'MC1', order_type: 'takeaway', status: 'confirmed', payment_status: 'pending', coupon_code: null, discount_amount: 0, total_amount: 29000 }]];
@@ -69,6 +71,9 @@ test.after(() => server.close());
 
 // Mỗi lần gọi dùng một id riêng: test đổi mật khẩu thu hồi mọi token của id đó nên không được dùng chung id
 let nextId = 100;
+let tableStatus = 'available';
+let dupEmail = false;
+let dupPhone = false;
 function as(role, position) {
     current = { id: role === 'admin' ? 1 : nextId++, full_name: 'Người dùng', email: 'u@moccoffee.local', role, status: 1, staff_position: position || null };
     const token = jwt.sign({ id: current.id, jti: 'j' + Math.random() }, process.env.JWT_SECRET, { algorithm: 'HS256', expiresIn: '1h' });
@@ -88,14 +93,27 @@ test('permissions: bảng quyền theo vị trí đúng như thiết kế', () =
     const waiter = { role: 'staff', staff_position: 'waiter' };
     const cashier = { role: 'staff', staff_position: 'cashier' };
     const kitchen = { role: 'staff', staff_position: 'kitchen' };
-    // Thu ngân và bếp đều xem được bàn
+    // Cả ba vị trí đều xem được bàn; bếp không đổi được
     for (const user of [waiter, cashier, kitchen]) assert.equal(permissions.can(user, 'tables.view'), true);
     assert.equal(permissions.can(waiter, 'tables.update'), true);
-    assert.equal(permissions.can(cashier, 'tables.update'), false);
+    assert.equal(permissions.can(cashier, 'tables.update'), true);
     assert.equal(permissions.can(kitchen, 'tables.update'), false);
-    // Bếp tạo và sửa được đơn
-    assert.equal(permissions.can(kitchen, 'orders.create'), true);
-    assert.equal(permissions.can(kitchen, 'orders.edit'), true);
+    assert.equal(permissions.can(cashier, 'tables.bill'), true);
+    assert.equal(permissions.can(waiter, 'tables.bill'), false);
+    // Bếp không tạo/sửa đơn
+    assert.equal(permissions.can(kitchen, 'orders.create'), false);
+    assert.equal(permissions.can(kitchen, 'orders.edit'), false);
+    assert.equal(permissions.can(waiter, 'orders.create'), true);
+    assert.equal(permissions.can(cashier, 'orders.create'), true);
+    // Chuyển trạng thái bàn theo vị trí
+    assert.equal(permissions.canTableTransition(waiter, 'available', 'occupied'), true);
+    assert.equal(permissions.canTableTransition(waiter, 'available', 'maintenance'), true);
+    assert.equal(permissions.canTableTransition(waiter, 'occupied', 'available'), false);
+    assert.equal(permissions.canTableTransition(cashier, 'available', 'occupied'), false);
+    assert.equal(permissions.canTableTransition(cashier, 'available', 'maintenance'), true);
+    assert.equal(permissions.canTableTransition(kitchen, 'available', 'maintenance'), false);
+    assert.equal(permissions.mustReceiveGuestsFirst(waiter), true);
+    assert.equal(permissions.mustReceiveGuestsFirst(cashier), false);
     assert.equal(permissions.can(kitchen, 'orders.payment'), false);
     assert.equal(permissions.can(cashier, 'orders.payment'), true);
     assert.equal(permissions.can(kitchen, 'bookings.view'), false);
@@ -129,7 +147,8 @@ test('GET /api/staff/me trả quyền theo vị trí; khách hàng bị chặn',
     const res = await call('GET', '/api/staff/me', as('staff', 'kitchen'));
     assert.equal(res.status, 200);
     assert.equal(res.body.data.position_text, 'Bếp');
-    assert.ok(res.body.data.permissions.includes('orders.create'));
+    assert.ok(!res.body.data.permissions.includes('orders.create'));
+    assert.deepEqual(res.body.data.table_transitions, {});
     assert.ok(!res.body.data.permissions.includes('orders.payment'));
     assert.deepEqual(res.body.data.order_statuses, ['confirmed', 'preparing', 'ready']);
 
@@ -138,11 +157,21 @@ test('GET /api/staff/me trả quyền theo vị trí; khách hàng bị chặn',
 });
 
 // ---------- Bàn ----------
-test('bàn: phục vụ đổi được trạng thái; thu ngân và bếp thì không', async () => {
-    assert.equal((await call('PATCH', '/api/tables/1/status', as('staff', 'waiter'), { status: 'occupied' })).status, 200);
-    assert.equal((await call('PATCH', '/api/tables/1/status', as('staff', 'cashier'), { status: 'occupied' })).status, 403);
-    assert.equal((await call('PATCH', '/api/tables/1/status', as('staff', 'kitchen'), { status: 'occupied' })).status, 403);
-    assert.equal((await call('PATCH', '/api/tables/1/status', as('admin'), { status: 'occupied' })).status, 200);
+test('bàn: phục vụ chỉ nhận khách/bảo trì; thu ngân chỉ bảo trì; bếp không đổi được', async () => {
+    const patch = (who, status) => call('PATCH', '/api/tables/1/status', who, { status });
+    tableStatus = 'available';
+    assert.equal((await patch(as('staff', 'waiter'), 'occupied')).status, 200);
+    assert.equal((await patch(as('staff', 'waiter'), 'maintenance')).status, 200);
+    assert.equal((await patch(as('staff', 'cashier'), 'maintenance')).status, 200);
+    assert.equal((await patch(as('staff', 'cashier'), 'occupied')).status, 403);
+    assert.equal((await patch(as('staff', 'kitchen'), 'maintenance')).status, 403);
+    assert.equal((await patch(as('admin'), 'occupied')).status, 200);
+    tableStatus = 'occupied';
+    assert.equal((await patch(as('staff', 'waiter'), 'available')).status, 403);
+    tableStatus = 'maintenance';
+    assert.equal((await patch(as('staff', 'waiter'), 'available')).status, 200);
+    assert.equal((await patch(as('staff', 'cashier'), 'available')).status, 200);
+    tableStatus = 'available';
 });
 
 // ---------- Đặt bàn ----------
@@ -183,23 +212,29 @@ test('hành động đổi trạng thái đơn được ghi vào nhật ký', as
 });
 
 // ---------- Tạo / sửa đơn tại quầy ----------
-test('tạo đơn tại quầy: bếp tạo được, đơn vào thẳng trạng thái confirmed', async () => {
+test('tạo đơn: bếp bị chặn; phục vụ tạo đơn mang đi; thu ngân tạo được', async () => {
+    assert.equal((await call('POST', '/api/staff/orders', as('staff', 'kitchen'), ORDER_BODY)).status, 403);
     sqlLog.length = 0;
-    const res = await call('POST', '/api/staff/orders', as('staff', 'kitchen'), ORDER_BODY);
+    const res = await call('POST', '/api/staff/orders', as('staff', 'waiter'), ORDER_BODY);
     assert.equal(res.status, 201);
     assert.equal(res.body.data.status, 'confirmed');
     assert.equal(res.body.data.total_amount, 58000); // 2 x 29.000, mang đi nên không có phí phục vụ
     assert.ok(sqlLog.some((sql) => /INSERT INTO orders/.test(sql) && /'staff'/.test(sql)));
+    assert.equal((await call('POST', '/api/staff/orders', as('staff', 'cashier'), ORDER_BODY)).status, 201);
 });
 
-test('tạo đơn tại bàn: tính phí phục vụ 5% và bắt buộc chọn bàn', async () => {
-    const ok = await call('POST', '/api/staff/orders', as('staff', 'waiter'), { ...ORDER_BODY, order_type: 'at_table', table_code: 't01' });
+test('tạo đơn tại bàn: phục vụ phải nhận khách trước; tính phí phục vụ 5%', async () => {
+    const body = { ...ORDER_BODY, order_type: 'at_table', table_code: 't01' };
+    tableStatus = 'available';
+    assert.equal((await call('POST', '/api/staff/orders', as('staff', 'waiter'), body)).status, 409);
+    tableStatus = 'occupied';
+    const ok = await call('POST', '/api/staff/orders', as('staff', 'waiter'), body);
     assert.equal(ok.status, 201);
     assert.equal(ok.body.data.service_fee, 3000); // 5% của 58.000 = 2.900 làm tròn 3.000
     assert.equal(ok.body.data.total_amount, 61000);
-
     const noTable = await call('POST', '/api/staff/orders', as('staff', 'waiter'), { ...ORDER_BODY, order_type: 'at_table' });
     assert.equal(noTable.status, 400);
+    tableStatus = 'available';
 });
 
 test('tạo đơn tại quầy: dữ liệu sai bị từ chối, khách hàng bị chặn', async () => {
@@ -209,14 +244,15 @@ test('tạo đơn tại quầy: dữ liệu sai bị từ chối, khách hàng b
     assert.equal((await call('POST', '/api/staff/orders', as('customer'), ORDER_BODY)).status, 403);
 });
 
-test('sửa đơn: nhân viên (cả bếp) sửa được món của đơn chưa thanh toán', async () => {
-    const res = await call('PUT', '/api/staff/orders/1', as('staff', 'kitchen'), {
+test('sửa đơn: bếp bị chặn; thu ngân sửa được món của đơn chưa thanh toán', async () => {
+    assert.equal((await call('PUT', '/api/staff/orders/1', as('staff', 'kitchen'), { items: [] })).status, 403);
+    const res = await call('PUT', '/api/staff/orders/1', as('staff', 'cashier'), {
         items: [{ product_id: 1, quantity: 3, size: 'L', sugar_level: '50%', ice_level: '50%', toppings: ['Trân châu'] }],
     });
     assert.equal(res.status, 200);
     // (29.000 + 10.000 size L + 10.000 trân châu) x 3 = 147.000, mang đi
     assert.equal(res.body.data.total_amount, 147000);
-    assert.equal((await call('PUT', '/api/staff/orders/abc', as('staff', 'kitchen'), { items: [] })).status, 400);
+    assert.equal((await call('PUT', '/api/staff/orders/abc', as('staff', 'cashier'), { items: [] })).status, 400);
 });
 
 // ---------- Màn hình bếp ----------
@@ -260,6 +296,20 @@ test('admin tạo nhân viên: kiểm tra dữ liệu và tạo thành công', a
     assert.ok(sqlLog.some((sql) => /INSERT INTO users/.test(sql) && /'staff'/.test(sql)));
 });
 
+test('admin tạo nhân viên: báo rõ email hoặc SĐT đã thuộc tài khoản nào', async () => {
+    const good = { full_name: 'Đình Đức', email: 'dinhduc@moccoffee.local', phone: '0123456789', staff_position: 'cashier', password: 'matkhau-tam-1' };
+    dupEmail = true;
+    const e = await call('POST', '/api/admin/staff', as('admin'), good);
+    dupEmail = false;
+    assert.equal(e.status, 409);
+    assert.match(e.body.message, /Dương Đình Đức/);
+    dupPhone = true;
+    const p = await call('POST', '/api/admin/staff', as('admin'), good);
+    dupPhone = false;
+    assert.equal(p.status, 409);
+    assert.match(p.body.message, /Trần Thị B/);
+});
+
 test('admin khóa, mở khóa, đặt lại mật khẩu nhân viên', async () => {
     const admin = as('admin');
     assert.equal((await call('PATCH', '/api/admin/staff/55/status', admin, { status: 0 })).status, 200);
@@ -300,4 +350,15 @@ test('database chưa có cột staff_position: khách/admin vẫn xác thực v�
 test('trang tạo đơn nhân viên tìm ảnh món theo cùng quy tắc với trang khách', async () => {
     const js = await (await fetch(`${baseUrl}/assets/js/staff-pos.js`)).text();
     assert.match(js, /\.\.\/assets\/images\/products\//);
+});
+
+test('trang tạo đơn nhân viên: có QR chuyển khoản dùng chung bộ tạo VietQR có sẵn số tiền', () => {
+    const fs = require('node:fs');
+    const html = fs.readFileSync('staff/new-order.html', 'utf8');
+    assert.match(html, /id="pos-qr"/);
+    assert.ok(html.indexOf('vendor/qrcode.js') < html.indexOf('payment-qr.js') && html.indexOf('payment-qr.js') < html.indexOf('staff-pos.js'));
+    const { buildPayload } = require('../assets/js/payment-qr.js');
+    const payload = buildPayload(61000, 'MC123');
+    assert.ok(payload.includes('540561000'), 'số tiền nằm trong mã QR');
+    assert.ok(payload.includes('MC123'));
 });

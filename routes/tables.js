@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
 const { verifyToken } = require('../middleware/auth');
-const { requirePermission } = require('../middleware/permissions');
+const { requirePermission, canTableTransition } = require('../middleware/permissions');
 const { logActivity } = require('../services/audit');
 const { dbErrorMessage } = require('../middleware/dbError');
 
@@ -95,6 +95,10 @@ router.patch('/:id/status', verifyToken, requirePermission('tables.update'), asy
         const unchanged = table.status === status;
 
         if (!unchanged) {
+            if (!canTableTransition(req.user, table.status, status)) {
+                fail(403, 'Vị trí của bạn không được đổi bàn từ trạng thái này sang trạng thái kia.');
+            }
+
             if (!transitions[table.status]?.includes(status)) {
                 fail(
                     409,

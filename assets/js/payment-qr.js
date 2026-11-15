@@ -58,6 +58,9 @@
     return body + crc16(body);
   }
 
+  // Trình duyệt: cho trang nhân viên dùng lại cùng bộ tạo mã (không phụ thuộc DOM trang thanh toán)
+  if (typeof window !== 'undefined') window.MocPaymentQr = { buildPayload: buildPayload, cleanContent: cleanContent };
+
   // Xuất để kiểm thử bằng Node.
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = { buildPayload: buildPayload, crc16: crc16, cleanContent: cleanContent };

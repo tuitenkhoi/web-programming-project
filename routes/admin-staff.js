@@ -87,10 +87,17 @@ router.post('/', async (req, res) => {
     if (password.length < 8 || password.length > 72) return bad(res, 400, 'Mật khẩu tạm phải từ 8 đến 72 ký tự.');
 
     try {
-        const [duplicates] = phone
-            ? await db.execute('SELECT id FROM users WHERE email = ? OR phone = ? LIMIT 1', [email, phone])
-            : await db.execute('SELECT id FROM users WHERE email = ? LIMIT 1', [email]);
-        if (duplicates.length) return bad(res, 409, 'Email hoặc số điện thoại đã được dùng cho tài khoản khác.');
+        const ROLE_TEXT = { customer: 'khách hàng', staff: 'nhân viên', admin: 'quản trị' };
+        const [sameEmail] = await db.execute('SELECT id, full_name, role FROM users WHERE email = ? LIMIT 1', [email]);
+        if (sameEmail.length) {
+            return bad(res, 409, `Email ${email} đã tồn tại (tài khoản ${ROLE_TEXT[sameEmail[0].role] || ''} "${sameEmail[0].full_name}"). Hãy đổi tên đăng nhập khác, hoặc dùng nút sửa nếu đó là nhân viên bạn đã tạo.`);
+        }
+        if (phone) {
+            const [samePhone] = await db.execute('SELECT id, full_name, role FROM users WHERE phone = ? LIMIT 1', [phone]);
+            if (samePhone.length) {
+                return bad(res, 409, `Số điện thoại ${phone} đang được dùng bởi tài khoản ${ROLE_TEXT[samePhone[0].role] || ''} "${samePhone[0].full_name}". Hãy dùng số khác hoặc để trống.`);
+            }
+        }
 
         const hash = await bcrypt.hash(password, 10);
         // email_verified_at = NOW(): tài khoản do admin tạo coi như đã xác minh

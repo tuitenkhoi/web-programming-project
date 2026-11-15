@@ -12,6 +12,8 @@ const { revokeAllForUser } = require('../middleware/revoke');
 const {
     permissionsOf,
     allowedOrderStatuses,
+    tableTransitionsOf,
+    mustReceiveGuestsFirst,
     requirePermission,
     POSITION_TEXT,
 } = require('../middleware/permissions');
@@ -67,6 +69,7 @@ router.get('/me', (req, res) => {
             position_text: req.user.role === 'admin' ? 'Quản trị viên' : (POSITION_TEXT[req.user.staff_position] || ''),
             permissions: permissionsOf(req.user),
             order_statuses: allowedOrderStatuses(req.user),
+            table_transitions: tableTransitionsOf(req.user),
         },
     });
 });
@@ -207,6 +210,9 @@ router.post('/orders', requirePermission('orders.create'), async (req, res) => {
             );
             if (!tables.length) throw fail(400, 'Mã bàn không tồn tại');
             if (tables[0].status === 'maintenance') throw fail(409, 'Bàn đang bảo trì, vui lòng chọn bàn khác');
+            if (mustReceiveGuestsFirst(req.user) && tables[0].status !== 'occupied') {
+                throw fail(409, 'Bàn này chưa nhận khách. Hãy bấm "Nhận khách" ở sơ đồ bàn trước khi gọi món.');
+            }
             await connection.execute("UPDATE coffee_tables SET status = 'occupied' WHERE id = ?", [tables[0].id]);
         }
 

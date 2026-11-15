@@ -35,7 +35,7 @@
         <div id="pos-alert" class="alert alert-danger d-none py-2"></div>
         <div id="pos-success" class="alert alert-success d-none py-2"></div>
         <div id="pos-form-top">
-          <div class="btn-group w-100 mb-2" role="group" aria-label="Hình thức">
+          <div class="btn-group w-100 mb-2" id="pos-type-group" role="group" aria-label="Hình thức">
             <input type="radio" class="btn-check" name="order-type" id="type-table" value="at_table" checked />
             <label class="btn btn-outline-secondary" for="type-table"><i class="bi bi-cup-straw me-1"></i>Tại bàn</label>
             <input type="radio" class="btn-check" name="order-type" id="type-takeaway" value="takeaway" />
@@ -55,6 +55,7 @@
             <option value="cash">Thanh toán tiền mặt</option>
             <option value="bank_transfer">Chuyển khoản (chờ xác nhận)</option>
           </select>
+          <div id="pos-qr" class="text-center mt-2 d-none"></div>
         </div>
         <div class="d-flex justify-content-between small"><span>Tạm tính</span><span id="sum-subtotal">0đ</span></div>
         <div class="d-flex justify-content-between small"><span>Phí phục vụ (5%, tại bàn)</span><span id="sum-fee">0đ</span></div>
@@ -89,6 +90,8 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/confirm-modal.js"></script>
   <script src="../assets/js/staff.js"></script>
+  <script src="../assets/js/vendor/qrcode.js"></script>
+  <script src="../assets/js/payment-qr.js"></script>
   <script src="../assets/js/staff-pos.js"></script>
 </body>
 

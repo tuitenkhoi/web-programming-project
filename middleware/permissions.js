@@ -5,15 +5,28 @@
 // Muốn đổi quyền của một vị trí, chỉ cần sửa bảng PERMISSIONS và ORDER_STATUS_BY_POSITION dưới đây.
 
 const PERMISSIONS = {
+    // Sơ đồ bàn. Bếp chỉ thấy bàn trống hay không (không có nút nào).
     'tables.view': ['waiter', 'cashier', 'kitchen'],
-    'tables.update': ['waiter'],
+    'tables.update': ['waiter', 'cashier'],   // chi tiết từng thao tác xem TABLE_TRANSITIONS_BY_POSITION
+    'tables.order': ['waiter'],               // nút "Gọi món" trên bàn đang có khách
+    'tables.bill': ['cashier'],               // trên bàn đang có khách: xác nhận đơn + xuất hóa đơn
     'bookings.view': ['waiter', 'cashier'],
     'bookings.manage': ['waiter'],
     'orders.view': ['waiter', 'cashier', 'kitchen'],
-    'orders.create': ['waiter', 'cashier', 'kitchen'],
-    'orders.edit': ['waiter', 'cashier', 'kitchen'],
+    'orders.create': ['waiter', 'cashier'],   // bếp không tạo đơn
+    'orders.edit': ['waiter', 'cashier'],     // bếp không sửa đơn
+    'orders.any_table': ['cashier'],          // được chọn bàn/hình thức tùy ý; phục vụ chỉ tạo đơn mang đi hoặc cho bàn vừa nhận khách
     'orders.payment': ['cashier'],
     'kitchen.view': ['waiter', 'cashier', 'kitchen'],
+};
+
+// Trạng thái bàn mà mỗi vị trí được chuyển TỪ -> TỚI (admin không bị giới hạn)
+//   Phục vụ: nhận khách (trống -> có khách), bảo trì và kết thúc bảo trì
+//   Thu ngân: chỉ bảo trì và kết thúc bảo trì
+const TABLE_TRANSITIONS_BY_POSITION = {
+    waiter: { available: ['occupied', 'maintenance'], maintenance: ['available'] },
+    cashier: { available: ['maintenance'], maintenance: ['available'] },
+    kitchen: {},
 };
 
 // Trạng thái đơn mà mỗi vị trí được phép chuyển TỚI (server vẫn kiểm tra thứ tự chuyển hợp lệ ở order.admin.controller)
@@ -39,6 +52,34 @@ function canSetOrderStatus(user, status) {
     if (isAdmin(user)) return true;
     if (!isStaff(user)) return false;
     return (ORDER_STATUS_BY_POSITION[user.staff_position] || []).includes(status);
+}
+
+const ALL_TABLE_STATUSES = ['available', 'occupied', 'maintenance'];
+
+// Nhân viên có được chuyển bàn từ trạng thái `from` sang `to` không (admin: luôn được, API bàn vẫn kiểm tra thêm)
+function canTableTransition(user, from, to) {
+    if (isAdmin(user)) return true;
+    if (!isStaff(user)) return false;
+    const rules = TABLE_TRANSITIONS_BY_POSITION[user.staff_position] || {};
+    return (rules[from] || []).includes(to);
+}
+
+// Bảng chuyển trạng thái bàn của người dùng, trả cho giao diện để ẩn/hiện nút
+function tableTransitionsOf(user) {
+    if (isAdmin(user)) {
+        return {
+            available: ['occupied', 'maintenance'],
+            occupied: ['available'],
+            maintenance: ['available'],
+        };
+    }
+    if (!isStaff(user)) return {};
+    return TABLE_TRANSITIONS_BY_POSITION[user.staff_position] || {};
+}
+
+// Phục vụ chỉ gọi món cho bàn đã bấm "Nhận khách" (bàn đang có khách)
+function mustReceiveGuestsFirst(user) {
+    return isStaff(user) && !can(user, 'orders.any_table');
 }
 
 const ALL_ORDER_STATUSES = ['pending', 'confirmed', 'preparing', 'ready', 'completed', 'cancelled'];
@@ -96,6 +137,9 @@ module.exports = {
     POSITION_TEXT,
     can,
     canSetOrderStatus,
+    canTableTransition,
+    tableTransitionsOf,
+    mustReceiveGuestsFirst,
     allowedOrderStatuses,
     permissionsOf,
     requireStaff,

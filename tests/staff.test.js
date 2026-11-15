@@ -404,3 +404,12 @@ test('QR theo bàn: trang khách nạp table-context.js, giỏ hàng tự chọn
     assert.ok(tables.includes('print-table-qr-button') && tables.includes('admin-table-qr.js'));
     assert.ok(fs.readFileSync('assets/js/admin-table-qr.js', 'utf8').includes('/pages/menu.html?table='));
 });
+
+test('điện thoại: trang menu/chi tiết/trang chủ có thanh giỏ hàng cố định; trang giỏ có nút thanh toán dính đáy', () => {
+    const fs = require('node:fs');
+    for (const f of ['pages/menu.html', 'pages/product-detail.html', 'index.html']) {
+        assert.ok(fs.readFileSync(f, 'utf8').includes('cart-bar.js'), f);
+    }
+    assert.ok(fs.readFileSync('pages/cart.html', 'utf8').includes('cart-pay-bar.js'));
+    assert.match(fs.readFileSync('assets/js/cart-bar.js', 'utf8'), /cart\.html/);
+});

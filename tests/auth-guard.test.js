@@ -108,12 +108,35 @@ const revokedResponse = async () => ({
     json: async () => ({ success: false, message: 'Phiên đăng nhập đã kết thúc', code: 'TOKEN_REVOKED' }),
 });
 
-test('API trả 401 TOKEN_REVOKED: xóa phiên và chuyển sang đăng nhập (không bị kẹt ở trang thanh toán)', async () => {
-    const { api, local, timers, location } = loadClient({ token: fakeJwt({ exp: inAnHour() }), pathname: '/pages/payment.html', search: '', fetchImpl: revokedResponse });
-    await assert.rejects(() => api.createOrder({}), /Phiên đăng nhập đã kết thúc/);
+test('API trả 401 TOKEN_REVOKED ở trang cần đăng nhập: xóa phiên và chuyển sang đăng nhập', async () => {
+    const { api, local, timers, location } = loadClient({ token: fakeJwt({ exp: inAnHour() }), pathname: '/pages/menu.html', search: '', fetchImpl: revokedResponse });
+    await assert.rejects(() => api.getMe(), /Phiên đăng nhập đã kết thúc/);
     assert.equal(local.getItem('mocCoffeeCustomerToken'), null);
     timers.forEach((fn) => fn());
-    assert.equal(location.href, '/pages/account.html?login=1&next=' + encodeURIComponent('/pages/payment.html'));
+    assert.equal(location.href, '/pages/account.html?login=1&next=' + encodeURIComponent('/pages/menu.html'));
+});
+
+test('Thanh toán không bắt buộc đăng nhập: token cũ bị từ chối thì đặt đơn lại như khách vãng lai, không chuyển trang', async () => {
+    const calls = [];
+    const fetchImpl = async (url, init) => {
+        calls.push(init.headers.Authorization || null);
+        if (init.headers.Authorization) return revokedResponse();
+        return { ok: true, status: 201, json: async () => ({ success: true, data: { order_code: 'MC1' } }) };
+    };
+    const { api, local, timers } = loadClient({ token: fakeJwt({ exp: inAnHour() }), pathname: '/pages/payment.html', search: '', fetchImpl });
+    const order = await api.createOrder({});
+    assert.equal(order.order_code, 'MC1');
+    assert.equal(calls.length, 2);
+    assert.equal(calls[1], null);
+    assert.equal(local.getItem('mocCoffeeCustomerToken'), null);
+    assert.equal(timers.length, 0);
+});
+
+test('Khách vãng lai (không token) đặt đơn được ngay, payment.js không gọi requireLogin', async () => {
+    const fs = require('node:fs');
+    assert.ok(!/requireLogin\(/.test(fs.readFileSync('assets/js/payment.js', 'utf8')));
+    const { api } = loadClient({ pathname: '/pages/payment.html', search: '', fetchImpl: async (u, init) => ({ ok: true, status: 201, json: async () => ({ success: true, data: { order_code: 'MC2', auth: init.headers.Authorization || null } }) }) });
+    assert.equal((await api.createOrder({})).auth, null);
 });
 
 test('API trả 401 TOKEN_REVOKED ở trang tài khoản: chỉ xóa phiên, không chuyển trang', async () => {

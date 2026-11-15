@@ -12,7 +12,7 @@ const {
     verifyToken,
     requireAdmin,
 } = require('./middleware/auth');
-const { requireStaff } = require('./middleware/permissions');
+const { requireStaff, requirePermission } = require('./middleware/permissions');
 const categoryRoutes = require('./backend/src/routes/category.routes');
 const productRoutes = require('./backend/src/routes/product.routes');
 const orderRoutes = require('./backend/src/routes/order.routes');
@@ -234,7 +234,7 @@ app.use('/api/reviews', require('./routes/reviews'));
 app.use(
     '/api/dashboard',
     verifyToken,
-    requireAdmin,
+    requirePermission('revenue.view'), // admin và thu ngân
     require('./routes/dashboard')
 ); // toàn bộ cần token
 app.use('/api/tables', require('./routes/tables'));     // GET công khai, PATCH cần token (bên trong route)

@@ -17,6 +17,7 @@ const PERMISSIONS = {
     'orders.edit': ['waiter', 'cashier'],     // bếp không sửa đơn
     'orders.any_table': ['cashier'],          // được chọn bàn/hình thức tùy ý; phục vụ chỉ tạo đơn mang đi hoặc cho bàn vừa nhận khách
     'orders.payment': ['cashier'],
+    'revenue.view': ['cashier'], // doanh thu, dashboard và hóa đơn (mọi thứ liên quan đến tiền)
     'orders.export': [], // xuất hóa đơn ra Excel/CSV/PDF: chỉ admin (không vị trí nhân viên nào được thêm vào đây)
     'kitchen.view': ['waiter', 'cashier', 'kitchen'],
 };

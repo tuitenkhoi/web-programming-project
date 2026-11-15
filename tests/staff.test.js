@@ -381,3 +381,26 @@ test('trang tạo đơn nhân viên: có QR chuyển khoản dùng chung bộ t�
     assert.ok(payload.includes('540561000'), 'số tiền nằm trong mã QR');
     assert.ok(payload.includes('MC123'));
 });
+
+test('thu ngân xem được dashboard/doanh thu; phục vụ và bếp thì không', async () => {
+    assert.equal(permissions.can({ role: 'staff', staff_position: 'cashier' }, 'revenue.view'), true);
+    assert.equal(permissions.can({ role: 'staff', staff_position: 'waiter' }, 'revenue.view'), false);
+    assert.equal(permissions.can({ role: 'staff', staff_position: 'kitchen' }, 'revenue.view'), false);
+    assert.equal((await call('GET', '/api/dashboard/stats?period=7-days', as('staff', 'waiter'))).status, 403);
+    assert.equal((await call('GET', '/api/dashboard/stats?period=7-days', as('staff', 'kitchen'))).status, 403);
+    assert.equal((await call('GET', '/api/dashboard/stats?period=7-days', as('customer'))).status, 403);
+    assert.equal((await call('GET', '/api/dashboard/stats?period=bad', as('staff', 'cashier'))).status, 400);
+    const me = await call('GET', '/api/staff/me', as('staff', 'cashier'));
+    assert.ok(me.body.data.permissions.includes('revenue.view'));
+});
+
+test('QR theo bàn: trang khách nạp table-context.js, giỏ hàng tự chọn bàn đã quét, admin in được mã QR', () => {
+    const fs = require('node:fs');
+    for (const f of ['pages/menu.html', 'pages/cart.html', 'pages/product-detail.html', 'index.html']) {
+        assert.ok(fs.readFileSync(f, 'utf8').includes('table-context.js'), f);
+    }
+    assert.match(fs.readFileSync('assets/js/cart.js', 'utf8'), /MocTable\?\.get/);
+    const tables = fs.readFileSync('admin/tables.html', 'utf8');
+    assert.ok(tables.includes('print-table-qr-button') && tables.includes('admin-table-qr.js'));
+    assert.ok(fs.readFileSync('assets/js/admin-table-qr.js', 'utf8').includes('/pages/menu.html?table='));
+});

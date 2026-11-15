@@ -214,6 +214,7 @@ app.use('/api/reviews', rateLimit({ windowMs: 10 * 60 * 1000, max: 30, methods: 
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/tags', require('./routes/tags'));
+app.use('/api/toppings', require('./routes/toppings'));
 app.use('/api/attachments', require('./backend/src/routes/attachment.routes'));
 app.get('/api/admin/me', verifyToken, requireAdmin, (req, res) => {
     res.json({

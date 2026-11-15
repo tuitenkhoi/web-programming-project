@@ -623,7 +623,12 @@
               Kích thước: M
             </small>
 
-            <div>
+            <div class="d-flex flex-wrap column-gap-3">
+              <button type="button" class="btn btn-link text-secondary p-0 small edit-options-button">
+                <i class="bi bi-sliders me-1"></i>
+                Tùy chỉnh size, topping
+              </button>
+
               <button type="button" class="btn btn-link text-secondary p-0 small edit-note-button">
                 <i class="bi bi-pencil me-1"></i>
                 Ghi chú
@@ -666,6 +671,60 @@
       </td>
     </tr>
   </template>
+
+  <!-- Modal sửa size và topping của một món trong giỏ -->
+  <div class="modal fade" id="cart-options-modal" tabindex="-1" aria-labelledby="cart-options-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content border-0">
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="cart-options-title">Tùy chỉnh món</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+
+        <div class="modal-body">
+          <p class="fw-semibold mb-3" id="cart-options-product"></p>
+
+          <!-- Size -->
+          <fieldset class="mb-4">
+            <legend class="form-label fw-bold fs-6">Kích thước</legend>
+            <div class="row g-2" id="cart-options-sizes">
+              <div class="col-4">
+                <input type="radio" class="btn-check size-option" name="cartOptionSize" id="cart-size-s" value="S" autocomplete="off" />
+                <label class="product-option-box" for="cart-size-s"><strong>S</strong><small>-5.000đ</small></label>
+              </div>
+              <div class="col-4">
+                <input type="radio" class="btn-check size-option" name="cartOptionSize" id="cart-size-m" value="M" autocomplete="off" />
+                <label class="product-option-box" for="cart-size-m"><strong>M</strong><small>+0đ</small></label>
+              </div>
+              <div class="col-4">
+                <input type="radio" class="btn-check size-option" name="cartOptionSize" id="cart-size-l" value="L" autocomplete="off" />
+                <label class="product-option-box" for="cart-size-l"><strong>L</strong><small>+10.000đ</small></label>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Topping: danh sách lấy từ máy chủ -->
+          <fieldset class="mb-3">
+            <legend class="form-label fw-bold fs-6">Topping thêm</legend>
+            <div class="row g-2" id="cart-options-toppings"></div>
+          </fieldset>
+
+          <div class="d-flex justify-content-between align-items-center border-top pt-3">
+            <span class="text-secondary">Đơn giá mới</span>
+            <strong class="text-danger fs-5" id="cart-options-price"></strong>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" id="cart-options-save" class="btn btn-coffee">
+            <i class="bi bi-check-lg me-1"></i>
+            Lưu thay đổi
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal xác nhận xóa toàn bộ -->
   <div class="modal fade" id="clear-cart-modal" tabindex="-1" aria-labelledby="clear-cart-title" aria-hidden="true">
@@ -728,6 +787,7 @@
   <script src="../assets/js/main.js"></script>
   <script src="../assets/js/client-api.js"></script>
   <script src="../assets/js/confirm-modal.js"></script>
+  <script src="../assets/js/cart-options.js"></script>
   <script src="../assets/js/cart.js"></script>
   <script src="../assets/js/effects.js"></script>
   <script src="../assets/js/customer-greeting.js"></script>

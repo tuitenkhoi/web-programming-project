@@ -322,6 +322,14 @@ document.addEventListener("DOMContentLoaded", function () {
           0
       ),
 
+      // Giá gốc của món (chưa cộng size/topping), dùng khi khách đổi size/topping trong giỏ
+      basePrice:
+        item.basePrice !== undefined &&
+        item.basePrice !== null &&
+        Number.isFinite(Number(item.basePrice))
+          ? Number(item.basePrice)
+          : undefined,
+
       quantity: Math.max(
         1,
         Number(item.quantity || 1)
@@ -674,6 +682,16 @@ document.addEventListener("DOMContentLoaded", function () {
         ".edit-note-button"
       );
 
+      const editOptionsButton = event.target.closest(
+        ".edit-options-button"
+      );
+
+      if (editOptionsButton) {
+        openOptionsModal(item);
+
+        return;
+      }
+
       if (decreaseButton) {
         if (item.quantity > 1) {
           item.quantity--;
@@ -780,6 +798,306 @@ document.addEventListener("DOMContentLoaded", function () {
       renderCart();
     }
   );
+
+  /* =========================================================
+     9B. ĐỔI SIZE VÀ TOPPING CỦA MỘT MÓN TRONG GIỎ
+     (xử lý tính giá nằm trong cart-options.js)
+  ========================================================= */
+
+  const Options = window.MocCartOptions;
+
+  const optionsModalElement =
+    document.querySelector("#cart-options-modal");
+
+  const optionsProductName =
+    document.querySelector("#cart-options-product");
+
+  const optionsToppingList =
+    document.querySelector("#cart-options-toppings");
+
+  const optionsPriceElement =
+    document.querySelector("#cart-options-price");
+
+  const optionsSaveButton =
+    document.querySelector("#cart-options-save");
+
+  let toppingsPromise = null;
+  let editingCartKey = null;
+  let editingBasePrice = 0;
+  let editingToppingsReady = false; // false: chưa tải được danh sách topping
+  let editingExistingToppings = []; // topping hiện có của món đang sửa
+
+  /*
+   * Danh sách topping đang bán (do admin quản lý).
+   * Chỉ tải một lần; nếu lỗi thì lần sau tải lại.
+   */
+  function loadToppings() {
+    if (!toppingsPromise) {
+      toppingsPromise = window.MocCoffeeApi
+        .getToppings()
+        .catch(function (error) {
+          toppingsPromise = null;
+          throw error;
+        });
+    }
+
+    return toppingsPromise;
+  }
+
+  function getSelectedOptionSize() {
+    return (
+      optionsModalElement.querySelector(
+        'input[name="cartOptionSize"]:checked'
+      )?.value || "M"
+    );
+  }
+
+  function getSelectedOptionToppings() {
+    return Array.from(
+      optionsToppingList.querySelectorAll(
+        ".cart-topping-checkbox:checked"
+      )
+    ).map(function (checkbox) {
+      return {
+        name: checkbox.value,
+        price: Number(checkbox.dataset.price || 0),
+      };
+    });
+  }
+
+  // Topping đang được chọn (chưa tải được danh sách thì coi như giữ nguyên topping cũ)
+  function getEditingToppings() {
+    return editingToppingsReady
+      ? getSelectedOptionToppings()
+      : editingExistingToppings;
+  }
+
+  function updateOptionsPrice() {
+    optionsPriceElement.textContent = formatCurrency(
+      Options.calcUnitPrice(
+        editingBasePrice,
+        getSelectedOptionSize(),
+        getEditingToppings()
+      )
+    );
+  }
+
+  function showOptionsMessage(text) {
+    optionsToppingList.textContent = "";
+
+    const column = document.createElement("div");
+    column.className = "col-12";
+
+    const message = document.createElement("p");
+    message.className = "text-secondary small mb-0";
+    message.textContent = text;
+
+    column.appendChild(message);
+    optionsToppingList.appendChild(column);
+  }
+
+  function renderOptionsToppings(toppings, selectedNames) {
+    optionsToppingList.textContent = "";
+
+    if (!toppings.length) {
+      showOptionsMessage("Hiện chưa có topping nào.");
+
+      return;
+    }
+
+    toppings.forEach(function (topping) {
+      const id = `cart-topping-${topping.id}`;
+
+      const column = document.createElement("div");
+      column.className = "col-12 col-sm-6";
+
+      const wrapper = document.createElement("div");
+      wrapper.className = "form-check topping-option";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.className =
+        "form-check-input cart-topping-checkbox";
+      checkbox.id = id;
+      checkbox.value = topping.name;
+      checkbox.dataset.price = String(topping.price);
+      checkbox.checked = selectedNames.has(topping.name);
+
+      const label = document.createElement("label");
+      label.className =
+        "form-check-label d-flex justify-content-between w-100";
+      label.htmlFor = id;
+
+      const name = document.createElement("span");
+      name.textContent = topping.name;
+
+      const price = document.createElement("strong");
+      price.textContent = `+${formatCurrency(topping.price)}`;
+
+      label.append(name, price);
+      wrapper.append(checkbox, label);
+      column.appendChild(wrapper);
+      optionsToppingList.appendChild(column);
+    });
+  }
+
+  async function openOptionsModal(item) {
+    if (!Options || !optionsModalElement) {
+      return;
+    }
+
+    editingCartKey = item.cartKey;
+    editingBasePrice = Options.getBasePrice(item);
+    editingToppingsReady = false;
+    editingExistingToppings = Options.normalizeToppings(item.toppings);
+
+    optionsProductName.textContent = item.name;
+
+    optionsModalElement
+      .querySelectorAll('input[name="cartOptionSize"]')
+      .forEach(function (radio) {
+        radio.checked = radio.value === item.size;
+      });
+
+    showOptionsMessage("Đang tải topping...");
+    updateOptionsPrice();
+
+    if (typeof bootstrap !== "undefined") {
+      bootstrap.Modal.getOrCreateInstance(
+        optionsModalElement
+      ).show();
+    }
+
+    /*
+     * Lấy giá món mới nhất từ máy chủ để đơn giá sau khi sửa luôn đúng
+     * (admin có thể đã đổi giá). Không lấy được thì dùng giá đã lưu.
+     */
+    const freshPrice = window.MocCoffeeApi
+      .getProductById(item.id)
+      .then(function (product) {
+        const price = Number(product?.price);
+
+        return Number.isFinite(price) ? price : null;
+      })
+      .catch(function () {
+        return null;
+      });
+
+    try {
+      const [toppings, price] = await Promise.all([
+        loadToppings(),
+        freshPrice,
+      ]);
+
+      if (editingCartKey !== item.cartKey) {
+        return;
+      }
+
+      if (price !== null) {
+        editingBasePrice = price;
+      }
+
+      renderOptionsToppings(
+        toppings,
+        new Set(item.toppings.map(Options.toppingName))
+      );
+
+      editingToppingsReady = true;
+    } catch (error) {
+      showOptionsMessage(
+        "Không tải được danh sách topping. Bạn vẫn có thể đổi size; topping hiện tại được giữ nguyên."
+      );
+    }
+
+    updateOptionsPrice();
+  }
+
+  optionsModalElement?.addEventListener(
+    "change",
+    function (event) {
+      if (
+        event.target.matches(
+          'input[name="cartOptionSize"], .cart-topping-checkbox'
+        )
+      ) {
+        updateOptionsPrice();
+      }
+    }
+  );
+
+  optionsSaveButton?.addEventListener(
+    "click",
+    function () {
+      if (!editingCartKey) {
+        return;
+      }
+
+      const itemsBefore = cart.length;
+
+      /*
+       * Chưa tải được danh sách topping thì không có ô nào được tích,
+       * nên phải giữ topping cũ chứ không được xóa hết.
+       */
+      const result = Options.applyOptions(
+        cart,
+        editingCartKey,
+        {
+          size: getSelectedOptionSize(),
+          toppings: getEditingToppings(),
+          basePrice: editingBasePrice,
+        }
+      );
+
+      cart = result.cart;
+      editingCartKey = null;
+
+      hideModal("#cart-options-modal");
+      renderCart();
+
+      showToast(
+        cart.length < itemsBefore
+          ? "Đã cập nhật món và gộp với món giống nhau trong giỏ."
+          : "Đã cập nhật size, topping cho món."
+      );
+    }
+  );
+
+  /*
+   * Đồng bộ giỏ với danh sách topping đang bán:
+   * topping đã ngừng bán thì bỏ khỏi giỏ, giá đổi thì tính lại.
+   */
+  function syncToppingsWithShop() {
+    if (!Options) {
+      return;
+    }
+
+    loadToppings()
+      .then(function (toppings) {
+        const result = Options.reconcile(cart, toppings);
+
+        if (!result.changed) {
+          return;
+        }
+
+        cart = result.cart;
+        renderCart();
+
+        if (result.removed.length) {
+          showToast(
+            `Topping ${result.removed.join(", ")} đã ngừng bán nên được bỏ khỏi giỏ hàng.`,
+            "warning"
+          );
+        } else if (result.priceChanged) {
+          showToast(
+            "Giá topping đã thay đổi, giỏ hàng đã được cập nhật.",
+            "warning"
+          );
+        }
+      })
+      .catch(function (error) {
+        console.error("Không thể đồng bộ topping:", error);
+      });
+  }
 
   /* =========================================================
      10. XÓA TOÀN BỘ GIỎ HÀNG
@@ -1072,4 +1390,5 @@ document.addEventListener("DOMContentLoaded", function () {
   updateOrderType();
   renderCart();
   loadAvailableTables();
+  syncToppingsWithShop();
 });

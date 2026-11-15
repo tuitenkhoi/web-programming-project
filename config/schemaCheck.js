@@ -155,6 +155,15 @@ const EXPECTED = {
         sort_order: 'TINYINT UNSIGNED NOT NULL DEFAULT 0',
         created_at: 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP',
     },
+    toppings: {
+        id: null,
+        name: 'VARCHAR(50) NOT NULL',
+        price: 'INT UNSIGNED NOT NULL DEFAULT 0',
+        is_active: 'TINYINT(1) NOT NULL DEFAULT 1',
+        sort_order: 'INT NOT NULL DEFAULT 0',
+        created_at: 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP',
+        updated_at: 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
+    },
     tags: {
         id: null,
         name: 'VARCHAR(50) NOT NULL',

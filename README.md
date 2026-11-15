@@ -49,12 +49,14 @@ mysql --default-character-set=utf8mb4 -u root < database/schema.sql
 
 **3. Chạy migrations theo đúng thứ tự** (DB vừa tạo xong vẫn cần chạy để có cột mới):
 ```bash
-for f in database/migrations/001_*.sql database/migrations/002_*.sql database/migrations/003_*.sql database/migrations/004_*.sql database/migrations/005_*.sql database/migrations/006_*.sql database/migrations/007_*.sql; do mysql --default-character-set=utf8mb4 -u root moc_coffee < "$f"; done
+for f in database/migrations/001_*.sql database/migrations/002_*.sql database/migrations/003_*.sql database/migrations/004_*.sql database/migrations/005_*.sql database/migrations/006_*.sql database/migrations/007_*.sql database/migrations/008_*.sql; do mysql --default-character-set=utf8mb4 -u root moc_coffee < "$f"; done
 ```
 > ⚠️ **Hai thông báo sau là bình thường, bỏ qua được** (migration lịch sử, không phải lỗi dự án):
 > * `001_...sql`: `ERROR 1146 ... Table 'moc_coffee.tables' doesn't exist` — tham chiếu bảng của bản cũ, nay đã gộp vào `coffee_tables`.
 > * `002_...sql`: `ERROR 1061 ... Duplicate key name 'idx_orders_table_open'` — index đã có sẵn trong `schema.sql`.
 > Chạy lại migration lần 2 cũng có thể báo trùng khóa; cấu trúc cuối cùng vẫn đúng (kiểm chứng bằng `npm run check-db`).
+>
+> `008_toppings.sql` tạo bảng topping do admin quản lý (nút **Quản lý topping** ở trang Quản lý món) kèm 12 topping mẫu; chạy lại nhiều lần vẫn an toàn. Thiếu bước này thì trang chi tiết món không hiện topping và đặt món có topping bị lỗi.
 
 **4. (Tùy chọn) `database/optional/theme_system_to_light.sql`** — chỉ đổi các tài khoản **cũ** đang để giao diện "Theo thiết bị" về "Sáng". Không nằm trong `migrations/` nên **không tự chạy**; bỏ qua cũng không sao vì tài khoản mới đã mặc định `light` (migration 006).
 

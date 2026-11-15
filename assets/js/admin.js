@@ -2127,28 +2127,7 @@ document.addEventListener("DOMContentLoaded", function () {
       () => window.print()
     );
 
-    $("#print-invoice-list")?.addEventListener(
-      "click",
-      () => window.print()
-    );
-
-    $("#export-invoice-excel")?.addEventListener(
-      "click",
-      function () {
-        showToast(
-          "Chức năng xuất Excel sẽ được kết nối ở giai đoạn PHP."
-        );
-      }
-    );
-
-    $("#export-invoice-pdf")?.addEventListener(
-      "click",
-      function () {
-        showToast(
-          "Chức năng xuất PDF sẽ được kết nối ở giai đoạn PHP."
-        );
-      }
-    );
+    // Nút "Xuất dữ liệu" (Excel / CSV / PDF) do admin-invoices.js xử lý
 
     calculateInvoiceForm();
   }

@@ -27,9 +27,9 @@ const {
     itemRowsFor,
     INSERT_ITEMS_SQL,
     SIZE_PRICES,
-    TOPPING_PRICES,
     LEVELS,
 } = require('../backend/src/services/order-items');
+const { listActiveToppings } = require('../backend/src/services/toppings');
 
 const router = express.Router();
 
@@ -108,15 +108,20 @@ router.post('/change-password', async (req, res) => {
 });
 
 // ----- Tùy chọn cho màn hình tạo đơn (lấy từ cùng nguồn với server tính tiền) -----
-router.get('/order-options', requirePermission('orders.create'), (req, res) => {
-    res.json({
-        success: true,
-        data: {
-            sizes: Object.entries(SIZE_PRICES).map(([code, price]) => ({ code, price })),
-            toppings: Object.entries(TOPPING_PRICES).map(([name, price]) => ({ name, price })),
-            levels: [...LEVELS],
-        },
-    });
+router.get('/order-options', requirePermission('orders.create'), async (req, res) => {
+    try {
+        res.json({
+            success: true,
+            data: {
+                sizes: Object.entries(SIZE_PRICES).map(([code, price]) => ({ code, price })),
+                toppings: await listActiveToppings(), // topping đang bán do admin quản lý
+                levels: [...LEVELS],
+            },
+        });
+    } catch (error) {
+        console.error('Lỗi tải tùy chọn tạo đơn:', error);
+        res.status(500).json({ success: false, message: 'Không thể tải tùy chọn gọi món lúc này.' });
+    }
 });
 
 // ----- Màn hình bếp -----

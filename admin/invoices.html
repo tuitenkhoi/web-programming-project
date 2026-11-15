@@ -428,36 +428,11 @@
                   Đặt lại bộ lọc
                 </button>
 
-                <div class="dropdown">
-                  <button class="btn btn-outline-coffee dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                    aria-expanded="false">
-                    <i class="bi bi-download me-1"></i>
-                    Xuất dữ liệu
-                  </button>
-
-                  <ul class="dropdown-menu dropdown-menu-end">
-                    <li>
-                      <button type="button" id="export-invoice-excel" class="dropdown-item">
-                        <i class="bi bi-file-earmark-excel me-2"></i>
-                        Xuất Excel
-                      </button>
-                    </li>
-
-                    <li>
-                      <button type="button" id="export-invoice-pdf" class="dropdown-item">
-                        <i class="bi bi-file-earmark-pdf me-2"></i>
-                        Xuất PDF
-                      </button>
-                    </li>
-
-                    <li>
-                      <button type="button" id="print-invoice-list" class="dropdown-item">
-                        <i class="bi bi-printer me-2"></i>
-                        In danh sách
-                      </button>
-                    </li>
-                  </ul>
-                </div>
+                <button type="button" id="open-export-modal" class="btn btn-outline-coffee" data-bs-toggle="modal"
+                  data-bs-target="#export-invoice-modal">
+                  <i class="bi bi-download me-1"></i>
+                  Xuất dữ liệu
+                </button>
               </div>
             </div>
           </div>
@@ -568,6 +543,71 @@
   </div>
 
   <!-- ==================== MODAL CHI TIẾT ==================== -->
+  <!-- Xuất dữ liệu hóa đơn: chọn kiểu file -->
+  <div class="modal fade" id="export-invoice-modal" tabindex="-1" aria-labelledby="export-invoice-title" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <form class="modal-content border-0" id="export-invoice-form" novalidate>
+        <div class="modal-header">
+          <h2 class="modal-title h5" id="export-invoice-title">Xuất dữ liệu hóa đơn</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+        </div>
+
+        <div class="modal-body">
+          <p class="mb-3" id="export-summary" aria-live="polite"></p>
+
+          <fieldset class="mb-3">
+            <legend class="form-label fw-bold fs-6">Kiểu xuất</legend>
+
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="exportFormat" id="export-format-xlsx" value="xlsx" checked />
+              <label class="form-check-label" for="export-format-xlsx">
+                <i class="bi bi-file-earmark-excel text-success me-1"></i>
+                <strong>Excel (.xlsx)</strong>
+                <small class="d-block text-secondary">Mở bằng Excel, Google Sheets. Cột tiền là số nên cộng được.</small>
+              </label>
+            </div>
+
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="radio" name="exportFormat" id="export-format-csv" value="csv" />
+              <label class="form-check-label" for="export-format-csv">
+                <i class="bi bi-filetype-csv text-primary me-1"></i>
+                <strong>CSV (.csv)</strong>
+                <small class="d-block text-secondary">File văn bản nhẹ, dùng để nhập vào phần mềm khác.</small>
+              </label>
+            </div>
+
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="exportFormat" id="export-format-pdf" value="pdf" />
+              <label class="form-check-label" for="export-format-pdf">
+                <i class="bi bi-file-earmark-pdf text-danger me-1"></i>
+                <strong>PDF / In danh sách</strong>
+                <small class="d-block text-secondary">Mở hộp thoại in: chọn máy in, hoặc chọn "Lưu dưới dạng PDF".</small>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="export-include-items" />
+            <label class="form-check-label" for="export-include-items">
+              Kèm chi tiết từng món
+              <small class="d-block text-secondary" id="export-items-hint"></small>
+            </label>
+          </div>
+
+          <p class="text-danger small mt-3 mb-0 d-none" id="export-error" role="alert"></p>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button>
+          <button type="submit" class="btn btn-coffee" id="export-submit">
+            <i class="bi bi-download me-1"></i>
+            Xuất
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="modal fade" id="invoice-detail-modal" tabindex="-1" aria-labelledby="invoice-detail-title"
     aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">

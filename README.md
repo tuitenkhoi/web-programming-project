@@ -49,7 +49,7 @@ mysql --default-character-set=utf8mb4 -u root < database/schema.sql
 
 **3. Chạy migrations theo đúng thứ tự** (DB vừa tạo xong vẫn cần chạy để có cột mới):
 ```bash
-for f in database/migrations/001_*.sql database/migrations/002_*.sql database/migrations/003_*.sql database/migrations/004_*.sql database/migrations/005_*.sql database/migrations/006_*.sql database/migrations/007_*.sql database/migrations/008_*.sql; do mysql --default-character-set=utf8mb4 -u root moc_coffee < "$f"; done
+for f in database/migrations/001_*.sql database/migrations/002_*.sql database/migrations/003_*.sql database/migrations/004_*.sql database/migrations/005_*.sql database/migrations/006_*.sql database/migrations/007_*.sql database/migrations/008_*.sql database/migrations/009_*.sql; do mysql --default-character-set=utf8mb4 -u root moc_coffee < "$f"; done
 ```
 > ⚠️ **Hai thông báo sau là bình thường, bỏ qua được** (migration lịch sử, không phải lỗi dự án):
 > * `001_...sql`: `ERROR 1146 ... Table 'moc_coffee.tables' doesn't exist` — tham chiếu bảng của bản cũ, nay đã gộp vào `coffee_tables`.
@@ -112,6 +112,9 @@ Admin tạo tài khoản nhân viên tại `admin/staff.html` (email dạng `ten
 | Nhận khách (bàn trống → có khách) rồi gọi món tại bàn đó | ✔ | | | ✔ |
 | Đặt bàn sang / ra khỏi bảo trì | ✔ | ✔ | | ✔ |
 | Xác nhận đơn và xuất hóa đơn ngay trên sơ đồ bàn | | ✔ | | ✔ |
+| Chuyển / gộp / tách bàn | ✔ | ✔ | | ✔ |
+| Đánh dấu món hết trong ngày (khách không đặt được, sang ngày mới tự bán lại) | ✔ | ✔ | ✔ | ✔ |
+| Nhận thông báo "món sẵn sàng" khi bếp bấm Xong món | ✔ | | | ✔ |
 | Xem đặt bàn | ✔ | ✔ | | ✔ |
 | Duyệt / xếp khách / hủy đặt bàn | ✔ | | | ✔ |
 | Xem đơn hàng | ✔ | ✔ | ✔ | ✔ |
@@ -122,6 +125,8 @@ Admin tạo tài khoản nhân viên tại `admin/staff.html` (email dạng `ten
 | Màn hình bếp (đổi sang đang làm / xong) | | | ✔ | ✔ |
 
 Bảng quyền nằm trong `middleware/permissions.js` (sửa ở đó nếu muốn đổi). Mọi thao tác quan trọng được ghi vào bảng `staff_activity_logs` (admin xem ở nút "Nhật ký thao tác"). Khóa tài khoản có hiệu lực ngay và đăng xuất mọi thiết bị.
+
+**Migration `009_product_sold_out.sql`:** thêm bảng `product_sold_out` cho tính năng "Hết món theo ngày". Chạy sau migration 008 (chạy lại nhiều lần vẫn an toàn). Chưa chạy thì thực đơn và đặt món vẫn hoạt động bình thường, chỉ chưa đánh dấu hết món được.
 
 **Migration `007_staff_accounts.sql`:** thêm role `staff`, cột `users.staff_position`, `users.created_by`, `orders.created_by`, `orders.source`, cho phép `orders.customer_phone` rỗng và tạo bảng `staff_activity_logs`. Chạy sau migration 006.
 

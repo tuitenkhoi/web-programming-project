@@ -12,6 +12,7 @@
         { href: 'orders.html', icon: 'bi-receipt', text: 'Đơn hàng', perm: 'orders.view' },
         { href: 'kitchen.html', icon: 'bi-fire', text: 'Màn hình bếp', perm: 'kitchen.view' },
         { href: 'bookings.html', icon: 'bi-calendar2-check', text: 'Đặt bàn', perm: 'bookings.view' },
+        { href: 'menu.html', icon: 'bi-slash-circle', text: 'Hết món', perm: 'products.soldout' },
         { href: 'revenue.html', icon: 'bi-graph-up-arrow', text: 'Doanh thu', perm: 'revenue.view' }
     ];
     var STATUS_TEXT = {
@@ -63,6 +64,40 @@
         document.addEventListener('visibilitychange', function () { if (!document.hidden) reload(); });
     }
 
+    // ----- Âm báo + thông báo "món sẵn sàng" (bếp bấm "Xong món" -> phục vụ nhận ngay) -----
+    var audioCtx = null;
+    function soundOn() {
+        try { return localStorage.getItem('mocStaffSound') !== '0'; } catch (e) { return true; }
+    }
+    function beep(freq, times) {
+        if (!soundOn()) return;
+        try {
+            audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+            for (var i = 0; i < (times || 1); i++) {
+                var osc = audioCtx.createOscillator();
+                var gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.value = freq || 880;
+                gain.gain.value = 0.15;
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                var t = audioCtx.currentTime + i * 0.32;
+                osc.start(t);
+                osc.stop(t + 0.22);
+            }
+        } catch (e) { /* trình duyệt chặn âm thanh khi chưa tương tác: bỏ qua */ }
+    }
+    function listenReady() {
+        window.addEventListener('mocCoffeeRealtime', function (event) {
+            var d = event.detail || {};
+            if (d.event !== 'order:ready') return;
+            var info = d.data || {};
+            var where = info.order_type === 'at_table' && info.table_code ? 'Bàn ' + info.table_code : 'Đơn mang đi';
+            A.toast('Món đã xong: ' + where + ' - mang ra phục vụ.');
+            beep(1040, 2);
+        });
+    }
+
     function buildShell() {
         var active = document.body.getAttribute('data-page') || '';
         var links = NAV.filter(function (item) { return can(item.perm); }).map(function (item) {
@@ -84,6 +119,7 @@
             '<div class="dropdown"><button class="btn btn-sm btn-outline-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Tài khoản"><i class="bi bi-person-circle"></i></button>' +
             '<ul class="dropdown-menu dropdown-menu-end">' +
             (me.role === 'admin' ? '<li><a class="dropdown-item" href="../admin/dashboard.html"><i class="bi bi-speedometer2 me-2"></i>Trang quản trị</a></li>' : '') +
+            '<li><button type="button" class="dropdown-item" id="staff-sound"><i class="bi me-2"></i><span></span></button></li>' +
             '<li><button type="button" class="dropdown-item" id="staff-change-password"><i class="bi bi-key me-2"></i>Đổi mật khẩu</button></li>' +
             '<li><hr class="dropdown-divider" /></li>' +
             '<li><button type="button" class="dropdown-item text-danger" id="staff-logout"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</button></li>' +
@@ -109,6 +145,17 @@
             '</form></div></div>';
         document.body.appendChild(extra);
 
+        function paintSound() {
+            var on = soundOn();
+            document.querySelector('#staff-sound i').className = 'bi me-2 ' + (on ? 'bi-bell' : 'bi-bell-slash');
+            document.querySelector('#staff-sound span').textContent = 'Âm báo: ' + (on ? 'bật' : 'tắt');
+        }
+        paintSound();
+        document.getElementById('staff-sound').addEventListener('click', function (event) {
+            event.stopPropagation();
+            try { localStorage.setItem('mocStaffSound', soundOn() ? '0' : '1'); } catch (e) { /* bỏ qua */ }
+            paintSound();
+        });
         document.getElementById('staff-logout').addEventListener('click', function () {
             A.logout();
             location.href = '/pages/account.html#login';
@@ -162,6 +209,7 @@
             showFatal('Vị trí của bạn không có quyền vào trang này.');
             return;
         }
+        listenReady();
         readyCallbacks.forEach(function (fn) { fn(me); });
         readyCallbacks = [];
     }
@@ -180,6 +228,7 @@
         dateTimeText: dateTimeText,
         todayLocal: todayLocal,
         debounce: debounce,
+        beep: beep,
         autoRefresh: autoRefresh,
         STATUS_TEXT: STATUS_TEXT,
         PAY_TEXT: PAY_TEXT,

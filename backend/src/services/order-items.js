@@ -12,6 +12,7 @@ const {
     findUnavailableTopping,
     unavailableToppingMessage,
 } = require("./toppings");
+const { findSoldOut, soldOutMessage } = require("./sold-out");
 
 // Trả { items } hoặc { error }
 function parseItems(rawItems) {
@@ -64,6 +65,14 @@ async function priceItems(items) {
 
     if (map.size !== ids.length) {
         const error = new Error("Có sản phẩm không tồn tại hoặc đã ngừng bán");
+        error.httpStatus = 400;
+        throw error;
+    }
+
+    // Món đã hết trong hôm nay thì không đặt được (cả khách lẫn nhân viên)
+    const soldOutProduct = await findSoldOut(ids);
+    if (soldOutProduct) {
+        const error = new Error(soldOutMessage(soldOutProduct));
         error.httpStatus = 400;
         throw error;
     }

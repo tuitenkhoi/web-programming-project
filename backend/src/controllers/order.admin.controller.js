@@ -391,6 +391,17 @@ const updateOrderStatus = async (req, res) => {
             payment_status: order.payment_status,
         });
 
+        // Bếp xong món: báo riêng cho phục vụ (và admin) để mang ra bàn
+        if (newStatus === "ready") {
+            try {
+                require("../../../realtime").emitToPositions(["waiter", "admin"], "order:ready", {
+                    id,
+                    order_type: order.order_type,
+                    table_code: order.table_code,
+                });
+            } catch { /* thông báo không được làm hỏng việc đổi trạng thái */ }
+        }
+
         return res.json({
             success: true,
             message: `Đã chuyển đơn sang "${STATUS_TEXT[newStatus]}"`,

@@ -5,6 +5,8 @@
 //   GET  /api/staff/kitchen          đơn đang xử lý kèm món (màn hình bếp)
 //   POST /api/staff/orders           tạo đơn tại quầy
 //   PUT  /api/staff/orders/:id       sửa món / ghi chú của đơn chưa thanh toán
+//   POST /api/staff/tables/move      chuyển / gộp / tách bàn (cả bàn hoặc chỉ một số đơn)
+//   PUT  /api/staff/products/:id/sold-out   đánh dấu món hết (hoặc bán lại) trong hôm nay
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const db = require('../config/db');
@@ -30,6 +32,7 @@ const {
     LEVELS,
 } = require('../backend/src/services/order-items');
 const { listActiveToppings } = require('../backend/src/services/toppings');
+const { setSoldOut } = require('../backend/src/services/sold-out');
 
 const router = express.Router();
 
@@ -342,6 +345,136 @@ router.put('/orders/:id', requirePermission('orders.edit'), async (req, res) => 
         });
     } finally {
         connection?.release();
+    }
+});
+
+// ----- Chuyển / gộp / tách bàn -----
+// Body: { from: 'T01', to: 'T02', order_ids?: [1, 2] }
+//  - Không gửi order_ids (hoặc chọn hết đơn đang mở): chuyển cả bàn. Bàn đích trống = "chuyển bàn", bàn đích đang có khách = "gộp bàn".
+//  - Chỉ chọn một số đơn: "tách bàn", bàn nguồn vẫn giữ các đơn còn lại.
+// Đơn giữ nguyên số tiền; chỉ đổi mã bàn. Thanh toán vẫn theo từng đơn.
+router.post('/tables/move', requirePermission('tables.move'), async (req, res) => {
+    const body = req.body || {};
+    const from = cleanText(body.from, 20).toUpperCase();
+    const to = cleanText(body.to, 20).toUpperCase();
+    const hasSelection = body.order_ids !== undefined && body.order_ids !== null;
+
+    if (!/^[A-Z0-9-]{1,20}$/.test(from) || !/^[A-Z0-9-]{1,20}$/.test(to)) {
+        return res.status(400).json({ success: false, message: 'Vui lòng chọn bàn nguồn và bàn đích.' });
+    }
+    if (from === to) {
+        return res.status(400).json({ success: false, message: 'Bàn đích phải khác bàn nguồn.' });
+    }
+    let selected = [];
+    if (hasSelection) {
+        if (!Array.isArray(body.order_ids) || !body.order_ids.length
+            || body.order_ids.some((id) => !Number.isSafeInteger(Number(id)) || Number(id) <= 0)) {
+            return res.status(400).json({ success: false, message: 'Vui lòng chọn ít nhất một đơn để tách.' });
+        }
+        selected = [...new Set(body.order_ids.map(Number))];
+    }
+
+    let connection;
+    try {
+        connection = await db.getConnection();
+        await connection.beginTransaction();
+
+        // Khóa cả hai bàn theo thứ tự id cố định để hai thao tác ngược chiều không bị kẹt nhau
+        const [tables] = await connection.execute(
+            'SELECT id, table_code, status FROM coffee_tables WHERE table_code IN (?, ?) ORDER BY id FOR UPDATE',
+            [from, to]
+        );
+        const source = tables.find((t) => t.table_code === from);
+        const target = tables.find((t) => t.table_code === to);
+        if (!source || !target) throw fail(404, 'Không tìm thấy bàn.');
+        if (source.status !== 'occupied') throw fail(409, 'Bàn nguồn hiện không có khách.');
+        if (target.status === 'maintenance') throw fail(409, 'Bàn đích đang bảo trì, vui lòng chọn bàn khác.');
+
+        const [openOrders] = await connection.execute(
+            `SELECT id
+               FROM orders
+              WHERE table_code = ?
+                AND order_type = 'at_table'
+                AND status <> 'cancelled'
+                AND (status <> 'completed' OR payment_status NOT IN ('paid', 'refunded'))
+              FOR UPDATE`,
+            [from]
+        );
+        const openIds = openOrders.map((o) => Number(o.id));
+
+        let moving = openIds;
+        if (hasSelection) {
+            if (selected.some((id) => !openIds.includes(id))) {
+                throw fail(400, 'Có đơn không thuộc bàn nguồn hoặc đã kết thúc.');
+            }
+            moving = selected;
+        }
+        const whole = moving.length === openIds.length; // chuyển hết mọi đơn (hoặc bàn chưa có đơn nào)
+        const mode = !whole ? 'split' : (target.status === 'occupied' ? 'merge' : 'move');
+
+        if (moving.length) {
+            await connection.execute(
+                `UPDATE orders SET table_code = ? WHERE id IN (${moving.map(() => '?').join(', ')})`,
+                [to, ...moving]
+            );
+        }
+        await connection.execute("UPDATE coffee_tables SET status = 'occupied' WHERE id = ?", [target.id]);
+        if (whole) {
+            // Khách đang ngồi theo lượt đặt bàn cũng đi theo sang bàn mới
+            await connection.execute(
+                "UPDATE bookings SET table_id = ? WHERE table_id = ? AND status = 'seated'",
+                [target.id, source.id]
+            );
+            await connection.execute("UPDATE coffee_tables SET status = 'available' WHERE id = ?", [source.id]);
+        }
+        await connection.commit();
+
+        const text = { move: `Đã chuyển khách sang bàn ${to}.`, merge: `Đã gộp bàn ${from} vào bàn ${to}.`, split: `Đã tách ${moving.length} đơn sang bàn ${to}.` }[mode];
+        logActivity(req.user, `table.${mode}`, 'table', source.id, `${from} -> ${to}: ${moving.length} đơn`);
+        emitRealtime('table:updated', { table_code: from, status: whole ? 'available' : 'occupied' });
+        emitRealtime('table:updated', { table_code: to, status: 'occupied' });
+        moving.forEach((id) => emitRealtime('order:updated', { id }));
+
+        return res.json({ success: true, message: text, data: { from, to, mode, moved_orders: moving.length } });
+    } catch (error) {
+        if (connection) await connection.rollback().catch(() => {});
+        console.error('Lỗi chuyển/gộp/tách bàn:', error.code || error.message);
+        return res.status(error.httpStatus || 500).json({
+            success: false,
+            message: error.httpStatus ? error.message : dbErrorMessage(error, 'Lỗi máy chủ khi chuyển bàn'),
+        });
+    } finally {
+        connection?.release();
+    }
+});
+
+// ----- Hết món theo ngày -----
+router.put('/products/:id/sold-out', requirePermission('products.soldout'), async (req, res) => {
+    const id = Number(req.params.id);
+    if (!Number.isSafeInteger(id) || id <= 0) {
+        return res.status(400).json({ success: false, message: 'Mã món không hợp lệ.' });
+    }
+    if (typeof req.body?.sold_out !== 'boolean') {
+        return res.status(400).json({ success: false, message: 'sold_out phải là true hoặc false.' });
+    }
+    try {
+        const [rows] = await db.execute('SELECT id, name FROM products WHERE id = ? AND status = 1 LIMIT 1', [id]);
+        if (!rows.length) return res.status(404).json({ success: false, message: 'Không tìm thấy món.' });
+
+        await setSoldOut(id, req.body.sold_out, req.user.id);
+        logActivity(req.user, req.body.sold_out ? 'product.sold_out' : 'product.available', 'product', id, rows[0].name);
+        emitRealtime('product:updated', { id, sold_out: req.body.sold_out });
+        return res.json({
+            success: true,
+            message: req.body.sold_out ? `Đã đánh dấu "${rows[0].name}" hết trong hôm nay.` : `"${rows[0].name}" đã được bán lại.`,
+            data: { id, sold_out: req.body.sold_out },
+        });
+    } catch (error) {
+        console.error('Lỗi đánh dấu hết món:', error.code || error.message);
+        return res.status(500).json({
+            success: false,
+            message: dbErrorMessage(error, 'Không cập nhật được trạng thái món. Hãy chạy migration 009_product_sold_out.sql.'),
+        });
     }
 });
 

@@ -27,12 +27,23 @@ function initialize(server) {
             if (!Number.isSafeInteger(userId) || userId <= 0 || !Number.isFinite(decoded.exp)) {
                 return next(new Error('UNAUTHORIZED'));
             }
-            const [rows] = await db.execute(
-                "SELECT id FROM users WHERE id = ? AND role IN ('admin', 'staff') AND status = 1 LIMIT 1",
-                [userId]
-            );
+            let rows;
+            try {
+                [rows] = await db.execute(
+                    "SELECT id, role, staff_position FROM users WHERE id = ? AND role IN ('admin', 'staff') AND status = 1 LIMIT 1",
+                    [userId]
+                );
+            } catch (error) {
+                if (error.code !== 'ER_BAD_FIELD_ERROR') throw error;
+                // Chưa chạy migration 007 (chưa có staff_position): vẫn cho kết nối, chỉ không có phòng theo vị trí
+                [rows] = await db.execute(
+                    "SELECT id, role FROM users WHERE id = ? AND role IN ('admin', 'staff') AND status = 1 LIMIT 1",
+                    [userId]
+                );
+            }
             if (!rows.length) return next(new Error('FORBIDDEN'));
             socket.data.userId = userId;
+            socket.data.room = rows[0].role === 'admin' ? 'pos:admin' : (rows[0].staff_position ? `pos:${rows[0].staff_position}` : null);
             return next();
         } catch (_error) {
             return next(new Error('UNAUTHORIZED'));
@@ -42,6 +53,8 @@ function initialize(server) {
     io.on('connection', (socket) => {
         // Tên phòng giữ là 'admins' cho tương thích; nay gồm cả nhân viên
         socket.join('admins');
+        // Phòng theo vị trí (pos:waiter, pos:cashier, pos:kitchen, pos:admin) để gửi thông báo đúng người
+        if (socket.data.room) socket.join(socket.data.room);
     });
     return io;
 }
@@ -50,4 +63,10 @@ function emit(event, payload = {}) {
     if (io) io.to('admins').emit(event, payload);
 }
 
-module.exports = { initialize, emit };
+// Gửi tới các vị trí được chọn, ví dụ emitToPositions(['waiter', 'admin'], 'order:ready', {...})
+function emitToPositions(positions, event, payload = {}) {
+    if (!io) return;
+    positions.forEach((position) => io.to(`pos:${position}`).emit(event, payload));
+}
+
+module.exports = { initialize, emit, emitToPositions };

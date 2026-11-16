@@ -15,8 +15,17 @@ let loginRow = null;
 let orderRow = { id: 1, status: 'confirmed', payment_status: 'pending', order_type: 'takeaway', table_code: null };
 
 let missingColumn = false; // mô phỏng database chưa chạy migration 007
+let moveTables = [];
+let moveOrders = [];
+let productExists = true;
+let soldOutHit = null;
 function answer(sql) {
     sqlLog.push(sql);
+    if (/FROM coffee_tables WHERE table_code IN/.test(sql)) return [moveTables];
+    if (/FROM orders[\s\S]*AND order_type = 'at_table'/.test(sql)) return [moveOrders];
+    if (/FROM product_sold_out AS s/.test(sql)) return [soldOutHit ? [soldOutHit] : []];
+    if (/INSERT INTO product_sold_out|DELETE FROM product_sold_out/.test(sql)) return [{ affectedRows: 1 }];
+    if (/SELECT id, name FROM products WHERE id = \? AND status = 1/.test(sql)) return [productExists ? [{ id: 1, name: 'Cà phê sữa đá' }] : []];
     if (missingColumn && /FROM users/.test(sql) && /staff_position/.test(sql)) {
         throw Object.assign(new Error("Unknown column 'staff_position'"), { code: 'ER_BAD_FIELD_ERROR' });
     }
@@ -412,4 +421,119 @@ test('điện thoại: trang menu/chi tiết/trang chủ có thanh giỏ hàng c
     }
     assert.ok(fs.readFileSync('pages/cart.html', 'utf8').includes('cart-pay-bar.js'));
     assert.match(fs.readFileSync('assets/js/cart-bar.js', 'utf8'), /cart\.html/);
+});
+
+
+// ---------- Hết món theo ngày ----------
+test('hết món: ai trong nhân viên cũng đánh dấu được; khách bị chặn; dữ liệu sai bị từ chối', async () => {
+    productExists = true;
+    for (const position of ['waiter', 'cashier', 'kitchen']) {
+        const res = await call('PUT', '/api/staff/products/1/sold-out', as('staff', position), { sold_out: true });
+        assert.equal(res.status, 200, position);
+        assert.match(res.body.message, /hết trong hôm nay/);
+    }
+    assert.equal((await call('PUT', '/api/staff/products/1/sold-out', as('staff', 'waiter'), { sold_out: false })).status, 200);
+    assert.equal((await call('PUT', '/api/staff/products/1/sold-out', as('customer'), { sold_out: true })).status, 403);
+    assert.equal((await call('PUT', '/api/staff/products/1/sold-out', as('staff', 'waiter'), { sold_out: 'yes' })).status, 400);
+    assert.equal((await call('PUT', '/api/staff/products/abc/sold-out', as('staff', 'waiter'), { sold_out: true })).status, 400);
+    productExists = false;
+    assert.equal((await call('PUT', '/api/staff/products/1/sold-out', as('staff', 'waiter'), { sold_out: true })).status, 404);
+    productExists = true;
+    assert.ok(sqlLog.some((sql) => /INSERT INTO product_sold_out/.test(sql)));
+    assert.ok(sqlLog.some((sql) => /DELETE FROM product_sold_out/.test(sql)));
+});
+
+test('hết món: món đang hết không đặt được (nhân viên lẫn khách), ngày tính theo giờ Việt Nam', async () => {
+    const { todayVn } = require('../backend/src/services/sold-out');
+    assert.equal(todayVn(Date.UTC(2026, 10, 15, 18, 0)), '2026-11-16'); // 18:00 UTC = 01:00 ngày hôm sau ở Việt Nam
+    assert.equal(todayVn(Date.UTC(2026, 10, 15, 10, 0)), '2026-11-15');
+
+    soldOutHit = { product_id: 1, name: 'Cà phê sữa đá' };
+    const staff = await call('POST', '/api/staff/orders', as('staff', 'waiter'), ORDER_BODY);
+    assert.equal(staff.status, 400);
+    assert.match(staff.body.message, /Cà phê sữa đá.*hết/);
+    const guest = await call('POST', '/api/orders', { 'Content-Type': 'application/json' }, {
+        ...ORDER_BODY, customer_name: 'Khách', customer_phone: '0901234567', payment_method: 'cash',
+    });
+    assert.equal(guest.status, 400);
+    assert.match(guest.body.message, /hết/);
+    soldOutHit = null;
+    assert.equal((await call('POST', '/api/staff/orders', as('staff', 'waiter'), ORDER_BODY)).status, 201);
+});
+
+// ---------- Chuyển / gộp / tách bàn ----------
+test('chuyển / gộp / tách bàn: đúng chế độ theo bàn đích và số đơn chọn', async () => {
+    const move = (who, body) => call('POST', '/api/staff/tables/move', who, body);
+    moveOrders = [{ id: 1 }, { id: 2 }];
+
+    moveTables = [{ id: 1, table_code: 'T01', status: 'occupied' }, { id: 2, table_code: 'T02', status: 'available' }];
+    let res = await move(as('staff', 'waiter'), { from: 'T01', to: 'T02' });
+    assert.equal(res.status, 200);
+    assert.equal(res.body.data.mode, 'move');
+    assert.equal(res.body.data.moved_orders, 2);
+
+    moveTables = [{ id: 1, table_code: 'T01', status: 'occupied' }, { id: 2, table_code: 'T02', status: 'occupied' }];
+    res = await move(as('staff', 'cashier'), { from: 'T01', to: 'T02' });
+    assert.equal(res.body.data.mode, 'merge');
+
+    res = await move(as('staff', 'waiter'), { from: 'T01', to: 'T02', order_ids: [2] });
+    assert.equal(res.status, 200);
+    assert.equal(res.body.data.mode, 'split');
+    assert.equal(res.body.data.moved_orders, 1);
+
+    // Bàn chưa có đơn: chỉ chuyển khách
+    moveOrders = [];
+    moveTables = [{ id: 1, table_code: 'T01', status: 'occupied' }, { id: 2, table_code: 'T02', status: 'available' }];
+    res = await move(as('admin'), { from: 'T01', to: 'T02' });
+    assert.equal(res.body.data.mode, 'move');
+    assert.equal(res.body.data.moved_orders, 0);
+});
+
+test('chuyển / gộp / tách bàn: từ chối đầu vào sai, bàn không hợp lệ và người không có quyền', async () => {
+    const move = (who, body) => call('POST', '/api/staff/tables/move', who, body);
+    moveOrders = [{ id: 1 }, { id: 2 }];
+    moveTables = [{ id: 1, table_code: 'T01', status: 'occupied' }, { id: 2, table_code: 'T02', status: 'available' }];
+
+    assert.equal((await move(as('staff', 'kitchen'), { from: 'T01', to: 'T02' })).status, 403);
+    assert.equal((await move(as('customer'), { from: 'T01', to: 'T02' })).status, 403);
+    assert.equal((await move(as('staff', 'waiter'), { from: 'T01', to: 'T01' })).status, 400);
+    assert.equal((await move(as('staff', 'waiter'), { from: 'T01' })).status, 400);
+    assert.equal((await move(as('staff', 'waiter'), { from: 'T01', to: 'T02', order_ids: [] })).status, 400);
+    assert.equal((await move(as('staff', 'waiter'), { from: 'T01', to: 'T02', order_ids: ['x'] })).status, 400);
+    assert.equal((await move(as('staff', 'waiter'), { from: 'T01', to: 'T02', order_ids: [99] })).status, 400); // đơn không thuộc bàn
+
+    moveTables = [{ id: 1, table_code: 'T01', status: 'available' }, { id: 2, table_code: 'T02', status: 'available' }];
+    assert.equal((await move(as('staff', 'waiter'), { from: 'T01', to: 'T02' })).status, 409); // bàn nguồn không có khách
+    moveTables = [{ id: 1, table_code: 'T01', status: 'occupied' }, { id: 2, table_code: 'T02', status: 'maintenance' }];
+    assert.equal((await move(as('staff', 'waiter'), { from: 'T01', to: 'T02' })).status, 409); // bàn đích bảo trì
+    moveTables = [{ id: 1, table_code: 'T01', status: 'occupied' }];
+    assert.equal((await move(as('staff', 'waiter'), { from: 'T01', to: 'T09' })).status, 404);
+});
+
+test('bếp bấm "Xong món": báo riêng cho phục vụ và admin (order:ready)', async () => {
+    const realtime = require('../realtime');
+    const calls = [];
+    const original = realtime.emitToPositions;
+    realtime.emitToPositions = (positions, event, payload) => calls.push({ positions, event, payload });
+    orderRow = { id: 1, status: 'preparing', payment_status: 'pending', order_type: 'at_table', table_code: 'T05' };
+    try {
+        const res = await call('PATCH', '/api/orders/1/status', as('staff', 'kitchen'), { status: 'ready' });
+        assert.equal(res.status, 200);
+        assert.equal(calls.length, 1);
+        assert.deepEqual(calls[0].positions, ['waiter', 'admin']);
+        assert.equal(calls[0].event, 'order:ready');
+        assert.equal(calls[0].payload.table_code, 'T05');
+    } finally {
+        realtime.emitToPositions = original;
+        orderRow = { id: 1, status: 'confirmed', payment_status: 'pending', order_type: 'takeaway', table_code: null };
+    }
+});
+
+test('giao diện: trang Hết món, hộp chuyển/tách bàn và khách thấy "Hết hôm nay"', () => {
+    const fs = require('node:fs');
+    assert.ok(fs.readFileSync('staff/menu.html', 'utf8').includes('staff-menu.js'));
+    assert.ok(fs.readFileSync('assets/js/staff.js', 'utf8').includes("'products.soldout'"));
+    assert.match(fs.readFileSync('assets/js/staff-tables.js', 'utf8'), /\/api\/staff\/tables\/move/);
+    assert.match(fs.readFileSync('assets/js/menu.js', 'utf8'), /soldOut/);
+    assert.match(fs.readFileSync('assets/js/client-api.js', 'utf8'), /soldOut: Boolean\(product\.sold_out\)/);
 });

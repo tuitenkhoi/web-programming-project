@@ -419,6 +419,35 @@ document.addEventListener("DOMContentLoaded", function () {
           : renderGridCard(product, searchKeyword);
       })
       .join("");
+
+    markSoldOut();
+  }
+
+  // Món nhân viên đánh dấu hết trong hôm nay: làm mờ, đổi nút thêm giỏ thành "Hết hôm nay"
+  function markSoldOut() {
+    productList.querySelectorAll(".product-item").forEach(function (item) {
+      const product = products.find(function (entry) {
+        return Number(entry.id) === Number(item.dataset.id);
+      });
+
+      if (!product || !product.soldOut) return;
+
+      item.classList.add("sold-out");
+      item.querySelector("article")?.insertAdjacentHTML(
+        "afterbegin",
+        '<span class="sold-out-badge">Hết hôm nay</span>'
+      );
+
+      const button = item.querySelector(".add-to-cart");
+
+      if (button) {
+        button.disabled = true;
+        button.classList.remove("btn-coffee");
+        button.classList.add("btn-secondary");
+        button.title = "Món này đã hết trong hôm nay";
+        button.setAttribute("aria-label", "Món này đã hết trong hôm nay");
+      }
+    });
   }
 
   function badgesHtml(product) {
@@ -561,7 +590,7 @@ document.addEventListener("DOMContentLoaded", function () {
       (item) => Number(item.id) === Number(productId)
     );
 
-    if (!product || !window.MocCoffee?.addToCart) return;
+    if (!product || product.soldOut || !window.MocCoffee?.addToCart) return;
 
     window.MocCoffee.addToCart({
       id: product.id,
@@ -806,4 +835,4 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   initialize();
-});
+});

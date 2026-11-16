@@ -1,5 +1,6 @@
 // Dùng chung kết nối DB của server chính
 const pool = require("../../../config/db");
+const { listSoldOutIds } = require("../services/sold-out");
 const fs = require("fs/promises");
 const path = require("path");
 const { listAttachments, removeStoredFile } = require("./attachment.controller");
@@ -384,12 +385,15 @@ const listProducts = async (req, res, onlyActive, errorLabel) => {
             products.map((product) => product.id).filter((id) => id !== undefined)
         );
 
+        const soldOutIds = await listSoldOutIds(); // món hết trong hôm nay
+
         return res.status(200).json({
             success: true,
             count: products.length,
             data: products.map((product) => ({
                 ...formatProduct(req, { ...product, has_voucher: hasVoucher }),
                 tags: tagsByProduct.get(product.id) || [],
+                sold_out: soldOutIds.has(Number(product.id)),
             })),
         });
     } catch (error) {
@@ -459,6 +463,7 @@ const getProductById = async (req, res) => {
         const detail = formatProduct(req, products[0]);
         detail.attachments = await listAttachments(req, productId);
         detail.tags = (await loadTagsByProduct([products[0].id])).get(products[0].id) || [];
+        detail.sold_out = (await listSoldOutIds()).has(Number(products[0].id));
 
         return res.status(200).json({
             success: true,

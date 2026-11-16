@@ -234,6 +234,7 @@
       price: Number(product.price) || 0,
       image: resolveProductImage(product, insidePages),
       status: Number(product.status ?? 1),
+      soldOut: Boolean(product.sold_out), // nhân viên đã đánh dấu hết trong hôm nay
     };
   }
 

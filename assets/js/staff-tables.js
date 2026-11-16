@@ -35,6 +35,9 @@
         } else if (t.status === 'maintenance') {
             if (S.canTable('maintenance', 'available')) actions += btn('available', 'btn-outline-success', 'Hết bảo trì');
         } else if (t.status === 'occupied') {
+            if (S.can('tables.move')) {
+                actions += '<button type="button" class="btn btn-sm btn-outline-secondary" data-move="' + S.esc(t.table_code) + '"><i class="bi bi-arrows-move me-1"></i>Chuyển / tách bàn</button>';
+            }
             // Phục vụ: gọi thêm món cho bàn đang có khách
             if (S.can('tables.order')) {
                 actions += '<a class="btn btn-sm btn-coffee" href="new-order.html?table=' + encodeURIComponent(t.table_code) + '"><i class="bi bi-plus-lg me-1"></i>Gọi món</a>';
@@ -117,7 +120,99 @@
         }
     }
 
+    // ----- Chuyển / gộp / tách bàn -----
+    var moveModal = null;
+    var moveFrom = null;
+
+    function ensureMoveModal() {
+        if (moveModal) return;
+        var el = document.createElement('div');
+        el.innerHTML =
+            '<div class="modal fade" id="move-modal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-dialog-centered"><div class="modal-content border-0">' +
+            '<div class="modal-header"><h2 class="modal-title h5" id="move-title">Chuyển / gộp / tách bàn</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button></div>' +
+            '<div class="modal-body"><div id="move-alert" class="alert alert-danger d-none py-2"></div>' +
+            '<div id="move-orders" class="mb-3"></div>' +
+            '<label class="form-label fw-semibold" for="move-target">Sang bàn</label><select id="move-target" class="form-select"></select>' +
+            '<div id="move-hint" class="form-text mt-2"></div></div>' +
+            '<div class="modal-footer"><button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Hủy</button><button type="button" id="move-submit" class="btn btn-coffee">Xác nhận</button></div>' +
+            '</div></div></div>';
+        document.body.appendChild(el.firstChild);
+        moveModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('move-modal'));
+        document.getElementById('move-orders').addEventListener('change', updateMoveHint);
+        document.getElementById('move-target').addEventListener('change', updateMoveHint);
+        document.getElementById('move-submit').addEventListener('click', submitMove);
+    }
+
+    function chosenOrderIds() {
+        return Array.prototype.map.call(document.querySelectorAll('#move-orders input[type=checkbox]:checked'), function (c) { return Number(c.value); });
+    }
+
+    function updateMoveHint() {
+        var orders = ordersByTable[moveFrom] || [];
+        var target = tables.filter(function (t) { return t.table_code === document.getElementById('move-target').value; })[0];
+        var chosen = chosenOrderIds();
+        var hint = '';
+        var ok = Boolean(target);
+        if (orders.length && !chosen.length) {
+            hint = 'Hãy chọn ít nhất một đơn.';
+            ok = false;
+        } else if (target) {
+            var whole = !orders.length || chosen.length === orders.length;
+            if (!whole) hint = 'Tách ' + chosen.length + ' đơn sang bàn ' + target.table_code + '. Các đơn còn lại ở lại bàn ' + moveFrom + '.';
+            else if (target.status === 'occupied') hint = 'Gộp toàn bộ bàn ' + moveFrom + ' vào bàn ' + target.table_code + ' (đang có khách). Bàn ' + moveFrom + ' sẽ trống.';
+            else hint = 'Chuyển khách và đơn sang bàn ' + target.table_code + '. Bàn ' + moveFrom + ' sẽ trống.';
+        }
+        document.getElementById('move-hint').textContent = hint;
+        document.getElementById('move-submit').disabled = !ok;
+    }
+
+    function openMove(code) {
+        ensureMoveModal();
+        moveFrom = code;
+        document.getElementById('move-alert').classList.add('d-none');
+        document.getElementById('move-title').textContent = 'Chuyển / gộp / tách bàn ' + code;
+        var orders = ordersByTable[code] || [];
+        document.getElementById('move-orders').innerHTML = orders.length
+            ? '<div class="fw-semibold mb-1">Đơn của bàn</div>' + orders.map(function (o) {
+                return '<div class="form-check"><input class="form-check-input" type="checkbox" id="mv-' + o.id + '" value="' + o.id + '" checked />' +
+                    '<label class="form-check-label" for="mv-' + o.id + '">' + S.esc(o.order_code) + ' · ' + S.money(o.total_amount) + ' · ' + S.esc(S.STATUS_TEXT[o.status] || o.status) + '</label></div>';
+            }).join('') + '<div class="form-text">Bỏ chọn bớt đơn để chỉ tách các đơn đã chọn sang bàn khác.</div>'
+            : '<div class="text-secondary">Bàn chưa có đơn nào, chỉ chuyển khách sang bàn khác.</div>';
+        var STATUS_LABEL = { available: 'Trống · chuyển', occupied: 'Có khách · gộp' };
+        document.getElementById('move-target').innerHTML = '<option value="">-- Chọn bàn --</option>' + tables.filter(function (t) {
+            return t.table_code !== code && t.status !== 'maintenance';
+        }).map(function (t) {
+            return '<option value="' + S.esc(t.table_code) + '">' + S.esc(t.table_name || t.table_code) + ' · ' + S.esc(t.area || '') + ' (' + STATUS_LABEL[t.status] + ')</option>';
+        }).join('');
+        updateMoveHint();
+        moveModal.show();
+    }
+
+    async function submitMove() {
+        var orders = ordersByTable[moveFrom] || [];
+        var chosen = chosenOrderIds();
+        var payload = { from: moveFrom, to: document.getElementById('move-target').value };
+        if (orders.length && chosen.length !== orders.length) payload.order_ids = chosen; // chọn hết = chuyển cả bàn
+        var btn = document.getElementById('move-submit');
+        btn.disabled = true;
+        try {
+            var res = await S.api('/api/staff/tables/move', { method: 'POST', body: JSON.stringify(payload) });
+            moveModal.hide();
+            S.toast(res.message);
+            await load();
+        } catch (err) {
+            var box2 = document.getElementById('move-alert');
+            box2.textContent = err.message;
+            box2.classList.remove('d-none');
+        } finally {
+            btn.disabled = false;
+            updateMoveHint();
+        }
+    }
+
     box.addEventListener('click', async function (event) {
+        var mv = event.target.closest('button[data-move]');
+        if (mv) return openMove(mv.dataset.move);
         var ob = event.target.closest('button[data-order-act]');
         if (ob) {
             if (ob.disabled) return;

@@ -164,6 +164,12 @@ const EXPECTED = {
         created_at: 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP',
         updated_at: 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP',
     },
+    product_sold_out: {
+        product_id: 'INT UNSIGNED NOT NULL',
+        sold_date: 'DATE NOT NULL',
+        marked_by: 'INT UNSIGNED NULL',
+        marked_at: 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP',
+    },
     tags: {
         id: null,
         name: 'VARCHAR(50) NOT NULL',

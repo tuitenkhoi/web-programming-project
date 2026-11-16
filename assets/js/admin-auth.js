@@ -191,7 +191,7 @@
                 auth: { token: getToken() }
             });
             window.__mocCoffeeSocket = socket;
-            ['order:created', 'order:updated', 'booking:created', 'booking:updated', 'table:updated']
+            ['order:created', 'order:updated', 'order:ready', 'booking:created', 'booking:updated', 'table:updated', 'product:updated']
                 .forEach(function (eventName) {
                     socket.on(eventName, function (detail) {
                         if (getRole() !== 'staff') loadSharedAdminData({ silent: true });

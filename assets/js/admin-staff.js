@@ -10,7 +10,9 @@ document.addEventListener('DOMContentLoaded', function () {
         'order.payment': 'Xác nhận thanh toán', 'table.status': 'Đổi trạng thái bàn',
         'booking.status': 'Đổi trạng thái đặt bàn', 'staff.create': 'Tạo nhân viên',
         'staff.update': 'Sửa nhân viên', 'staff.lock': 'Khóa tài khoản', 'staff.unlock': 'Mở khóa tài khoản',
-        'staff.reset_password': 'Đặt lại mật khẩu', 'account.password': 'Đổi mật khẩu'
+        'staff.reset_password': 'Đặt lại mật khẩu', 'account.password': 'Đổi mật khẩu',
+        'table.move': 'Chuyển bàn', 'table.merge': 'Gộp bàn', 'table.split': 'Tách bàn',
+        'product.sold_out': 'Đánh dấu hết món', 'product.available': 'Bán lại món'
     };
 
     var body = document.getElementById('staff-table-body');

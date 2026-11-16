@@ -65,9 +65,9 @@
         });
         $('menu-grid').innerHTML = list.length ? list.map(function (p) {
             var img = imageOf(p);
-            return '<button type="button" class="product-tile" data-id="' + p.id + '">' +
+            return '<button type="button" class="product-tile" data-id="' + p.id + '"' + (p.sold_out ? ' disabled style="opacity:.5;cursor:not-allowed"' : '') + '>' +
                 '<img src="' + S.esc(img) + '" alt="" loading="lazy" onerror="this.onerror=null;this.src=\'' + DEFAULT_IMAGE + '\'" />' +
-                '<div class="tile-body"><div class="p-name">' + S.esc(p.name) + '</div><div class="p-price">' + S.money(p.price) + '</div></div></button>';
+                '<div class="tile-body"><div class="p-name">' + S.esc(p.name) + '</div><div class="p-price">' + (p.sold_out ? '<span class="text-danger fw-semibold">Hết hôm nay</span>' : S.money(p.price)) + '</div></div></button>';
         }).join('') : '<div class="text-secondary py-4">Không có món nào.</div>';
     }
 
@@ -342,7 +342,7 @@
         var tile = event.target.closest('.product-tile');
         if (!tile) return;
         var product = products.filter(function (p) { return String(p.id) === tile.dataset.id; })[0];
-        if (product) quickAdd(product);
+        if (product && !product.sold_out) quickAdd(product);
     });
     $('cart-lines').addEventListener('click', function (event) {
         var btn = event.target.closest('button[data-act]');

@@ -215,6 +215,17 @@ CREATE TABLE IF NOT EXISTS toppings (
     UNIQUE KEY uq_toppings_name (name)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
+-- Hết món theo ngày - migration 009
+CREATE TABLE IF NOT EXISTS product_sold_out (
+    product_id INT UNSIGNED NOT NULL PRIMARY KEY,
+    sold_date DATE NOT NULL,
+    marked_by INT UNSIGNED NULL,
+    marked_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_sold_out_date (sold_date),
+    CONSTRAINT fk_sold_out_product FOREIGN KEY (product_id)
+        REFERENCES products(id) ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS tags (
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(50) NOT NULL,

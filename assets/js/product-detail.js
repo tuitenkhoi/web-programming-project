@@ -447,6 +447,11 @@ document.addEventListener("DOMContentLoaded", function () {
   function addToCart() {
     if (!currentProduct) return;
 
+    if (currentProduct.soldOut) {
+      showToast(`Món "${currentProduct.name}" đã hết trong hôm nay.`);
+      return;
+    }
+
     if (!window.MocCoffee?.addToCart) {
       window.alert("Chưa tải được chức năng giỏ hàng. Vui lòng tải lại trang.");
       return;
@@ -594,6 +599,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
       currentAttachments = rawProduct.attachments || [];
       renderProduct();
+
+      if (currentProduct.soldOut) {
+        const addButton = document.querySelector("#add-detail-to-cart");
+
+        if (addButton) {
+          addButton.disabled = true;
+          addButton.textContent = "Hết hôm nay";
+        }
+      }
     } catch (error) {
       showUnavailable(error.message || "Không thể tải sản phẩm.");
       return;
@@ -619,4 +633,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
   loadToppings();
   initialize();
-});
+});

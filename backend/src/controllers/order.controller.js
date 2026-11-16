@@ -7,6 +7,7 @@ const {
     findUnavailableTopping,
     unavailableToppingMessage,
 } = require("../services/toppings");
+const { findSoldOut, soldOutMessage } = require("../services/sold-out");
 
 const SIZE_PRICES = {
     S: -5000,
@@ -219,6 +220,16 @@ const createOrder = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: "Có sản phẩm không tồn tại hoặc đã ngừng bán",
+            });
+        }
+
+        // Món đã hết trong hôm nay (nhân viên đánh dấu) thì không đặt được
+        const soldOutProduct = await findSoldOut(productIds);
+
+        if (soldOutProduct) {
+            return res.status(400).json({
+                success: false,
+                message: soldOutMessage(soldOutProduct),
             });
         }
 

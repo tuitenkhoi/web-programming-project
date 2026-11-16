@@ -9,6 +9,7 @@ const PERMISSIONS = {
     'tables.view': ['waiter', 'cashier', 'kitchen'],
     'tables.update': ['waiter', 'cashier'],   // chi tiết từng thao tác xem TABLE_TRANSITIONS_BY_POSITION
     'tables.order': ['waiter'],               // nút "Gọi món" trên bàn đang có khách
+    'tables.move': ['waiter', 'cashier'],     // chuyển / gộp / tách bàn
     'tables.bill': ['cashier'],               // trên bàn đang có khách: xác nhận đơn + xuất hóa đơn
     'bookings.view': ['waiter', 'cashier'],
     'bookings.manage': ['waiter'],
@@ -19,6 +20,7 @@ const PERMISSIONS = {
     'orders.payment': ['cashier'],
     'revenue.view': ['cashier'], // doanh thu, dashboard và hóa đơn (mọi thứ liên quan đến tiền)
     'orders.export': [], // xuất hóa đơn ra Excel/CSV/PDF: chỉ admin (không vị trí nhân viên nào được thêm vào đây)
+    'products.soldout': ['waiter', 'cashier', 'kitchen'], // đánh dấu món hết trong ngày
     'kitchen.view': ['waiter', 'cashier', 'kitchen'],
 };
 

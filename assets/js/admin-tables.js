@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var statusFilter = A.fresh('table-status-filter');
     var resetBtn = A.fresh('reset-table-filter');
     var refreshBtn = A.fresh('refresh-tables-button');
+    var addBtn = A.fresh('open-add-table-button');
+    var form = A.fresh('admin-table-form');
     var all = [];
 
     function setStat(id, value) {
@@ -36,8 +38,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Những thứ API chưa hỗ trợ
     var areaSelect = document.getElementById('table-area-filter');
     if (areaSelect) areaSelect.closest('[class*="col-"]').remove();
-    var addBtn = document.getElementById('open-add-table-button');
-    if (addBtn) addBtn.remove();
     if (statusFilter) {
         Array.prototype.slice.call(statusFilter.options).forEach(function (o) {
             if (o.value !== 'all' && !STATUS[o.value]) o.remove();
@@ -122,6 +122,47 @@ document.addEventListener('DOMContentLoaded', function () {
         render();
     });
     if (refreshBtn) refreshBtn.addEventListener('click', load);
+
+    // ----- Thêm bàn mới -----
+    function openAdd() {
+        form.reset();
+        form.classList.remove('was-validated');
+        document.getElementById('admin-table-original-id').value = '';
+        document.getElementById('table-form-title').textContent = 'Thêm bàn mới';
+        var areas = [];
+        all.forEach(function (t) { if (t.area && areas.indexOf(t.area) === -1) areas.push(t.area); });
+        document.getElementById('admin-table-area-list').innerHTML = areas.map(function (a) { return '<option value="' + A.esc(a) + '"></option>'; }).join('');
+        // gợi ý mã bàn kế tiếp theo bàn cuối (T09 -> T10)
+        var last = all.length ? String(all[all.length - 1].table_code || '') : '';
+        var m = last.match(/^(.*?)(\d+)$/);
+        if (m) document.getElementById('admin-table-code').value = m[1] + String(Number(m[2]) + 1).padStart(m[2].length, '0');
+    }
+    if (addBtn) addBtn.addEventListener('click', openAdd);
+    if (form) form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        form.classList.add('was-validated');
+        if (!form.checkValidity()) return;
+        var submit = form.querySelector('button[type="submit"]');
+        submit.disabled = true;
+        try {
+            var res = await A.api('/api/tables', {
+                method: 'POST',
+                body: JSON.stringify({
+                    table_code: document.getElementById('admin-table-code').value.trim(),
+                    table_name: document.getElementById('admin-table-name').value.trim(),
+                    area: document.getElementById('admin-table-area').value.trim(),
+                    capacity: Number(document.getElementById('admin-table-capacity').value)
+                })
+            });
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('table-form-modal')).hide();
+            A.toast(res.message);
+            await load();
+        } catch (err) {
+            A.toast(err.message, 'error');
+        } finally {
+            submit.disabled = false;
+        }
+    });
 
     load();
 });

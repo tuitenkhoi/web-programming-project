@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../config/db');
-const { verifyToken } = require('../middleware/auth');
+const { verifyToken, requireAdmin } = require('../middleware/auth');
 const { requirePermission, canTableTransition } = require('../middleware/permissions');
 const { logActivity } = require('../services/audit');
 const { dbErrorMessage } = require('../middleware/dbError');
@@ -28,6 +28,48 @@ router.get('/', async (req, res) => {
         res.status(500).json({
             message: dbErrorMessage(error, 'Lỗi truy vấn cơ sở dữ liệu!'),
         });
+    }
+});
+
+// Admin thêm bàn mới. Mã bàn là duy nhất; bàn mới luôn ở trạng thái "trống".
+router.post('/', verifyToken, requireAdmin, async (req, res) => {
+    const body = req.body || {};
+    const code = String(body.table_code || '').trim().toUpperCase();
+    const name = String(body.table_name || '').trim();
+    const area = String(body.area || '').trim();
+    const capacity = Number(body.capacity);
+
+    if (!/^[A-Z0-9_-]{1,20}$/.test(code)) {
+        return res.status(400).json({ success: false, message: 'Mã bàn chỉ gồm chữ, số, "-" hoặc "_" (tối đa 20 ký tự).' });
+    }
+    if (!name || name.length > 100) {
+        return res.status(400).json({ success: false, message: 'Tên bàn bắt buộc, tối đa 100 ký tự.' });
+    }
+    if (area.length > 100) {
+        return res.status(400).json({ success: false, message: 'Khu vực tối đa 100 ký tự.' });
+    }
+    if (!Number.isInteger(capacity) || capacity < 1 || capacity > 20) {
+        return res.status(400).json({ success: false, message: 'Sức chứa phải từ 1 đến 20 người.' });
+    }
+
+    try {
+        const [result] = await db.execute(
+            `INSERT INTO coffee_tables (table_code, table_name, capacity, area, status)
+             VALUES (?, ?, ?, ?, 'available')`,
+            [code, name, capacity, area || null]
+        );
+        await logActivity(req.user, 'table.create', 'table', result.insertId, `${code} - ${name}`);
+        res.status(201).json({
+            success: true,
+            message: 'Đã thêm bàn ' + name + '.',
+            data: { id: result.insertId, table_code: code, table_name: name, name, capacity, area: area || null, status: 'available' },
+        });
+    } catch (error) {
+        if (error.code === 'ER_DUP_ENTRY') {
+            return res.status(409).json({ success: false, message: 'Mã bàn ' + code + ' đã tồn tại.' });
+        }
+        console.error('Lỗi thêm bàn:', error.code, error.sqlMessage || error.message);
+        res.status(500).json({ success: false, message: dbErrorMessage(error, 'Không thể thêm bàn.') });
     }
 });
 

@@ -34,8 +34,8 @@
         $('sold-grid').innerHTML = list.length ? list.map(function (p) {
             return '<div class="product-tile" style="cursor:default;' + (p.sold_out ? 'border-color:#dc3545' : '') + '">' +
                 '<img src="' + S.esc(imageOf(p)) + '" alt="" loading="lazy" style="' + (p.sold_out ? 'filter:grayscale(1);opacity:.55' : '') + '" onerror="this.onerror=null;this.src=\'' + DEFAULT_IMAGE + '\'" />' +
-                '<div class="tile-body"><div class="fw-semibold small">' + S.esc(p.name) + '</div>' +
-                '<div class="text-secondary small mb-2">' + S.money(p.price) + '</div>' +
+                '<div class="tile-body"><div class="tile-name">' + S.esc(p.name) + '</div>' +
+                '<div class="text-secondary small mb-2 mt-1">' + S.money(p.price) + '</div>' +
                 '<button type="button" class="btn btn-sm w-100 ' + (p.sold_out ? 'btn-success' : 'btn-outline-danger') + '" data-id="' + p.id + '" data-sold="' + (p.sold_out ? '0' : '1') + '">' +
                 (p.sold_out ? 'Bán lại' : 'Hết món') + '</button></div></div>';
         }).join('') : '<div class="text-secondary py-4">Không có món nào phù hợp.</div>';

@@ -16,7 +16,7 @@
         var total = orders.reduce(function (sum, o) { return sum + Number(o.total_amount || 0); }, 0);
         var meta = S.esc(t.capacity) + ' chỗ';
         var info = '';
-        if (orders.length && S.can('tables.update')) {
+        if (orders.length) {
             info += '<div class="tile-meta"><i class="bi bi-receipt me-1"></i>' + orders.length + ' đơn · ' + S.money(total) + '</div>';
         }
         var booking = bookingByTable[t.table_code];
@@ -57,10 +57,11 @@
         }
         if (!canManage && !actions) actions = '';
 
-        return '<div class="col-6 col-md-4 col-xl-3 col-xxl-2"><article class="table-tile ' + S.esc(t.status) + '">' +
+        return '<div class="col-6 col-md-4 col-xl-3 col-xxl-2"><article class="table-tile ' + S.esc(t.status) + (t.status === 'occupied' ? ' is-clickable' : '') + '" data-table="' + S.esc(t.table_code) + '"' + (t.status === 'occupied' ? ' role="button" tabindex="0" title="Xem đơn hàng của bàn"' : '') + '>' +
             '<div class="tile-head"><span class="tile-name">' + S.esc(t.table_name || t.table_code) + '</span>' +
             '<span class="status-pill ' + S.esc(t.status) + '">' + S.esc(STATUS[t.status] || t.status) + '</span></div>' +
             '<div class="tile-meta">' + meta + '</div>' + info +
+            (t.status === 'occupied' && S.can('orders.view') ? '<div class="tile-hint"><i class="bi bi-hand-index me-1"></i>Chạm để xem đơn</div>' : '') +
             '<div class="tile-actions">' + actions + '</div></article></div>';
     }
 
@@ -209,6 +210,88 @@
             updateMoveHint();
         }
     }
+
+    // ----- Xem đơn hàng của bàn đang có khách -----
+    var detailModal = null;
+    var detailCode = null;
+    function ensureDetailModal() {
+        if (detailModal) return;
+        var wrap = document.createElement('div');
+        wrap.innerHTML = '<div class="modal fade" id="table-orders-modal" tabindex="-1" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg"><div class="modal-content border-0">' +
+            '<div class="modal-header"><h2 class="modal-title h5" id="table-orders-title">Đơn của bàn</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button></div>' +
+            '<div class="modal-body" id="table-orders-body"></div>' +
+            '<div class="modal-footer flex-wrap" id="table-orders-actions"></div></div></div></div>';
+        document.body.appendChild(wrap.firstChild);
+        detailModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('table-orders-modal'));
+        document.getElementById('table-orders-actions').addEventListener('click', function (event) {
+            var b = event.target.closest('button[data-detail-act]');
+            if (!b) return;
+            if (b.dataset.detailAct === 'invoice') {
+                S.api('/api/orders/' + encodeURIComponent(b.dataset.oid)).then(function (d) { S.printInvoice(d.data); })
+                    .catch(function (err) { S.toast(err.message, 'error'); });
+            }
+        });
+    }
+    function lineText(it) {
+        var parts = ['Size ' + it.size, 'Đường ' + it.sugar_level, 'Đá ' + it.ice_level];
+        if (it.toppings && it.toppings.length) parts.push('+ ' + it.toppings.join(', '));
+        return parts.join(' · ');
+    }
+    async function openTableOrders(code) {
+        if (!S.can('orders.view')) return;
+        ensureDetailModal();
+        detailCode = code;
+        var t = tables.filter(function (x) { return x.table_code === code; })[0] || {};
+        document.getElementById('table-orders-title').textContent = 'Đơn của ' + (t.table_name || code);
+        var body = document.getElementById('table-orders-body');
+        var actions = document.getElementById('table-orders-actions');
+        body.innerHTML = '<div class="text-center text-secondary py-4">Đang tải đơn hàng...</div>';
+        actions.innerHTML = '';
+        detailModal.show();
+        var list = ordersByTable[code] || [];
+        if (!list.length) {
+            body.innerHTML = '<div class="text-center text-secondary py-4">Bàn đang có khách nhưng chưa có đơn nào.</div>';
+        } else {
+            try {
+                var details = await Promise.all(list.map(function (o) { return S.api('/api/orders/' + encodeURIComponent(o.id)).then(function (r) { return r.data; }); }));
+                var grand = 0;
+                body.innerHTML = details.map(function (o) {
+                    grand += Number(o.total_amount || 0);
+                    return '<section class="border rounded-3 p-2 p-md-3 mb-3">' +
+                        '<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2">' +
+                        '<strong>' + S.esc(o.order_code) + '</strong><span>' + S.statusBadge(o.status) + ' <span class="badge text-bg-' + (o.payment_status === 'paid' ? 'success' : 'secondary') + '">' + S.esc(S.PAY_TEXT[o.payment_status] || o.payment_status) + '</span></span>' +
+                        '<small class="text-secondary w-100">' + S.esc(S.timeText(o.created_at)) + (o.customer_name ? ' · ' + S.esc(o.customer_name) : '') + '</small></div>' +
+                        o.items.map(function (it) {
+                            return '<div class="d-flex justify-content-between gap-2 py-1 border-top"><div><strong>' + it.quantity + '× ' + S.esc(it.product_name) + '</strong>' +
+                                '<small class="d-block text-secondary">' + S.esc(lineText(it)) + '</small>' +
+                                (it.note ? '<small class="d-block text-danger">' + S.esc(it.note) + '</small>' : '') + '</div>' +
+                                '<span class="text-nowrap">' + S.money(it.line_total) + '</span></div>';
+                        }).join('') +
+                        (o.note ? '<div class="alert alert-warning py-1 px-2 mt-2 mb-0 small"><i class="bi bi-sticky me-1"></i>' + S.esc(o.note) + '</div>' : '') +
+                        '<div class="d-flex justify-content-between fw-semibold border-top pt-2 mt-2"><span>Tổng đơn</span><span>' + S.money(o.total_amount) + '</span></div>' +
+                        (S.can('tables.bill') ? '<div class="text-end mt-2"><button type="button" class="btn btn-sm btn-coffee" data-detail-act="invoice" data-oid="' + o.id + '"><i class="bi bi-printer me-1"></i>Xuất hóa đơn</button></div>' : '') +
+                        '</section>';
+                }).join('') + '<div class="d-flex justify-content-between fw-bold fs-5"><span>Cả bàn</span><span>' + S.money(grand) + '</span></div>';
+            } catch (err) {
+                body.innerHTML = '<div class="alert alert-danger mb-0">' + S.esc(err.message) + '</div>';
+            }
+        }
+        var foot = '';
+        if (S.can('tables.order')) foot += '<a class="btn btn-coffee" href="new-order.html?table=' + encodeURIComponent(code) + '"><i class="bi bi-plus-lg me-1"></i>Gọi thêm món</a>';
+        foot += '<a class="btn btn-outline-secondary" href="orders.html?q=' + encodeURIComponent(code) + '">Mở trong Đơn hàng</a>';
+        actions.innerHTML = foot;
+    }
+
+    box.addEventListener('click', function (event) {
+        if (event.target.closest('button, a')) return;
+        var tileEl = event.target.closest('.table-tile.is-clickable');
+        if (tileEl) openTableOrders(tileEl.dataset.table);
+    });
+    box.addEventListener('keydown', function (event) {
+        if (event.key !== 'Enter' && event.key !== ' ') return;
+        var tileEl = event.target.closest('.table-tile.is-clickable');
+        if (tileEl && event.target === tileEl) { event.preventDefault(); openTableOrders(tileEl.dataset.table); }
+    });
 
     box.addEventListener('click', async function (event) {
         var mv = event.target.closest('button[data-move]');

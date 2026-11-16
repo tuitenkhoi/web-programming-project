@@ -537,3 +537,35 @@ test('giao diện: trang Hết món, hộp chuyển/tách bàn và khách thấy
     assert.match(fs.readFileSync('assets/js/menu.js', 'utf8'), /soldOut/);
     assert.match(fs.readFileSync('assets/js/client-api.js', 'utf8'), /soldOut: Boolean\(product\.sold_out\)/);
 });
+
+test('admin thêm bàn: chỉ admin, kiểm tra dữ liệu, trùng mã báo 409', async () => {
+    const body = { table_code: 't09', table_name: 'Bàn T09', area: 'Tầng trệt', capacity: 4 };
+    assert.equal((await call('POST', '/api/tables', as('staff', 'waiter'), body)).status, 403);
+
+    const ok = await call('POST', '/api/tables', as('admin'), body);
+    assert.equal(ok.status, 201);
+    assert.equal(ok.body.data.table_code, 'T09');
+    assert.equal(ok.body.data.status, 'available');
+
+    assert.equal((await call('POST', '/api/tables', as('admin'), { ...body, table_code: 'bad code!' })).status, 400);
+    assert.equal((await call('POST', '/api/tables', as('admin'), { ...body, table_name: '' })).status, 400);
+    assert.equal((await call('POST', '/api/tables', as('admin'), { ...body, capacity: 0 })).status, 400);
+    assert.equal((await call('POST', '/api/tables', as('admin'), { ...body, capacity: 21 })).status, 400);
+});
+
+test('giao diện admin: nút Thêm bàn không bị gỡ và gọi POST /api/tables', () => {
+    const fs = require('node:fs');
+    const js = fs.readFileSync('assets/js/admin-tables.js', 'utf8');
+    assert.ok(!/addBtn\.remove\(\)/.test(js));
+    assert.match(js, /\/api\/tables'/);
+    assert.match(fs.readFileSync('admin/tables.html', 'utf8'), /id="open-add-table-button"/);
+});
+
+test('giao diện: chạm vào bàn có khách mở danh sách đơn của bàn', () => {
+    const fs = require('node:fs');
+    const js = fs.readFileSync('assets/js/staff-tables.js', 'utf8');
+    assert.match(js, /is-clickable/);
+    assert.match(js, /openTableOrders/);
+    assert.match(js, /\/api\/orders\/' \+ encodeURIComponent\(o\.id\)/);
+    assert.match(fs.readFileSync('assets/css/staff.css', 'utf8'), /\.table-tile\.is-clickable/);
+});

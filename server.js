@@ -275,7 +275,7 @@ const PORT = Number(process.env.PORT || 5000);
 if (require.main === module) {
     const server = http.createServer(app);
     require('./realtime').initialize(server);
-    server.listen(PORT);
+    server.listen(PORT, '0.0.0.0');
 
     // Tắt server êm: ngừng nhận request mới, chờ request đang chạy xong rồi đóng pool MySQL
     const shutdown = (signal) => {

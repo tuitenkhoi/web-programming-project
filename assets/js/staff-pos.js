@@ -93,6 +93,7 @@
         $('sum-subtotal').textContent = S.money(subtotal);
         $('sum-fee').textContent = S.money(fee);
         $('sum-total').textContent = S.money(subtotal + fee);
+        updateCartBar(count, subtotal + fee);
         if (cart.length) qrFixed = null;
         renderQr(subtotal + fee);
     }
@@ -125,6 +126,48 @@
             console.error('Không tạo được mã QR:', error);
             box.classList.add('d-none');
         }
+    }
+
+    // ----- Điện thoại: giỏ hàng là tấm trượt từ đáy + thanh "N món · tổng" -----
+    var cartBar = null;
+    var cartBackdrop = null;
+    function cartPanel() { return document.querySelector('.pos-cart'); }
+    function setCartOpen(open) {
+        var panel = cartPanel();
+        if (!panel || !cartBackdrop) return;
+        panel.classList.toggle('open', open);
+        cartBackdrop.classList.toggle('show', open);
+    }
+    function initCartSheet() {
+        var panel = cartPanel();
+        if (!panel || cartBar) return;
+        cartBackdrop = document.createElement('div');
+        cartBackdrop.className = 'pos-backdrop';
+        cartBackdrop.addEventListener('click', function () { setCartOpen(false); });
+        document.body.appendChild(cartBackdrop);
+
+        cartBar = document.createElement('button');
+        cartBar.type = 'button';
+        cartBar.className = 'cart-bar';
+        cartBar.innerHTML = '<span><span class="cb-count" id="cb-count">0</span><span id="cb-total">0đ</span></span><span class="cb-go">Xem giỏ</span>';
+        cartBar.addEventListener('click', function () { setCartOpen(true); });
+        document.body.appendChild(cartBar);
+
+        var head = document.createElement('div');
+        head.className = 'sheet-close';
+        head.innerHTML = '<span>Giỏ hàng</span><button type="button" class="btn btn-light" aria-label="Đóng giỏ hàng"><i class="bi bi-chevron-down"></i></button>';
+        head.querySelector('button').addEventListener('click', function () { setCartOpen(false); });
+        panel.insertBefore(head, panel.firstChild);
+        document.addEventListener('keydown', function (event) { if (event.key === 'Escape') setCartOpen(false); });
+    }
+    function updateCartBar(count, total) {
+        initCartSheet();
+        if (!cartBar) return;
+        $('cb-count').textContent = count;
+        $('cb-total').textContent = S.money(total);
+        cartBar.classList.toggle('show', count > 0);
+        document.body.classList.toggle('has-cart-bar', count > 0);
+        if (!count) setCartOpen(false);
     }
 
     // ----- Hộp thoại tùy chọn món -----
@@ -265,6 +308,8 @@
             $('pos-phone').value = '';
             renderCart();
             if ($('pos-payment').value === 'bank_transfer') { qrFixed = { amount: Number(res.data.total_amount), content: res.data.order_code }; renderQr(0); }
+            setCartOpen(false);
+            S.toast('Đã tạo đơn ' + res.data.order_code + ' · ' + S.money(res.data.total_amount));
             var ok = $('pos-success');
             ok.innerHTML = 'Đã tạo đơn <strong>' + S.esc(res.data.order_code) + '</strong> · ' + S.money(res.data.total_amount) + '. <a href="orders.html">Xem đơn</a>';
             ok.classList.remove('d-none');

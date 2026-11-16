@@ -14,9 +14,12 @@
 </head>
 
 <body class="staff-body" data-page="bookings.html" data-perm="bookings.view">
-  <header id="staff-header"></header>
+  <div class="staff-main">
+    <div id="staff-shell"></div>
+    <header id="staff-header" hidden></header>
 
-  <main id="staff-content" class="staff-main">
+    <main class="staff-content" id="staff-content">
+
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
       <div>
         <h1 class="h3 staff-title">Đặt bàn</h1>
@@ -24,10 +27,10 @@
       </div>
       <button type="button" id="refresh" class="btn btn-light border" title="Làm mới"><i class="bi bi-arrow-clockwise"></i></button>
     </div>
-    <div class="staff-card p-3 mb-3">
+    <div class="staff-card p-3 mb-3 staff-toolbar">
       <div class="row g-2 align-items-center">
         <div class="col-12 col-lg-6">
-          <div class="btn-group flex-wrap" id="booking-tabs" role="group" aria-label="Lọc trạng thái">
+          <div class="btn-group" id="booking-tabs" role="group" aria-label="Lọc trạng thái">
             <button type="button" class="btn btn-outline-secondary btn-sm active" data-tab="active">Cần xử lý</button>
             <button type="button" class="btn btn-outline-secondary btn-sm" data-tab="pending">Chờ duyệt</button>
             <button type="button" class="btn btn-outline-secondary btn-sm" data-tab="confirmed">Đã duyệt</button>
@@ -41,13 +44,15 @@
     </div>
     <div class="staff-card">
       <div class="table-responsive">
-        <table class="table align-middle mb-0">
+        <table class="table align-middle mb-0 staff-table-list">
           <thead class="table-light"><tr><th>Mã</th><th>Khách</th><th>Bàn</th><th>Ngày giờ</th><th>Số khách</th><th>Ghi chú</th><th>Trạng thái</th><th class="text-end">Thao tác</th></tr></thead>
           <tbody id="booking-body"></tbody>
         </table>
       </div>
     </div>
-  </main>
+
+    </main>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/confirm-modal.js"></script>

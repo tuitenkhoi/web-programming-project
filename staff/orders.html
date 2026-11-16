@@ -14,9 +14,12 @@
 </head>
 
 <body class="staff-body" data-page="orders.html" data-perm="orders.view">
-  <header id="staff-header"></header>
+  <div class="staff-main">
+    <div id="staff-shell"></div>
+    <header id="staff-header" hidden></header>
 
-  <main id="staff-content" class="staff-main">
+    <main class="staff-content" id="staff-content">
+
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
       <div>
         <h1 class="h3 staff-title">Đơn hàng</h1>
@@ -24,10 +27,10 @@
       </div>
       <a href="new-order.html" id="btn-new-order" class="btn btn-coffee d-none"><i class="bi bi-plus-lg me-1"></i>Tạo đơn mới</a>
     </div>
-    <div class="staff-card p-3 mb-3">
+    <div class="staff-card p-3 mb-3 staff-toolbar">
       <div class="row g-2 align-items-center">
         <div class="col-12 col-lg-5">
-          <div class="btn-group flex-wrap" id="order-tabs" role="group" aria-label="Lọc trạng thái">
+          <div class="btn-group" id="order-tabs" role="group" aria-label="Lọc trạng thái">
             <button type="button" class="btn btn-outline-secondary btn-sm active" data-tab="open">Đang xử lý</button>
             <button type="button" class="btn btn-outline-secondary btn-sm" data-tab="unpaid">Chờ thanh toán</button>
             <button type="button" class="btn btn-outline-secondary btn-sm" data-tab="completed">Hoàn thành</button>
@@ -41,7 +44,7 @@
     </div>
     <div class="staff-card">
       <div class="table-responsive">
-        <table class="table align-middle mb-0">
+        <table class="table align-middle mb-0 staff-table-list">
           <thead class="table-light"><tr><th>Mã đơn</th><th>Bàn / Hình thức</th><th>Khách</th><th class="text-end">Tổng tiền</th><th>Thanh toán</th><th>Trạng thái</th><th>Giờ</th></tr></thead>
           <tbody id="order-body"></tbody>
         </table>
@@ -61,7 +64,9 @@
         </div>
       </div>
     </div>
-  </main>
+
+    </main>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/confirm-modal.js"></script>

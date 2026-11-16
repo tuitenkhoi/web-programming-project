@@ -7,13 +7,16 @@
     if (!A) return;
 
     var NAV = [
-        { href: 'index.html', icon: 'bi-grid-3x3-gap', text: 'Sơ đồ bàn', perm: 'tables.view' },
-        { href: 'new-order.html', icon: 'bi-plus-circle', text: 'Tạo đơn', perm: 'orders.create' },
-        { href: 'orders.html', icon: 'bi-receipt', text: 'Đơn hàng', perm: 'orders.view' },
-        { href: 'kitchen.html', icon: 'bi-fire', text: 'Màn hình bếp', perm: 'kitchen.view' },
-        { href: 'bookings.html', icon: 'bi-calendar2-check', text: 'Đặt bàn', perm: 'bookings.view' },
-        { href: 'menu.html', icon: 'bi-slash-circle', text: 'Hết món', perm: 'products.soldout' },
-        { href: 'revenue.html', icon: 'bi-graph-up-arrow', text: 'Doanh thu', perm: 'revenue.view' }
+        { href: 'index.html', icon: 'bi-grid-3x3-gap', text: 'Sơ đồ bàn', perm: 'tables.view', group: 'Phục vụ' },
+        { href: 'new-order.html', icon: 'bi-plus-circle', text: 'Tạo đơn', perm: 'orders.create', group: 'Phục vụ' },
+        { href: 'orders.html', icon: 'bi-receipt', text: 'Đơn hàng', perm: 'orders.view', group: 'Phục vụ' },
+        { href: 'kitchen.html', icon: 'bi-fire', text: 'Màn hình bếp', perm: 'kitchen.view', group: 'Phục vụ' },
+        { href: 'bookings.html', icon: 'bi-calendar2-check', text: 'Đặt bàn', perm: 'bookings.view', group: 'Phục vụ' },
+        { href: 'menu.html', icon: 'bi-slash-circle', text: 'Hết món', perm: 'products.soldout', group: 'Quản lý' },
+        { href: 'revenue.html', icon: 'bi-graph-up-arrow', text: 'Doanh thu', perm: 'revenue.view', group: 'Quản lý' }
+    ];
+    var NAV_EXTRA = [
+        { href: '../index.html', icon: 'bi-globe', text: 'Xem trang khách hàng' }
     ];
     var STATUS_TEXT = {
         pending: 'Chờ xác nhận', confirmed: 'Đã xác nhận', preparing: 'Đang chế biến',
@@ -98,32 +101,97 @@
         });
     }
 
-    function buildShell() {
-        var active = document.body.getAttribute('data-page') || '';
-        var links = NAV.filter(function (item) { return can(item.perm); }).map(function (item) {
-            return '<li class="nav-item"><a class="nav-link' + (item.href === active ? ' active' : '') + '" href="' + item.href + '">' +
-                '<i class="bi ' + item.icon + ' me-1"></i>' + item.text + '</a></li>';
-        }).join('');
+    function initials(name) {
+        var parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+        if (!parts.length) return 'NV';
+        return (parts.length > 1 ? parts[0].charAt(0) + parts[parts.length - 1].charAt(0) : parts[0].charAt(0)).toUpperCase();
+    }
 
-        var header = document.getElementById('staff-header');
-        header.className = 'staff-header';
-        header.innerHTML =
-            '<nav class="navbar navbar-expand-lg navbar-dark">' +
-            '<div class="container-fluid">' +
-            '<a class="navbar-brand" href="index.html"><i class="bi bi-cup-hot-fill me-2"></i>Mộc Coffee</a>' +
-            '<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#staff-nav" aria-label="Mở menu"><span class="navbar-toggler-icon"></span></button>' +
-            '<div class="collapse navbar-collapse" id="staff-nav">' +
-            '<ul class="navbar-nav me-auto mb-2 mb-lg-0">' + links + '</ul>' +
-            '<div class="d-flex align-items-center gap-2">' +
-            '<div class="staff-user">' + esc(me.full_name) + '<small>' + esc(me.position_text) + '</small></div>' +
-            '<div class="dropdown"><button class="btn btn-sm btn-outline-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Tài khoản"><i class="bi bi-person-circle"></i></button>' +
+    function menuItems(items, active) {
+        return items.map(function (item) {
+            return '<li><a href="' + item.href + '"' + (item.href === active ? ' class="active" aria-current="page"' : '') + '>' +
+                '<i class="bi ' + item.icon + '"></i><span>' + esc(item.text) + '</span></a></li>';
+        }).join('');
+    }
+
+    // Trên điện thoại bảng danh sách chuyển thành dạng thẻ: gắn nhãn cột vào từng ô để CSS hiển thị.
+    function labelTableCells(table) {
+        var labels = Array.prototype.map.call(table.querySelectorAll('thead th'), function (th) {
+            return th.textContent.trim();
+        });
+        var body = table.tBodies[0];
+        if (!labels.length || !body) return;
+        table.classList.add('staff-table-cards');
+        function paint() {
+            Array.prototype.forEach.call(body.rows, function (tr) {
+                Array.prototype.forEach.call(tr.cells, function (td, i) {
+                    td.setAttribute('data-label', labels[i] || '');
+                });
+            });
+        }
+        paint();
+        new MutationObserver(paint).observe(body, { childList: true });
+    }
+
+    function buildShell(pageTitle) {
+        var active = document.body.getAttribute('data-page') || '';
+        var allowed = NAV.filter(function (item) { return can(item.perm); });
+        var groups = [];
+        allowed.forEach(function (item) {
+            var group = groups.filter(function (g) { return g.name === item.group; })[0];
+            if (!group) groups.push({ name: item.group, items: [item] });
+            else group.items.push(item);
+        });
+        var nav = groups.map(function (g) {
+            return '<p class="staff-nav-title">' + esc(g.name) + '</p><ul>' + menuItems(g.items, active) + '</ul>';
+        }).join('') + '<p class="staff-nav-title">Khác</p><ul>' + menuItems(NAV_EXTRA, active) +
+            '<li><button type="button" class="staff-nav-btn text-danger" id="staff-logout"><i class="bi bi-box-arrow-right"></i><span>Đăng xuất</span></button></li></ul>';
+
+        var wrap = document.getElementById('staff-shell');
+        wrap.innerHTML =
+            '<div class="staff-sidebar-overlay" id="staff-sidebar-overlay"></div>' +
+            '<aside class="staff-sidebar" id="staff-sidebar" aria-label="Menu nhân viên">' +
+            '<div class="staff-sidebar-header"><a href="index.html" class="staff-logo"><i class="bi bi-cup-hot-fill"></i><span>Mộc Coffee</span></a>' +
+            '<button type="button" id="staff-close-sidebar" class="btn text-white d-lg-none" aria-label="Đóng menu"><i class="bi bi-x-lg"></i></button></div>' +
+            '<div class="staff-user-box"><div class="staff-avatar">' + esc(initials(me.full_name)) + '</div>' +
+            '<div><strong>' + esc(me.full_name) + '</strong><small>' + esc(me.position_text) + '</small></div></div>' +
+            '<nav class="staff-nav">' + nav + '</nav></aside>' +
+            '<header class="staff-topbar">' +
+            '<div class="d-flex align-items-center gap-2 min-w-0">' +
+            '<button type="button" id="staff-open-sidebar" class="btn btn-light d-lg-none" aria-label="Mở menu"><i class="bi bi-list fs-4"></i></button>' +
+            '<div class="staff-topbar-title"><h1 id="staff-page-title">' + esc(pageTitle) + '</h1></div>' +
+            '</div>' +
+            '<div class="dropdown">' +
+            '<button class="btn btn-light dropdown-toggle d-flex align-items-center gap-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">' +
+            '<span class="staff-avatar staff-avatar-sm">' + esc(initials(me.full_name)) + '</span>' +
+            '<span class="d-none d-md-inline staff-account-name">' + esc(me.full_name) + '</span></button>' +
             '<ul class="dropdown-menu dropdown-menu-end">' +
+            '<li><h6 class="dropdown-header">' + esc(me.full_name) + ' · ' + esc(me.position_text) + '</h6></li>' +
             (me.role === 'admin' ? '<li><a class="dropdown-item" href="../admin/dashboard.html"><i class="bi bi-speedometer2 me-2"></i>Trang quản trị</a></li>' : '') +
             '<li><button type="button" class="dropdown-item" id="staff-sound"><i class="bi me-2"></i><span></span></button></li>' +
             '<li><button type="button" class="dropdown-item" id="staff-change-password"><i class="bi bi-key me-2"></i>Đổi mật khẩu</button></li>' +
             '<li><hr class="dropdown-divider" /></li>' +
-            '<li><button type="button" class="dropdown-item text-danger" id="staff-logout"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</button></li>' +
-            '</ul></div></div></div></div></nav>';
+            '<li><button type="button" class="dropdown-item text-danger" id="staff-logout-menu"><i class="bi bi-box-arrow-right me-2"></i>Đăng xuất</button></li>' +
+            '</ul></div></header>';
+
+        // Nội dung trang: tiêu đề đã lên topbar nên bỏ phần mô tả lớn ở đầu trang
+        var content = document.getElementById('staff-content');
+        var lead = content.querySelector(':scope > .d-flex.flex-wrap.justify-content-between.align-items-center, :scope > .d-flex.flex-column.flex-md-row');
+        if (lead) {
+            lead.classList.add('staff-lead');
+            var heading = lead.querySelector('h1, h2');
+            if (heading) {
+                heading.classList.add('d-none');
+                // Tiêu đề trang đổi theo thao tác (VD: "Gọi món · Bàn 5") -> hiện lên topbar
+                new MutationObserver(function () {
+                    document.getElementById('staff-page-title').textContent = heading.textContent.trim();
+                }).observe(heading, { childList: true, characterData: true, subtree: true });
+            }
+            var paragraph = lead.querySelector('p');
+            if (paragraph) paragraph.classList.add('staff-page-note');
+        }
+
+        content.querySelectorAll('table.staff-table-list').forEach(labelTableCells);
 
         // Toast (cùng id với trang admin để AdminAuth.toast dùng chung) + hộp thoại đổi mật khẩu
         var extra = document.createElement('div');
@@ -145,6 +213,27 @@
             '</form></div></div>';
         document.body.appendChild(extra);
 
+        // ----- Menu trên điện thoại: mở/đóng sidebar -----
+        var sidebar = document.getElementById('staff-sidebar');
+        var overlay = document.getElementById('staff-sidebar-overlay');
+        function openSidebar() {
+            sidebar.classList.add('show');
+            overlay.classList.add('show');
+            document.body.classList.add('staff-sidebar-open');
+        }
+        function closeSidebar() {
+            sidebar.classList.remove('show');
+            overlay.classList.remove('show');
+            document.body.classList.remove('staff-sidebar-open');
+        }
+        document.getElementById('staff-open-sidebar').addEventListener('click', openSidebar);
+        document.getElementById('staff-close-sidebar').addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
+        sidebar.addEventListener('click', function (event) {
+            if (event.target.closest('a')) closeSidebar();
+        });
+        window.addEventListener('resize', function () { if (window.innerWidth >= 992) closeSidebar(); });
+
         function paintSound() {
             var on = soundOn();
             document.querySelector('#staff-sound i').className = 'bi me-2 ' + (on ? 'bi-bell' : 'bi-bell-slash');
@@ -156,10 +245,12 @@
             try { localStorage.setItem('mocStaffSound', soundOn() ? '0' : '1'); } catch (e) { /* bỏ qua */ }
             paintSound();
         });
-        document.getElementById('staff-logout').addEventListener('click', function () {
+        var logout = function () {
             A.logout();
             location.href = '/pages/account.html#login';
-        });
+        };
+        document.getElementById('staff-logout').addEventListener('click', logout);
+        document.getElementById('staff-logout-menu').addEventListener('click', logout);
         document.getElementById('staff-change-password').addEventListener('click', function () {
             document.getElementById('staff-password-form').reset();
             document.getElementById('staff-password-alert').classList.add('d-none');
@@ -192,6 +283,15 @@
         if (main) main.innerHTML = '<div class="alert alert-danger">' + esc(text) + '</div>';
     }
 
+    function pageTitle() {
+        var custom = document.body.getAttribute('data-title');
+        if (custom) return custom;
+        var page = document.body.getAttribute('data-page') || '';
+        var item = NAV.filter(function (n) { return n.href === page; })[0];
+        if (item) return item.text;
+        return String(document.title || '').replace(/\s*-\s*Mộc Coffee$/, '');
+    }
+
     // Mở trang: lấy thông tin + quyền, dựng menu, kiểm tra trang này có được phép không
     async function boot() {
         try {
@@ -202,7 +302,7 @@
             showFatal(err.message || 'Không tải được thông tin tài khoản.');
             return;
         }
-        buildShell();
+        buildShell(pageTitle());
 
         var needs = document.body.getAttribute('data-perm');
         if (needs && !can(needs)) {

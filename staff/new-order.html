@@ -14,10 +14,13 @@
 </head>
 
 <body class="staff-body" data-page="new-order.html" data-perm="orders.create">
-  <header id="staff-header"></header>
+  <div class="staff-main">
+    <div id="staff-shell"></div>
+    <header id="staff-header" hidden></header>
 
-  <main id="staff-content" class="staff-main">
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <main class="staff-content" id="staff-content">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 staff-lead">
       <div>
         <h1 class="h3 staff-title" id="pos-title">Tạo đơn mới</h1>
         <p class="text-secondary mb-0" id="pos-subtitle">Chọn món bên trái, kiểm tra giỏ bên phải rồi bấm tạo đơn.</p>
@@ -86,7 +89,9 @@
         </div>
       </div>
     </div>
-  </main>
+
+    </main>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/confirm-modal.js"></script>

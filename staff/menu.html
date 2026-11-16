@@ -14,9 +14,12 @@
 </head>
 
 <body class="staff-body" data-page="menu.html" data-perm="products.soldout">
-  <header id="staff-header"></header>
+  <div class="staff-main">
+    <div id="staff-shell"></div>
+    <header id="staff-header" hidden></header>
 
-  <main id="staff-content" class="staff-main">
+    <main class="staff-content" id="staff-content">
+
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
       <div>
         <h1 class="h3 staff-title">Hết món hôm nay</h1>
@@ -30,7 +33,9 @@
     <div class="d-flex flex-wrap gap-2 mb-3" id="sold-cats"></div>
     <div class="small text-secondary mb-2" id="sold-summary"></div>
     <div id="sold-grid" class="pos-menu-grid"><div class="text-secondary py-4">Đang tải thực đơn...</div></div>
-  </main>
+
+    </main>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/confirm-modal.js"></script>

@@ -14,9 +14,12 @@
 </head>
 
 <body class="staff-body" data-page="kitchen.html" data-perm="kitchen.view">
-  <header id="staff-header"></header>
+  <div class="staff-main">
+    <div id="staff-shell"></div>
+    <header id="staff-header" hidden></header>
 
-  <main id="staff-content" class="staff-main">
+    <main class="staff-content" id="staff-content">
+
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
       <div>
         <h1 class="h3 staff-title">Màn hình bếp</h1>
@@ -32,7 +35,9 @@
       <section class="kitchen-col"><h2>Đang làm <span class="badge text-bg-warning" id="cnt-preparing">0</span></h2><div id="col-preparing"></div></section>
       <section class="kitchen-col"><h2>Đã xong - chờ phục vụ <span class="badge text-bg-success" id="cnt-ready">0</span></h2><div id="col-ready"></div></section>
     </div>
-  </main>
+
+    </main>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="../assets/js/confirm-modal.js"></script>

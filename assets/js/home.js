@@ -119,6 +119,11 @@ document.addEventListener("DOMContentLoaded", async function () {
               false
             );
 
+          if (window.MocItemSheet) {
+            window.MocItemSheet.open(normalized);
+            return;
+          }
+
           window.MocCoffee.addToCart({
             id: normalized.id,
             name: normalized.name,

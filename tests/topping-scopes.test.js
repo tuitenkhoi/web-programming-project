@@ -69,5 +69,7 @@ test('trang topping của bếp, thẻ tùy chỉnh món và giao diện tại b
         assert.ok(menu.includes(f), `menu.html thiếu ${f}`);
     }
     assert.match(read('assets/js/menu.js'), /MocItemSheet\.open/);
+    assert.match(read('assets/js/home.js'), /MocItemSheet\.open/);
+    assert.ok(read('index.html').includes('item-sheet.js'));
     assert.match(read('database/migrations/010_topping_scopes.sql'), /topping_categories/);
 });

@@ -166,7 +166,7 @@
     var img = el("img", "isheet-img");
     img.alt = "";
     img.src = product.image;
-    img.addEventListener("error", function () { img.src = "../assets/images/products/default-product.jpg"; }, { once: true });
+    img.addEventListener("error", function () { img.src = (/\/pages\//.test(location.pathname) ? "../" : "") + "assets/images/products/default-product.jpg"; }, { once: true });
     var info = el("div", "isheet-info");
     info.append(el("h2", "isheet-name", product.name), el("p", "isheet-base", money(product.price)));
     var closeBtn = el("button", "isheet-close");

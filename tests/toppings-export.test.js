@@ -114,7 +114,7 @@ test('GET /api/toppings: ai cũng xem được, chỉ lấy topping đang bán',
     state.toppings = [{ id: 1, name: 'Trân châu', price: 10000, is_active: 1, sort_order: 1 }];
     const res = await send('GET', '/api/toppings', undefined, {});
     assert.equal(res.status, 200);
-    assert.deepEqual(res.body.data, [{ id: 1, name: 'Trân châu', price: 10000, is_active: true, sort_order: 1 }]);
+    assert.deepEqual(res.body.data, [{ id: 1, name: 'Trân châu', price: 10000, is_active: true, sort_order: 1, scope: { categories: [], include: [], exclude: [] } }]);
     assert.match(lastSql(/FROM toppings/).sql, /WHERE is_active = 1/);
 });
 

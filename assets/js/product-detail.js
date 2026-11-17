@@ -142,9 +142,21 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  let allToppings = null;
+
+  // Chỉ hiện topping áp dụng cho món đang xem (theo danh mục / ngoại lệ do quản trị đặt)
+  function renderForProduct() {
+    if (!allToppings || !currentProduct) return;
+    const list = window.MocCartOptions?.toppingsFor
+      ? window.MocCartOptions.toppingsFor(allToppings, currentProduct.id, currentProduct.categoryId)
+      : allToppings;
+    renderToppings(list);
+  }
+
   async function loadToppings() {
     try {
-      renderToppings(await window.MocCoffeeApi.getToppings());
+      allToppings = await window.MocCoffeeApi.getToppings();
+      renderForProduct();
     } catch (error) {
       console.error("Không thể tải topping:", error);
 
@@ -599,6 +611,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       currentAttachments = rawProduct.attachments || [];
       renderProduct();
+      renderForProduct();
 
       if (currentProduct.soldOut) {
         const addButton = document.querySelector("#add-detail-to-cart");

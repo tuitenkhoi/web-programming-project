@@ -20,6 +20,7 @@ const PERMISSIONS = {
     'orders.payment': ['cashier'],
     'revenue.view': ['cashier'], // doanh thu, dashboard và hóa đơn (mọi thứ liên quan đến tiền)
     'orders.export': [], // xuất hóa đơn ra Excel/CSV/PDF: chỉ admin (không vị trí nhân viên nào được thêm vào đây)
+    'toppings.manage': ['kitchen'],            // bếp thêm / sửa / bật-tắt topping và chọn món áp dụng (không xóa)
     'products.soldout': ['waiter', 'cashier', 'kitchen'], // đánh dấu món hết trong ngày
     'kitchen.view': ['waiter', 'cashier', 'kitchen'],
 };

@@ -4,6 +4,8 @@ const pool = require("../../../config/db");
 const { dbErrorMessage } = require("../../../middleware/dbError");
 const {
     loadActiveToppingPrices,
+    findToppingNotForProduct,
+    toppingNotForProductMessage,
     findUnavailableTopping,
     unavailableToppingMessage,
 } = require("../services/toppings");
@@ -199,7 +201,8 @@ const createOrder = async (req, res) => {
                 p.id,
                 p.name,
                 p.price,
-                p.image
+                p.image,
+                p.category_id
              FROM products AS p
              INNER JOIN categories AS c
                 ON c.id = p.category_id
@@ -242,6 +245,15 @@ const createOrder = async (req, res) => {
             return res.status(400).json({
                 success: false,
                 message: unavailableToppingMessage(unavailableTopping),
+            });
+        }
+
+        const notForProduct = await findToppingNotForProduct(order.items, productMap);
+
+        if (notForProduct) {
+            return res.status(400).json({
+                success: false,
+                message: toppingNotForProductMessage(notForProduct),
             });
         }
 

@@ -13,6 +13,7 @@
         { href: 'kitchen.html', icon: 'bi-fire', text: 'Màn hình bếp', perm: 'kitchen.view', group: 'Phục vụ' },
         { href: 'bookings.html', icon: 'bi-calendar2-check', text: 'Đặt bàn', perm: 'bookings.view', group: 'Phục vụ' },
         { href: 'menu.html', icon: 'bi-slash-circle', text: 'Hết món', perm: 'products.soldout', group: 'Quản lý' },
+        { href: 'toppings.html', icon: 'bi-cup-straw', text: 'Topping', perm: 'toppings.manage', group: 'Quản lý' },
         { href: 'revenue.html', icon: 'bi-graph-up-arrow', text: 'Doanh thu', perm: 'revenue.view', group: 'Quản lý' }
     ];
     var NAV_EXTRA = [

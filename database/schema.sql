@@ -215,6 +215,20 @@ CREATE TABLE IF NOT EXISTS toppings (
     UNIQUE KEY uq_toppings_name (name)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
+-- Topping theo danh mục / món - migration 010
+CREATE TABLE IF NOT EXISTS topping_categories (
+    topping_id INT UNSIGNED NOT NULL,
+    category_id INT UNSIGNED NOT NULL,
+    PRIMARY KEY (topping_id, category_id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS topping_products (
+    topping_id INT UNSIGNED NOT NULL,
+    product_id INT UNSIGNED NOT NULL,
+    allowed TINYINT(1) NOT NULL DEFAULT 1,
+    PRIMARY KEY (topping_id, product_id)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
 -- Hết món theo ngày - migration 009
 CREATE TABLE IF NOT EXISTS product_sold_out (
     product_id INT UNSIGNED NOT NULL PRIMARY KEY,

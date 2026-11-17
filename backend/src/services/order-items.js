@@ -9,6 +9,8 @@ const {
 } = require("../controllers/order.controller");
 const {
     loadActiveToppingPrices,
+    findToppingNotForProduct,
+    toppingNotForProductMessage,
     findUnavailableTopping,
     unavailableToppingMessage,
 } = require("./toppings");
@@ -53,7 +55,7 @@ function parseItems(rawItems) {
 async function priceItems(items) {
     const ids = [...new Set(items.map((item) => item.productId))];
     const [rows] = await pool.execute(
-        `SELECT p.id, p.name, p.price, p.image
+        `SELECT p.id, p.name, p.price, p.image, p.category_id
            FROM products AS p
           INNER JOIN categories AS c ON c.id = p.category_id
           WHERE p.id IN (${ids.map(() => "?").join(", ")})
@@ -84,6 +86,13 @@ async function priceItems(items) {
 
     if (unavailableTopping) {
         const error = new Error(unavailableToppingMessage(unavailableTopping));
+        error.httpStatus = 400;
+        throw error;
+    }
+
+    const notForProduct = await findToppingNotForProduct(items, map);
+    if (notForProduct) {
+        const error = new Error(toppingNotForProductMessage(notForProduct));
         error.httpStatus = 400;
         throw error;
     }

@@ -854,6 +854,8 @@ document.addEventListener("DOMContentLoaded", function () {
    * Danh sách topping đang bán (do admin quản lý).
    * Chỉ tải một lần; nếu lỗi thì lần sau tải lại.
    */
+  let editingProduct = null;
+
   function loadToppings() {
     if (!toppingsPromise) {
       toppingsPromise = window.MocCoffeeApi
@@ -995,10 +997,13 @@ document.addEventListener("DOMContentLoaded", function () {
      * Lấy giá món mới nhất từ máy chủ để đơn giá sau khi sửa luôn đúng
      * (admin có thể đã đổi giá). Không lấy được thì dùng giá đã lưu.
      */
+    editingProduct = null;
     const freshPrice = window.MocCoffeeApi
       .getProductById(item.id)
       .then(function (product) {
         const price = Number(product?.price);
+
+        editingProduct = product || null;
 
         return Number.isFinite(price) ? price : null;
       })
@@ -1020,10 +1025,22 @@ document.addEventListener("DOMContentLoaded", function () {
         editingBasePrice = price;
       }
 
-      renderOptionsToppings(
-        toppings,
-        new Set(item.toppings.map(Options.toppingName))
-      );
+      // chỉ hiện topping áp dụng cho món này; topping đang chọn vẫn giữ để không mất
+      const keep = new Set(item.toppings.map(Options.toppingName));
+      const usable = editingProduct
+        ? toppings.filter(function (topping) {
+            return (
+              keep.has(topping.name) ||
+              Options.appliesTo(
+                topping,
+                Number(editingProduct.id),
+                Number(editingProduct.category_id)
+              )
+            );
+          })
+        : toppings;
+
+      renderOptionsToppings(usable, keep);
 
       editingToppingsReady = true;
     } catch (error) {

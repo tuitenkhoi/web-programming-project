@@ -592,6 +592,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!product || product.soldOut || !window.MocCoffee?.addToCart) return;
 
+    if (window.MocItemSheet) {
+      // mở thẻ tùy chỉnh (size, đường, đá, topping, số lượng, ghi chú)
+      window.MocItemSheet.open(product, {
+        onAdded: function () {
+          showCartToast(product.name);
+        },
+      });
+      return;
+    }
+
     window.MocCoffee.addToCart({
       id: product.id,
       name: product.name,

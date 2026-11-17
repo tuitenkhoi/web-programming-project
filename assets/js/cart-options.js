@@ -141,7 +141,26 @@
     return { cart: changed ? mergeSameItems(next) : cart, removed: removed, priceChanged: priceChanged, changed: changed };
   }
 
+  // Topping có áp dụng cho món này không. PHẢI khớp toppingAppliesTo ở backend/src/services/toppings.js.
+  // topping.scope = { categories: [id], include: [productId], exclude: [productId] }; không có scope = mọi món.
+  function appliesTo(topping, productId, categoryId) {
+    var scope = topping && topping.scope;
+    if (!scope) return true;
+    var categories = scope.categories || [];
+    var include = scope.include || [];
+    var exclude = scope.exclude || [];
+    if (exclude.indexOf(Number(productId)) !== -1) return false;
+    if (!categories.length && !include.length) return true;
+    return include.indexOf(Number(productId)) !== -1 || categories.indexOf(Number(categoryId)) !== -1;
+  }
+
+  function toppingsFor(toppings, productId, categoryId) {
+    return (toppings || []).filter(function (topping) { return appliesTo(topping, productId, categoryId); });
+  }
+
   return {
+    appliesTo: appliesTo,
+    toppingsFor: toppingsFor,
     SIZE_EXTRA: SIZE_EXTRA,
     toppingName: toppingName,
     normalizeToppings: normalizeToppings,

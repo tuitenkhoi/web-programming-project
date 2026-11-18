@@ -26,6 +26,9 @@ function getTransporter() {
 // Trả true nếu đã gửi/ghi log, false nếu gửi lỗi (không ném lỗi để không làm hỏng luồng đăng ký)
 async function sendMail({ to, subject, text, html }) {
     if (!process.env.SMTP_HOST) {
+        if (process.env.NODE_ENV === 'production') {
+            console.warn('[MAIL] Chưa đặt SMTP_HOST nên email KHÔNG được gửi thật. Hãy thêm SMTP_HOST/SMTP_USER/SMTP_PASS trong Render > Environment.');
+        }
         console.log(`[MAIL TRAP] Gửi tới: ${to} | Tiêu đề: ${subject}\n${text}`);
         return true;
     }

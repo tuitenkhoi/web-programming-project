@@ -1,0 +1,185 @@
+/* =========================================================
+   GIAO DIỆN TỐI cho các trang khách (nạp SAU mọi file css khác).
+   Chỉ có tác dụng khi prefs.js đặt data-theme="dark" trên <html>;
+   mặc định (sáng) không bị ảnh hưởng gì.
+   Bảng màu tối: nền #1c1410, thẻ #2a1d17, thẻ nổi #36261e, viền #4d382d,
+   chữ #f3e9df, chữ phụ #c9b5a2, điểm nhấn #e0a56d.
+========================================================= */
+html[data-theme="dark"] {
+  --dk-bg: #1c1410;
+  --dk-surface: #2a1d17;
+  --dk-raised: #36261e;
+  --dk-border: #4d382d;
+  --dk-text: #f3e9df;
+  --dk-muted: #c9b5a2;
+  --dk-accent: #e0a56d;
+  --dk-danger: #ff8a80;
+  --dk-ok: #7fd1a0;
+
+  --bs-body-bg: var(--dk-bg);
+  --bs-body-color: var(--dk-text);
+  --bs-secondary-color: var(--dk-muted);
+  --bs-border-color: var(--dk-border);
+  --bs-link-color: var(--dk-accent);
+  --bs-link-hover-color: #f0c08f;
+  --bs-heading-color: var(--dk-text);
+  --bs-emphasis-color: var(--dk-text);
+}
+
+html[data-theme="dark"] body { background: var(--dk-bg); color: var(--dk-text); }
+html[data-theme="dark"] a:not(.btn):not(.nav-link):not(.navbar-brand) { color: var(--dk-accent); }
+
+/* Các vùng nền sáng cố định */
+html[data-theme="dark"] .bg-light,
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] section.bg-light,
+html[data-theme="dark"] .sticky-filter,
+html[data-theme="dark"] .card-header.bg-white,
+html[data-theme="dark"] .card-footer.bg-white { background-color: var(--dk-bg) !important; }
+html[data-theme="dark"] .sticky-filter { border-color: var(--dk-border) !important; }
+html[data-theme="dark"] .border-bottom, html[data-theme="dark"] .border-top, html[data-theme="dark"] .border { border-color: var(--dk-border) !important; }
+
+/* Thẻ, hộp, bảng */
+html[data-theme="dark"] .card,
+html[data-theme="dark"] .modal-content,
+html[data-theme="dark"] .list-group-item,
+html[data-theme="dark"] .dropdown-menu,
+html[data-theme="dark"] .accordion-item,
+html[data-theme="dark"] .auth-card,
+html[data-theme="dark"] .form-card,
+html[data-theme="dark"] .summary-card,
+html[data-theme="dark"] .payment-card,
+html[data-theme="dark"] .toast {
+  background-color: var(--dk-surface);
+  color: var(--dk-text);
+  border-color: var(--dk-border);
+}
+html[data-theme="dark"] .card-header, html[data-theme="dark"] .card-footer { background-color: var(--dk-surface) !important; border-color: var(--dk-border); }
+html[data-theme="dark"] .table { --bs-table-bg: transparent; --bs-table-color: var(--dk-text); --bs-table-border-color: var(--dk-border); --bs-table-striped-bg: var(--dk-raised); --bs-table-hover-bg: var(--dk-raised); color: var(--dk-text); }
+html[data-theme="dark"] .table th { background-color: var(--dk-raised) !important; color: var(--dk-text) !important; }
+
+/* Chữ */
+html[data-theme="dark"] h1, html[data-theme="dark"] h2, html[data-theme="dark"] h3,
+html[data-theme="dark"] h4, html[data-theme="dark"] h5, html[data-theme="dark"] h6,
+html[data-theme="dark"] .card-title, html[data-theme="dark"] .section-title,
+html[data-theme="dark"] label, html[data-theme="dark"] .form-label, html[data-theme="dark"] .form-check-label,
+html[data-theme="dark"] .card-header h2, html[data-theme="dark"] strong { color: var(--dk-text); }
+html[data-theme="dark"] .text-secondary, html[data-theme="dark"] .text-muted, html[data-theme="dark"] .form-text,
+html[data-theme="dark"] small.text-secondary, html[data-theme="dark"] .cart-product-option { color: var(--dk-muted) !important; }
+html[data-theme="dark"] .text-danger { color: var(--dk-danger) !important; }
+html[data-theme="dark"] .text-success { color: var(--dk-ok) !important; }
+html[data-theme="dark"] .text-uppercase.text-secondary { color: var(--dk-accent) !important; }
+
+/* Ô nhập liệu */
+html[data-theme="dark"] .form-control,
+html[data-theme="dark"] .form-select,
+html[data-theme="dark"] .input-group-text,
+html[data-theme="dark"] textarea {
+  background-color: var(--dk-raised);
+  color: var(--dk-text);
+  border-color: var(--dk-border);
+}
+html[data-theme="dark"] .form-control::placeholder, html[data-theme="dark"] textarea::placeholder { color: #a8927f; opacity: 1; }
+html[data-theme="dark"] .form-control:focus, html[data-theme="dark"] .form-select:focus { background-color: var(--dk-raised); color: var(--dk-text); border-color: var(--dk-accent); box-shadow: 0 0 0 .2rem rgba(224, 165, 109, .25); }
+html[data-theme="dark"] .form-select { --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23c9b5a2' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e"); }
+html[data-theme="dark"] .form-check-input { background-color: var(--dk-raised); border-color: var(--dk-muted); }
+html[data-theme="dark"] .form-check-input:checked { background-color: #6f4e37; border-color: var(--dk-accent); }
+html[data-theme="dark"] .form-control:disabled, html[data-theme="dark"] .form-select:disabled { opacity: .6; }
+
+/* Nút */
+html[data-theme="dark"] .btn-outline-coffee { color: var(--dk-accent); border-color: var(--dk-accent); background: transparent; }
+html[data-theme="dark"] .btn-outline-coffee:hover, html[data-theme="dark"] .btn-outline-coffee:focus-visible,
+html[data-theme="dark"] .btn-outline-coffee.active { color: #fff; background: #6f4e37; border-color: #6f4e37; }
+html[data-theme="dark"] .btn-outline-secondary { color: var(--dk-muted); border-color: var(--dk-border); }
+html[data-theme="dark"] .btn-outline-secondary:hover { color: var(--dk-text); background: var(--dk-raised); }
+html[data-theme="dark"] .btn-outline-danger { color: var(--dk-danger); border-color: var(--dk-danger); }
+html[data-theme="dark"] .btn-outline-danger:hover { color: #1c1410; background: var(--dk-danger); }
+html[data-theme="dark"] .btn-link { color: var(--dk-accent); }
+html[data-theme="dark"] .btn-light { color: #2a1d17; }
+html[data-theme="dark"] .category-btn.active, html[data-theme="dark"] .btn-coffee { color: #fff; }
+html[data-theme="dark"] .btn-close { filter: invert(1) grayscale(1); }
+
+/* Breadcrumb + các bước đặt hàng */
+html[data-theme="dark"] .breadcrumb-item a { color: var(--dk-accent); }
+html[data-theme="dark"] .breadcrumb-item.active { color: var(--dk-muted); }
+html[data-theme="dark"] .breadcrumb-item + .breadcrumb-item::before { color: var(--dk-muted); }
+html[data-theme="dark"] .step-number { background: var(--dk-raised); color: var(--dk-muted); }
+html[data-theme="dark"] .step-label { color: var(--dk-muted); }
+html[data-theme="dark"] .step.active .step-label, html[data-theme="dark"] .step.completed .step-label { color: var(--dk-text); }
+html[data-theme="dark"] .step-line, html[data-theme="dark"] .step-connector { background: var(--dk-border); }
+
+/* Giỏ hàng */
+html[data-theme="dark"] .cart-product-image, html[data-theme="dark"] .product-thumbnail { background-color: var(--dk-raised); }
+html[data-theme="dark"] .quantity-button { background: var(--dk-raised); color: var(--dk-text); border-color: var(--dk-border); }
+html[data-theme="dark"] .service-option { background: var(--dk-raised); color: var(--dk-text); border-color: var(--dk-border); }
+html[data-theme="dark"] .service-option:has(input:checked), html[data-theme="dark"] .service-option.active { border-color: var(--dk-accent); background: #44302a; }
+html[data-theme="dark"] .payment-method-badge { background: var(--dk-raised); color: var(--dk-accent); border-color: var(--dk-border); }
+html[data-theme="dark"] .alert { border-color: var(--dk-border); }
+html[data-theme="dark"] .alert-warning { background: #3d2f17; color: #f2d9a0; }
+html[data-theme="dark"] .alert-info { background: #1f3340; color: #bfe0f5; }
+html[data-theme="dark"] .alert-success { background: #1d3527; color: #bfe8cd; }
+html[data-theme="dark"] .alert-danger { background: #40211f; color: #ffc9c4; }
+html[data-theme="dark"] .alert-secondary { background: var(--dk-raised); color: var(--dk-text); }
+html[data-theme="dark"] .badge.bg-light { color: #2a1d17; }
+html[data-theme="dark"] hr { border-color: var(--dk-border); opacity: 1; }
+
+/* Thanh dưới: giỏ hàng & tổng cộng cố định */
+html[data-theme="dark"] .mobile-checkout-bar,
+html[data-theme="dark"] .cart-summary-bar,
+html[data-theme="dark"] .sticky-total,
+html[data-theme="dark"] .cart-checkout-bar { background: var(--dk-surface); color: var(--dk-text); border-color: var(--dk-border); }
+
+/* Thẻ tùy chỉnh món (item-sheet) và giao diện tại bàn (table-menu) */
+html[data-theme="dark"] .isheet-panel, html[data-theme="dark"] .isheet-foot,
+html[data-theme="dark"] .tm-sheet-panel { background: var(--dk-surface); color: var(--dk-text); }
+html[data-theme="dark"] .isheet-head, html[data-theme="dark"] .isheet-foot,
+html[data-theme="dark"] .tm-sheet-head, html[data-theme="dark"] .tm-sheet-foot, html[data-theme="dark"] .tm-line { border-color: var(--dk-border); }
+html[data-theme="dark"] .isheet-name, html[data-theme="dark"] .isheet-title, html[data-theme="dark"] .tm-sheet-head h2 { color: var(--dk-text); }
+html[data-theme="dark"] .isheet-base, html[data-theme="dark"] .tm-line-price { color: var(--dk-accent); }
+html[data-theme="dark"] .isheet-img { background: var(--dk-raised); }
+html[data-theme="dark"] .isheet-close, html[data-theme="dark"] .tm-sheet-x, html[data-theme="dark"] .isheet-stepper, html[data-theme="dark"] .tm-step { background: var(--dk-raised); color: var(--dk-text); }
+html[data-theme="dark"] .isheet-step, html[data-theme="dark"] .tm-step button { color: var(--dk-text); }
+html[data-theme="dark"] .isheet-chip, html[data-theme="dark"] .isheet-topping, html[data-theme="dark"] .isheet-note { background: var(--dk-raised); color: var(--dk-text); border-color: var(--dk-border); }
+html[data-theme="dark"] .isheet-chip small, html[data-theme="dark"] .isheet-muted, html[data-theme="dark"] .tm-line-info small, html[data-theme="dark"] .tm-sheet-note { color: var(--dk-muted); }
+html[data-theme="dark"] .isheet-chip.is-on { background: #6f4e37; border-color: var(--dk-accent); color: #fff; }
+html[data-theme="dark"] .isheet-chip.is-on small { color: rgba(255, 255, 255, .85); }
+html[data-theme="dark"] .isheet-topping.is-on { background: #44302a; border-color: var(--dk-accent); }
+html[data-theme="dark"] .isheet-add, html[data-theme="dark"] .tm-go { color: #fff; }
+html[data-theme="dark"] body.table-mode { background: var(--dk-bg); }
+html[data-theme="dark"] body.table-mode .sticky-filter { background: var(--dk-bg) !important; box-shadow: 0 2px 8px rgba(0, 0, 0, .4); }
+html[data-theme="dark"] body.table-mode .product-card-list { border-color: var(--dk-border); background: transparent; }
+html[data-theme="dark"] body.table-mode .product-list-price { color: var(--dk-accent); }
+html[data-theme="dark"] body.table-mode section.bg-light:has(#product-list) { background: var(--dk-bg) !important; }
+
+/* Ảnh không bị chói trên nền tối */
+html[data-theme="dark"] img:not([src$=".svg"]) { filter: brightness(.92); }
+html[data-theme="dark"] .isheet-img, html[data-theme="dark"] .product-list-row img { filter: brightness(.92); }
+
+/* Ghi đè các chỗ style cũ có độ ưu tiên cao hơn (tiêu đề, giá, thanh bảng, ô chọn) */
+html[data-theme="dark"] body :is(h1, h2, h3, h4, h5, h6):not(.text-white):not(.btn) { color: var(--dk-text); }
+html[data-theme="dark"] body .text-danger { color: var(--dk-danger) !important; }
+html[data-theme="dark"] body .card-body .text-danger,
+html[data-theme="dark"] body .product-card .text-danger { color: var(--dk-accent) !important; }
+html[data-theme="dark"] body .table thead th,
+html[data-theme="dark"] body .table > :not(caption) > * > th { background-color: var(--dk-raised) !important; color: var(--dk-text) !important; border-color: var(--dk-border); }
+html[data-theme="dark"] body .product-option-box,
+html[data-theme="dark"] body .product-service-item,
+html[data-theme="dark"] body .payment-option,
+html[data-theme="dark"] body .area-option,
+html[data-theme="dark"] body .payment-detail-box,
+html[data-theme="dark"] body .product-detail-image-wrapper { background-color: var(--dk-raised); color: var(--dk-text); border-color: var(--dk-border); }
+html[data-theme="dark"] body .product-option-box:has(input:checked),
+html[data-theme="dark"] body .payment-option:has(input:checked),
+html[data-theme="dark"] body .area-option:has(input:checked) { background-color: #44302a; border-color: var(--dk-accent); }
+html[data-theme="dark"] body .process-icon { background: var(--dk-raised); color: var(--dk-accent); }
+html[data-theme="dark"] body .btn-light, html[data-theme="dark"] body .btn-outline-light.active { background: #f3e9df; color: #2a1d17; }
+html[data-theme="dark"] body.inner-page #product-name { color: var(--dk-text); }
+html[data-theme="dark"] body.inner-page #product-price { color: var(--dk-accent) !important; }
+html[data-theme="dark"] body.inner-page .success-code-box { background-color: #1d3527; }
+html[data-theme="dark"] body.inner-page .area-option span.fw-semibold,
+html[data-theme="dark"] body .area-option .fw-semibold { color: var(--dk-text); }
+html[data-theme="dark"] #moc-pay-bar { background: var(--dk-surface); border-top: 1px solid var(--dk-border); box-shadow: 0 -4px 16px rgba(0, 0, 0, .5); }
+html[data-theme="dark"] #moc-pay-bar small { color: var(--dk-muted); }
+html[data-theme="dark"] #moc-pay-bar strong { color: var(--dk-accent); }
+/* Giao diện tại bàn: bỏ khối mời đặt bàn ở cuối trang cho gọn */
+body.table-mode .booking-callout { display: none !important; }

@@ -951,6 +951,22 @@ document.addEventListener("DOMContentLoaded", function () {
       resetProductForm
     );
 
+        // Mở thẳng biểu mẫu thêm món từ Dashboard.
+    const quickActionUrl = new URL(window.location.href);
+
+    if (quickActionUrl.searchParams.get("action") === "create") {
+      resetProductForm();
+      showModal("#product-form-modal");
+
+      quickActionUrl.searchParams.delete("action");
+
+      window.history.replaceState(
+        {},
+        "",
+        quickActionUrl.pathname + quickActionUrl.search + quickActionUrl.hash
+      );
+    }
+
     $("#admin-product-description")?.addEventListener(
       "input",
       function () {
